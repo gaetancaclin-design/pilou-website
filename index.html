@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pilou — Vos médicaments, en 10 secondes</title>
+<meta name="description" content="Pilulier numérique intelligent. Scannez votre ordonnance, validez vos prises, recevez vos rappels. Sans compte. Sans inscription. Application française.">
+<meta property="og:title" content="Pilou — Vos médicaments, en 10 secondes">
+<meta property="og:description" content="Pilulier numérique intelligent. Scannez votre ordonnance, validez vos prises, recevez vos rappels. Sans compte. Application française.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pilou-app.fr">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://pilou-app.fr">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#4a6d52;
+  --brand-light:#eef4ef;
+  --brand-mid:#6b9575;
+  --brand-dark:#35503c;
+  --ink:#18181b;
+  --ink-light:#3f3f46;
+  --muted:#71717a;
+  --muted-light:#a1a1aa;
+  --surface:#f4f4f5;
+  --surface-warm:#fafaf9;
+  --white:#ffffff;
+  --border:#e4e4e7;
+  --border-light:#f0f0f0;
+  --radius-sm:8px;
+  --radius:16px;
+  --radius-lg:24px;
+  --radius-xl:32px;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;
+  color:var(--ink);
+  background:var(--white);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── UTILITAIRES ── */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.container{max-width:680px;margin:0 auto;padding:0 24px}
+a{text-decoration:none;color:inherit}
+
+/* ── NAVIGATION ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.88);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:0.5px solid var(--border);
+  padding:0 24px;
+  height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-mark{
+  width:34px;height:34px;
+  background:var(--brand);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.nav-logo-mark svg{width:18px;height:18px;fill:white}
+.nav-logo-name{font-size:17px;font-weight:700;letter-spacing:-0.4px;color:var(--ink)}
+.nav-pill{
+  font-size:11px;font-weight:700;
+  color:var(--brand);
+  background:var(--brand-light);
+  border:0.5px solid rgba(74,109,82,0.25);
+  padding:3px 9px;border-radius:20px;
+  letter-spacing:0.1px;
+}
+.nav-cta{
+  background:var(--brand);color:white;
+  padding:9px 20px;border-radius:20px;
+  font-size:14px;font-weight:600;
+  border:none;cursor:pointer;
+  transition:opacity .15s;
+}
+.nav-cta:hover{opacity:.88}
+
+/* ── HERO ── */
+.hero{
+  padding:72px 24px 56px;
+  text-align:center;
+  max-width:680px;margin:0 auto;
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--brand-light);
+  color:var(--brand);
+  border:0.5px solid rgba(74,109,82,0.2);
+  padding:6px 14px;border-radius:20px;
+  font-size:13px;font-weight:600;
+  margin-bottom:28px;
+}
+.hero-tag-dot{width:6px;height:6px;background:var(--brand);border-radius:50%;flex-shrink:0}
+h1{
+  font-size:clamp(36px,8vw,52px);
+  font-weight:800;
+  line-height:1.08;
+  letter-spacing:-2px;
+  color:var(--ink);
+  margin-bottom:20px;
+}
+h1 em{font-style:normal;color:var(--brand)}
+.hero-sub{
+  font-size:18px;color:var(--muted);
+  line-height:1.65;
+  max-width:460px;margin:0 auto 40px;
+  font-weight:400;
+}
+.hero-actions{
+  display:flex;gap:12px;justify-content:center;
+  flex-wrap:wrap;margin-bottom:48px;
+}
+.btn-primary{
+  background:var(--brand);color:white;
+  padding:15px 28px;border-radius:14px;
+  font-size:16px;font-weight:700;
+  border:none;cursor:pointer;
+  display:inline-flex;align-items:center;gap:9px;
+  transition:opacity .15s,transform .1s;
+}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-ghost{
+  background:transparent;color:var(--ink);
+  padding:15px 28px;border-radius:14px;
+  font-size:16px;font-weight:500;
+  border:0.5px solid var(--border);
+  cursor:pointer;
+  display:inline-flex;align-items:center;gap:9px;
+  transition:background .15s;
+}
+.btn-ghost:hover{background:var(--surface)}
+
+.trust-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:24px;flex-wrap:wrap;
+}
+.trust-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;color:var(--muted);font-weight:500;
+}
+.trust-item svg{width:15px;height:15px;flex-shrink:0;color:var(--brand)}
+
+/* ── MOCKUP PHONE ── */
+.phone-wrap{
+  max-width:320px;margin:56px auto;
+  padding:0 24px;
+}
+.phone{
+  background:white;
+  border-radius:40px;
+  border:0.5px solid var(--border);
+  overflow:hidden;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.04),
+    0 20px 60px rgba(0,0,0,0.08),
+    0 8px 20px rgba(0,0,0,0.04);
+}
+.phone-header{
+  background:var(--brand-light);
+  padding:18px 18px 10px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.phone-logo-row{display:flex;align-items:center;gap:8px}
+.phone-logo-sq{width:30px;height:30px;background:var(--brand);border-radius:9px;flex-shrink:0}
+.phone-title{font-size:17px;font-weight:700;letter-spacing:-0.3px}
+.phone-subtitle{padding:14px 18px 6px}
+.phone-subtitle h3{font-size:19px;font-weight:800;letter-spacing:-0.5px}
+.phone-subtitle p{font-size:12px;color:var(--muted);margin-top:2px}
+.dose-card{
+  margin:6px 16px;
+  background:white;
+  border-radius:16px;
+  border:0.5px solid var(--border);
+  padding:13px;
+}
+.dose-row{display:flex;align-items:center;gap:11px}
+.dose-ico{
+  width:42px;height:42px;border-radius:12px;
+  background:var(--brand-light);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.dose-ico svg{width:20px;height:20px;stroke:var(--brand);fill:none;stroke-width:2;stroke-linecap:round}
+.dose-name{font-size:14px;font-weight:700;color:var(--ink)}
+.dose-meta{font-size:11px;color:var(--muted);margin-top:1px}
+.dose-btn{
+  margin-top:10px;
+  background:var(--brand);color:white;
+  border:none;border-radius:10px;
+  padding:10px 0;width:100%;
+  font-size:13px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.done-card{
+  margin:8px 16px 18px;
+  background:var(--brand-light);
+  border-radius:16px;
+  border:0.5px solid rgba(74,109,82,0.15);
+  padding:18px;text-align:center;
+}
+.done-circle{
+  width:48px;height:48px;
+  background:var(--brand);border-radius:50%;
+  margin:0 auto 10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.done-circle svg{width:22px;height:22px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round}
+.done-title{font-size:15px;font-weight:700;color:var(--ink)}
+.done-sub{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* ── SECTIONS ── */
+section{padding:64px 24px}
+.section-inner{max-width:680px;margin:0 auto}
+.eyebrow{
+  font-size:12px;font-weight:700;
+  color:var(--brand);
+  text-transform:uppercase;letter-spacing:1.2px;
+  margin-bottom:12px;
+}
+h2{
+  font-size:clamp(26px,5vw,34px);
+  font-weight:800;letter-spacing:-0.8px;
+  line-height:1.15;margin-bottom:14px;
+}
+.section-lead{
+  font-size:17px;color:var(--muted);
+  line-height:1.65;margin-bottom:40px;
+  max-width:520px;
+}
+
+/* ── FEATURES ── */
+.features-bg{background:var(--surface-warm)}
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:14px;
+}
+.feat{
+  background:white;
+  border:0.5px solid var(--border);
+  border-radius:20px;
+  padding:22px;
+}
+.feat-icon{
+  width:44px;height:44px;
+  background:var(--brand-light);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:14px;
+}
+.feat-icon svg{width:22px;height:22px;stroke:var(--brand);fill:none;stroke-width:1.8;stroke-linecap:round}
+.feat-name{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.feat-desc{font-size:14px;color:var(--muted);line-height:1.6}
+.feat-badge{
+  display:inline-block;
+  font-size:11px;font-weight:700;
+  color:var(--brand);
+  background:var(--brand-light);
+  padding:3px 8px;border-radius:6px;
+  margin-top:10px;
+}
+
+/* ── PRICING ── */
+.pricing-bg{background:white}
+.pricing-grid{display:flex;flex-direction:column;gap:12px}
+.price-card{
+  background:var(--surface-warm);
+  border:0.5px solid var(--border);
+  border-radius:20px;padding:22px;
+  position:relative;
+}
+.price-card.featured{
+  background:white;
+  border:1.5px solid var(--brand);
+}
+.featured-badge{
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  background:var(--brand);color:white;
+  font-size:11px;font-weight:700;
+  padding:4px 14px;border-radius:20px;
+  white-space:nowrap;letter-spacing:0.2px;
+}
+.price-tier{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.price-amount{font-size:36px;font-weight:800;letter-spacing:-1.5px;color:var(--ink)}
+.price-period{font-size:14px;color:var(--muted);font-weight:400;margin-left:3px}
+.price-annual{font-size:12px;color:var(--brand);font-weight:600;margin-top:2px}
+.price-desc{font-size:14px;color:var(--muted);margin:10px 0 16px;line-height:1.5}
+.price-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.price-item{display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--ink)}
+.check-circle{
+  width:17px;height:17px;
+  background:var(--brand-light);
+  border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:1px;
+}
+.check-circle svg{width:9px;height:9px;stroke:var(--brand);fill:none;stroke-width:3;stroke-linecap:round}
+.price-btn-primary{
+  width:100%;padding:13px;
+  background:var(--brand);color:white;
+  border:none;border-radius:11px;
+  font-size:14px;font-weight:700;cursor:pointer;
+  transition:opacity .15s;
+}
+.price-btn-primary:hover{opacity:.88}
+.price-btn-secondary{
+  width:100%;padding:13px;
+  background:transparent;color:var(--ink);
+  border:0.5px solid var(--border);
+  border-radius:11px;font-size:14px;font-weight:500;cursor:pointer;
+  transition:background .15s;
+}
+.price-btn-secondary:hover{background:var(--surface)}
+
+/* ── TRUST ── */
+.trust-section{background:var(--brand);color:white;padding:64px 24px}
+.trust-section h2{color:white}
+.trust-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;margin-top:32px;
+}
+.trust-card{
+  background:rgba(255,255,255,0.1);
+  border:0.5px solid rgba(255,255,255,0.18);
+  border-radius:16px;padding:18px;
+}
+.trust-card-icon{
+  width:34px;height:34px;
+  background:rgba(255,255,255,0.15);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:10px;
+}
+.trust-card-icon svg{width:17px;height:17px;stroke:white;fill:none;stroke-width:1.8;stroke-linecap:round}
+.trust-card-title{font-size:14px;font-weight:700;color:white;margin-bottom:4px}
+.trust-card-desc{font-size:12px;color:rgba(255,255,255,0.65);line-height:1.55}
+
+/* ── CONFIDENTIALITE ── */
+.confidentialite-section{background:var(--surface-warm);padding:64px 24px}
+.legal-card{
+  background:white;
+  border:0.5px solid var(--border);
+  border-radius:20px;padding:28px;
+  display:flex;flex-direction:column;gap:24px;
+}
+.legal-section-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.legal-section-body{font-size:14px;color:var(--muted);line-height:1.7}
+.legal-section-body strong{color:var(--ink);font-weight:600}
+.legal-update{font-size:12px;color:var(--muted-light);margin-bottom:20px}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--ink);color:white;
+  padding:44px 24px 32px;
+}
+.footer-inner{max-width:680px;margin:0 auto}
+.footer-logo-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.footer-sq{width:28px;height:28px;background:var(--brand);border-radius:8px;flex-shrink:0}
+.footer-name{font-size:16px;font-weight:700;letter-spacing:-0.3px}
+.footer-tagline{font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:28px;line-height:1.5}
+.footer-links{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:28px}
+.footer-links a{font-size:13px;color:rgba(255,255,255,0.5);transition:color .15s}
+.footer-links a:hover{color:rgba(255,255,255,0.85)}
+.footer-bottom{
+  border-top:0.5px solid rgba(255,255,255,0.08);
+  padding-top:20px;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  font-size:12px;color:rgba(255,255,255,0.35);
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:480px){
+  h1{letter-spacing:-1.2px}
+  .trust-grid{grid-template-columns:1fr}
+  .nav-pill{display:none}
+  .hero{padding:56px 20px 44px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="8" rx="4"/><circle cx="9" cy="10" r="3"/><circle cx="15" cy="10" r="3"/></svg>
+    </div>
+    <span class="nav-logo-name">Pilou</span>
+    <span class="nav-pill">Application française</span>
+  </div>
+  <a href="#telecharger" class="nav-cta">Télécharger</a>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">
+    <div class="hero-tag-dot"></div>
+    Disponible sur Android
+  </div>
+  <h1>Vos médicaments,<br><em>en 10 secondes</em></h1>
+  <p class="hero-sub">Scannez votre ordonnance. Pilou lit vos médicaments, posologies et durées automatiquement. Sans compte. Sans inscription.</p>
+  <div class="hero-actions">
+    <a href="#telecharger" class="btn-primary" id="telecharger">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+      Télécharger sur Android
+    </a>
+    <a href="#fonctionnalites" class="btn-ghost">
+      Découvrir Pilou
+    </a>
+  </div>
+  <div class="trust-row">
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Données 100% locales
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+      Sans compte
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      Made in France
+    </div>
+  </div>
+</div>
+
+<!-- PHONE MOCKUP -->
+<div class="phone-wrap">
+  <div class="phone" aria-hidden="true">
+    <div class="phone-header">
+      <div class="phone-logo-row">
+        <div class="phone-logo-sq"></div>
+        <span class="phone-title">Pilou</span>
+      </div>
+    </div>
+    <div class="phone-subtitle">
+      <h3>À prendre</h3>
+      <p>Matin · Dimanche 5 juillet</p>
+    </div>
+    <div class="dose-card">
+      <div class="dose-row">
+        <div class="dose-ico">
+          <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="8" rx="4"/><circle cx="9" cy="10" r="3"/><circle cx="15" cy="10" r="3"/></svg>
+        </div>
+        <div>
+          <div class="dose-name">Levothyrox 50 µg</div>
+          <div class="dose-meta">Matin · 07:30 · 1 comprimé</div>
+        </div>
+      </div>
+      <button class="dose-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+        Valider la prise
+      </button>
+    </div>
+    <div class="done-card">
+      <div class="done-circle">
+        <svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg>
+      </div>
+      <div class="done-title">Toutes vos prises du jour</div>
+      <div class="done-sub">Ce soir à 19h00</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features-bg" id="fonctionnalites">
+  <div class="section-inner">
+    <div class="eyebrow">Fonctionnalités</div>
+    <h2>Tout ce dont vous avez besoin,<br>rien de plus</h2>
+    <p class="section-lead">Conçu pour les patients. Chaque fonctionnalité a été pensée pour être simple, fiable et respectueuse de vos données.</p>
+    <div class="features-grid">
+
+      <div class="feat">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/><circle cx="15" cy="15" r="2"/></svg>
+        </div>
+        <div class="feat-name">Scan d'ordonnance par IA</div>
+        <div class="feat-desc">Photographiez votre ordonnance. Pilou extrait automatiquement médicaments, posologies, durées et créneaux de prise. En quelques secondes.</div>
+        <span class="feat-badge">Exclusif Pilou</span>
+      </div>
+
+      <div class="feat">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+        </div>
+        <div class="feat-name">Données 100% locales</div>
+        <div class="feat-desc">Médicaments, posologies et historique stockés uniquement sur votre appareil. Aucun compte requis. Aucun serveur. Conforme RGPD.</div>
+      </div>
+
+      <div class="feat">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1m-2 0H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h12"/><path d="M6 8V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"/></svg>
+        </div>
+        <div class="feat-name">Rappels intelligents</div>
+        <div class="feat-desc">Notifications précises à chaque créneau de prise. Pilou vous rappelle même quand l'application est fermée.</div>
+      </div>
+
+      <div class="feat">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6m-4 5H8m4 4H8m2-8H8"/></svg>
+        </div>
+        <div class="feat-name">Bilan médical PDF</div>
+        <div class="feat-desc">Exportez un document complet avec votre observance, vos dosages réels et l'historique de vos prises. Prêt à partager avec votre médecin.</div>
+        <span class="feat-badge">Pilou+</span>
+      </div>
+
+      <div class="feat">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <div class="feat-name">Suivi des stocks</div>
+        <div class="feat-desc">Saisissez la quantité dans votre boîte. Pilou calcule les jours restants et vous prévient avant d'être à court.</div>
+        <span class="feat-badge">Pilou+</span>
+      </div>
+
+      <div class="feat">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 7h-9m9 5h-7m7 5h-9M4 5l2-2 2 2M4 12l2-2 2 2M4 19l2-2 2 2"/></svg>
+        </div>
+        <div class="feat-name">Trousse voyage</div>
+        <div class="feat-desc">Pilou calcule exactement la quantité de médicaments à emporter pour la durée de votre séjour.</div>
+        <span class="feat-badge">Pilou+</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-bg" id="tarifs">
+  <div class="section-inner">
+    <div class="eyebrow">Tarifs</div>
+    <h2>Simple. Transparent.<br>Sans surprise.</h2>
+    <p class="section-lead">Commencez gratuitement. Passez à Pilou+ uniquement si vous avez besoin de plus.</p>
+    <div class="pricing-grid">
+
+      <div class="price-card">
+        <div class="price-tier">Gratuit</div>
+        <div><span class="price-amount">0€</span></div>
+        <div class="price-desc">Pour découvrir Pilou et commencer votre suivi.</div>
+        <ul class="price-list">
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>5 médicaments</li>
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>1 scan OCR par mois</li>
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>14 jours d'historique</li>
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Rappels illimités</li>
+        </ul>
+        <button class="price-btn-secondary" onclick="document.querySelector('#telecharger').click()">Commencer gratuitement</button>
+      </div>
+
+      <div class="price-card">
+        <div class="price-tier">Essentiel</div>
+        <div>
+          <span class="price-amount">1,49€</span><span class="price-period">/mois</span>
+        </div>
+        <div class="price-annual">ou 11,99€/an — 2 mois offerts</div>
+        <div class="price-desc">Pour les patients avec plusieurs traitements.</div>
+        <ul class="price-list">
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>15 médicaments</li>
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>3 scans OCR par mois</li>
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>30 jours d'historique</li>
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Alertes fin de traitement</li>
+        </ul>
+        <button class="price-btn-secondary" onclick="document.querySelector('#telecharger').click()">Choisir Essentiel</button>
+      </div>
+
+      <div class="price-card featured">
+        <div class="featured-badge">Le plus complet</div>
+        <div class="price-tier">Pilou+</div>
+        <div>
+          <span class="price-amount">3,99€</span><span class="price-period">/mois</span>
+        </div>
+        <div class="price-annual">ou 29,99€/an — 2 mois offerts</div>
+        <div class="price-desc">L'expérience Pilou complète, sans limite.</div>
+        <ul class="price-list">
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Médicaments illimités</li>
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>30 scans OCR par mois</li>
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>90 jours d'historique</li>
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Suivi des stocks</li>
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Trousse voyage</li>
+          <li class="price-item"><div class="check-circle"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Export PDF médical</li>
+        </ul>
+        <button class="price-btn-primary" onclick="document.querySelector('#telecharger').click()">Commencer avec Pilou+</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TRUST / RGPD -->
+<section class="trust-section" aria-label="Confiance et sécurité">
+  <div class="section-inner">
+    <div class="eyebrow" style="color:rgba(255,255,255,0.55)">Confiance</div>
+    <h2>Conçu pour vos données de santé</h2>
+    <div class="trust-grid">
+      <div class="trust-card">
+        <div class="trust-card-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="trust-card-title">100% local</div>
+        <div class="trust-card-desc">Vos données restent sur votre téléphone. Jamais sur nos serveurs.</div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <div class="trust-card-title">Sans compte</div>
+        <div class="trust-card-desc">Aucune inscription. Aucun email. Aucun mot de passe.</div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-card-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div class="trust-card-title">Hébergé en France</div>
+        <div class="trust-card-desc">Analyse OCR sur serveur Paris (Vertex AI, Google UE). Conforme RGPD.</div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-card-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+        <div class="trust-card-title">RGPD conforme</div>
+        <div class="trust-card-desc">Politique de confidentialité complète. Droit à l'effacement respecté.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POLITIQUE DE CONFIDENTIALITE -->
+<section class="confidentialite-section" id="confidentialite">
+  <div class="section-inner">
+    <div class="eyebrow">Légal</div>
+    <h2>Politique de confidentialité</h2>
+    <p class="legal-update">Dernière mise à jour : juin 2026</p>
+    <div class="legal-card">
+
+      <div>
+        <div class="legal-section-title">1. Responsable du traitement</div>
+        <div class="legal-section-body">
+          L'éditeur de l'application Pilou est responsable du traitement de vos données personnelles au sens du Règlement général sur la protection des données (RGPD). Pour toute question relative à vos données ou pour exercer vos droits, vous pouvez le contacter à l'adresse : <a href="mailto:agc.logiciels@gmail.com" style="color:var(--brand)">agc.logiciels@gmail.com</a>.
+        </div>
+      </div>
+
+      <div>
+        <div class="legal-section-title">2. Vos données restent sur votre téléphone</div>
+        <div class="legal-section-body">
+          Pilou est conçue pour minimiser la collecte de données. L'intégralité de vos données de santé — traitements, posologies et historique de prise — est stockée <strong>exclusivement dans la mémoire locale de votre appareil</strong>. L'éditeur ne dispose d'aucun serveur de base de données centralisé : ces données ne sont transmises ni à l'éditeur, ni à un tiers, et ne quittent pas votre téléphone.
+        </div>
+      </div>
+
+      <div>
+        <div class="legal-section-title">3. Analyse des ordonnances</div>
+        <div class="legal-section-body">
+          <p>Lorsque vous choisissez de photographier une ordonnance, l'image est transmise, de façon chiffrée (HTTPS/TLS), à notre sous-traitant technique <strong>Google (service Vertex AI)</strong>, à la seule fin d'en extraire automatiquement le texte. C'est le seul traitement réalisé en dehors de votre appareil.</p>
+          <br>
+          <p>Ce traitement a lieu <strong>au sein de l'Union européenne, dans la région de Paris</strong>. Pilou ne conserve pas l'image, et Google ne l'utilise pas pour entraîner ses modèles d'intelligence artificielle.</p>
+          <br>
+          <p>Conformément à la politique de gouvernance des données de Google, l'image et le texte extrait peuvent faire l'objet d'une conservation temporaire et limitée — une mise en cache technique de courte durée (jusqu'à 24 heures) et, en cas de détection d'activité suspecte, une journalisation à des fins de prévention des abus (jusqu'à 90 jours) — au sein de l'Union européenne, avant suppression.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="legal-section-title">4. Base légale</div>
+        <div class="legal-section-body">
+          Les informations figurant sur une ordonnance sont des données de santé, qui relèvent d'une catégorie particulière protégée par l'article 9 du RGPD. Leur traitement repose sur votre <strong>consentement explicite</strong>, que vous donnez au moment où vous décidez de scanner une ordonnance. Vous pouvez à tout moment renoncer au scan et saisir vos traitements manuellement, sans aucune transmission externe.
+        </div>
+      </div>
+
+      <div>
+        <div class="legal-section-title">5. Durées de conservation</div>
+        <div class="legal-section-body">
+          Vos données locales sont conservées sur votre appareil tant que vous ne les supprimez pas. L'image d'ordonnance n'est pas conservée par Pilou ; sa conservation temporaire éventuelle chez Google est limitée aux durées indiquées au point 3.
+        </div>
+      </div>
+
+      <div>
+        <div class="legal-section-title">6. Vos droits</div>
+        <div class="legal-section-body">
+          <p>Vous disposez des droits d'accès, de rectification, d'effacement, de limitation, de portabilité, d'opposition, ainsi que du droit de retirer votre consentement. Vos données étant stockées localement, vous exercez la plupart de ces droits directement dans l'application.</p>
+          <br>
+          <p>Vous pouvez modifier ou supprimer un traitement, utiliser « Vider le pilulier » et « Réinitialiser l'historique » dans les Réglages, ou désinstaller Pilou pour effacer définitivement l'ensemble de vos données de l'appareil.</p>
+          <br>
+          <p>Pour toute demande relative à vos droits, écrivez à <a href="mailto:agc.logiciels@gmail.com" style="color:var(--brand)">agc.logiciels@gmail.com</a>. Vous avez également le droit d'introduire une réclamation auprès de la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener" style="color:var(--brand)">www.cnil.fr</a>).</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="legal-section-title">7. Sécurité</div>
+        <div class="legal-section-body">
+          Vos données sont chiffrées lors de leur transmission, et leur stockage local est protégé par les mécanismes de sécurité de votre appareil. Pilou ne crée aucun compte et ne collecte ni mot de passe, ni identifiant.
+        </div>
+      </div>
+
+      <div>
+        <div class="legal-section-title">8. Rappel important</div>
+        <div class="legal-section-body">
+          Pilou est un outil de confort et d'aide à l'observance ; ce n'est pas un dispositif médical. L'extraction automatique est une aide qui ne remplace pas la vérification de votre ordonnance, ni l'avis d'un professionnel de santé.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo-row">
+      <div class="footer-sq"></div>
+      <span class="footer-name">Pilou</span>
+    </div>
+    <p class="footer-tagline">Le pilulier français qui veille sur vos traitements,<br>jour après jour.</p>
+    <div class="footer-links">
+      <a href="#confidentialite">Politique de confidentialité</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#fonctionnalites">Fonctionnalités</a>
+      <a href="mailto:agc.logiciels@gmail.com">Contact</a>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Pilou — Application française</span>
+      <span>Non médical — Outil d'aide au suivi</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

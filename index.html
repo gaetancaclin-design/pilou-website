@@ -225,6 +225,10 @@ h1 em{
 }
 .phone-title{font-size:16px;font-weight:700;letter-spacing:-.4px;color:var(--ink)}
 .phone-body{padding:14px 16px}
+.phone-screen{
+  display:block;width:100%;height:auto;
+  border-bottom-left-radius:49px;border-bottom-right-radius:49px;
+}
 .p-day{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:10px;letter-spacing:.3px;text-transform:uppercase}
 .p-dose{
   background:white;border-radius:16px;
@@ -591,46 +595,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="phone-float">
         <div class="phone-outer">
           <div class="phone-notch"><div class="phone-notch-pill"></div></div>
-          <div class="phone-head">
-            <div class="phone-logo-r">
-              <div class="phone-sq"></div>
-              <span class="phone-title">Pilou</span>
-            </div>
-          </div>
-          <div class="phone-body">
-            <div class="p-day">Matin · Aujourd'hui</div>
-            <div class="p-dose">
-              <div class="p-dose-row">
-                <div class="p-ico"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="8" rx="4"/><circle cx="9" cy="10" r="3"/><circle cx="15" cy="10" r="3"/></svg></div>
-                <div>
-                  <div class="p-name">Levothyrox 50 µg</div>
-                  <div class="p-meta">07:30 · 1 comprimé · À jeun</div>
-                </div>
-              </div>
-              <button class="p-btn">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Valider la prise
-              </button>
-            </div>
-            <div class="p-dose">
-              <div class="p-dose-row">
-                <div class="p-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg></div>
-                <div>
-                  <div class="p-name">Doliprane 1000 mg</div>
-                  <div class="p-meta">08:00 · 1 comprimé</div>
-                </div>
-              </div>
-              <button class="p-btn">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Valider la prise
-              </button>
-            </div>
-            <div class="p-done">
-              <div class="p-done-ring"><svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg></div>
-              <div class="p-done-title">Toutes les prises du matin</div>
-              <div class="p-done-sub">Ce soir à 19h00</div>
-            </div>
-          </div>
+          <img class="phone-screen" src="/pilou-hero-screen.webp" alt="Ecran de l’application Pilou affichant les medicaments du soir a valider" width="640" height="1302" loading="eager">
         </div>
       </div>
     </div>

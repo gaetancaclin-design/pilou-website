@@ -510,6 +510,18 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   .phone-outer{width:280px}
   .trust-grid{grid-template-columns:1fr}
 }
+/* GALLERY */
+.gallery{padding:112px 40px;background:var(--white)}
+.gallery-wrap{max-width:var(--max-w);margin:0 auto;text-align:center}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:56px;margin-top:64px;align-items:start}
+.gallery-item{display:flex;flex-direction:column;align-items:center}
+.gallery-phone{width:100%;max-width:260px;background:white;border-radius:44px;border:1px solid rgba(0,0,0,.08);overflow:hidden;position:relative;box-shadow:var(--shadow-xl),0 0 0 1px rgba(255,255,255,.5) inset}
+.gallery-notch{height:28px;background:#f2f4f2;display:flex;align-items:center;justify-content:center}
+.gallery-notch-pill{width:80px;height:9px;background:#d0d8d0;border-radius:5px}
+.gallery-screen{display:block;width:100%;height:400px;object-fit:cover;object-position:top;border-bottom-left-radius:43px;border-bottom-right-radius:43px}
+.gallery-caption{margin-top:28px;max-width:280px}
+.gallery-title{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-.4px;margin-bottom:6px}
+.gallery-desc{font-size:14px;color:var(--muted);line-height:1.5}
 </style>
 <script type="application/ld+json">
 {
@@ -601,6 +613,47 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     </div>
   </div>
 </div>
+
+<!-- GALLERY -->
+<section class="gallery" aria-label="Aperçu de l'application">
+  <div class="gallery-wrap">
+    <div class="eyebrow fade-up">En images</div>
+    <h2 class="fade-up fade-up-d1">Pensé pour votre quotidien</h2>
+    <p class="section-lead fade-up fade-up-d2">Une interface claire, conçue pour aller à l'essentiel. Voici Pilou en situation.</p>
+    <div class="gallery-grid">
+      <div class="gallery-item fade-up fade-up-d1">
+        <div class="gallery-phone">
+          <div class="gallery-notch"><div class="gallery-notch-pill"></div></div>
+          <img class="gallery-screen" src="/pilou-gallery-historique.webp" alt="Écran historique Pilou avec taux d'observance de 88 pourcent" width="640" height="1254" loading="lazy">
+        </div>
+        <div class="gallery-caption">
+          <div class="gallery-title">Suivez votre observance</div>
+          <div class="gallery-desc">Un bilan clair, jour après jour, à partager avec votre médecin.</div>
+        </div>
+      </div>
+      <div class="gallery-item fade-up fade-up-d2">
+        <div class="gallery-phone">
+          <div class="gallery-notch"><div class="gallery-notch-pill"></div></div>
+          <img class="gallery-screen" src="/pilou-gallery-prises.webp" alt="Écran Pilou confirmant que toutes les prises du jour sont enregistrées" width="640" height="1254" loading="lazy">
+        </div>
+        <div class="gallery-caption">
+          <div class="gallery-title">Le devoir accompli</div>
+          <div class="gallery-desc">La satisfaction, chaque jour, de n'avoir rien oublié.</div>
+        </div>
+      </div>
+      <div class="gallery-item fade-up fade-up-d3">
+        <div class="gallery-phone">
+          <div class="gallery-notch"><div class="gallery-notch-pill"></div></div>
+          <img class="gallery-screen" src="/pilou-gallery-voyage.webp" alt="Écran trousse de voyage Pilou calculant les quantités de médicaments à emporter" width="640" height="1190" loading="lazy">
+        </div>
+        <div class="gallery-caption">
+          <div class="gallery-title">Partez l'esprit tranquille</div>
+          <div class="gallery-desc">Les bonnes quantités, calculées pour la durée de votre séjour.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- FEATURES -->
 <section class="section section-alt" id="fonctionnalites">

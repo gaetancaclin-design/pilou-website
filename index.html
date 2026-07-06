@@ -342,19 +342,20 @@ h2{
 /* ── PRICING ── */
 .price-grid{
   display:grid;grid-template-columns:repeat(3,1fr);
-  gap:16px;align-items:start;
+  gap:20px;align-items:stretch;
 }
 .price-card{
   background:white;border:1px solid var(--border);
   border-radius:var(--r-lg);padding:28px;
   position:relative;transition:box-shadow .2s,transform .2s;
+  display:flex;flex-direction:column;
 }
 .price-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
 .price-card.featured{
   border:2px solid var(--brand);background:white;
-  box-shadow:0 8px 32px rgba(61,107,71,.12);
+  box-shadow:0 8px 32px rgba(61,107,71,.12);transform:translateY(-12px);
 }
-.price-card.featured:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(61,107,71,.15)}
+.price-card.featured:hover{transform:translateY(-16px);box-shadow:0 16px 48px rgba(61,107,71,.15)}
 .featured-badge{
   position:absolute;top:-14px;left:50%;transform:translateX(-50%);
   background:linear-gradient(135deg,var(--brand-mid),var(--brand-dark));
@@ -369,7 +370,7 @@ h2{
 .price-annual{font-size:12px;color:var(--brand);font-weight:600;margin-top:4px}
 .price-sep{height:1px;background:var(--border);margin:18px 0}
 .price-desc{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6}
-.price-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:24px}
+.price-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:auto;padding-top:8px;margin-bottom:24px}
 .price-item{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--ink)}
 .chk{
   width:16px;height:16px;background:var(--brand-light);
@@ -387,12 +388,11 @@ h2{
 }
 .price-btn-p:hover{background:var(--brand-dark);box-shadow:0 4px 16px rgba(61,107,71,.3);transform:translateY(-1px)}
 .price-btn-s{
-  width:100%;padding:13px;background:var(--surface);color:var(--ink);
-  border:1px solid var(--border);border-radius:10px;
-  font-size:14px;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;
+  width:100%;padding:13px;background:white;color:var(--ink);
+  border:1.5px solid var(--ink);border-radius:10px;
+  font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,color .15s;
 }
-.price-btn-s:hover{background:var(--surface-2);border-color:var(--muted-light)}
-
+.price-btn-s:hover{background:var(--ink);color:white}
 /* ── TRUST ── */
 .trust-section{
   background:linear-gradient(135deg,var(--brand-dark) 0%,#1a3321 100%);
@@ -696,7 +696,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </div>
       <div class="feat fade-up fade-up-d3">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M20 7h-9m9 5h-7m7 5h-9M4 5l2-2 2 2M4 12l2-2 2 2M4 19l2-2 2 2"/></svg></div>
-        <div class="feat-name">Trousse voyage</div>
+        <div class="feat-name">Trousse de voyage</div>
         <div class="feat-desc">Pilou calcule exactement la quantité à emporter pour la durée de votre séjour et génère votre liste complète.</div>
         <span class="feat-badge">Pilou+</span>
       </div>
@@ -750,7 +750,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>30 lectures d’ordonnance par mois</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>90 jours d'historique</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Suivi des stocks</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Trousse voyage</li>
+          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Trousse de voyage</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Export PDF médical</li>
         </ul>
         <button class="price-btn-p">Commencer avec Pilou+</button>

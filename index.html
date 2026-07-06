@@ -546,28 +546,71 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   .gallery-phone{max-width:280px}
 }
 
-    /* ─── Formulaire de teasing (waitlist lancement) ─────────────────── */
-    .waitlist{display:flex;flex-direction:column;gap:14px;margin-bottom:40px;max-width:440px}
+    /* ─── Waitlist premium 2026 ─────────────────────────────────────────── */
+    .waitlist-card{
+      background:#fff;
+      border-radius:24px;
+      padding:28px;
+      box-shadow:0 4px 24px rgba(71,110,84,.10),0 1px 4px rgba(0,0,0,.06);
+      border:1px solid rgba(113,143,122,.18);
+      max-width:480px;
+      margin-bottom:40px;
+      position:relative;
+      overflow:hidden;
+    }
+    .waitlist-card::before{
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,var(--brand),var(--brand-mid),var(--brand-dark));
+      border-radius:24px 24px 0 0;
+    }
+    .waitlist-eyebrow{
+      font-size:11px;font-weight:700;letter-spacing:.08em;
+      text-transform:uppercase;color:var(--brand-dark);
+      margin-bottom:8px;
+      display:flex;align-items:center;gap:6px;
+    }
+    .waitlist-eyebrow::before{
+      content:'';width:6px;height:6px;border-radius:50%;
+      background:var(--brand);display:inline-block;
+      animation:pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot{
+      0%,100%{box-shadow:0 0 0 0 rgba(113,143,122,.5)}
+      50%{box-shadow:0 0 0 6px rgba(113,143,122,0)}
+    }
+    .waitlist-headline{
+      font-size:22px;font-weight:700;color:var(--ink);
+      letter-spacing:-.4px;line-height:1.2;margin-bottom:20px;
+    }
+    .waitlist{display:flex;flex-direction:column;gap:14px}
     .waitlist-row{display:flex;gap:10px;flex-wrap:wrap}
     .waitlist-input{
-      flex:1;min-width:200px;height:54px;padding:0 20px;
+      flex:1;min-width:180px;height:54px;padding:0 20px;
       font-family:inherit;font-size:15px;color:var(--ink);
-      background:var(--white);border:1.5px solid var(--border);
-      border-radius:16px;outline:none;
-      transition:border-color .25s cubic-bezier(.16,1,.3,1),box-shadow .25s cubic-bezier(.16,1,.3,1);
+      background:#f8faf9;border:1.5px solid rgba(113,143,122,.25);
+      border-radius:14px;outline:none;
+      transition:border-color .25s cubic-bezier(.16,1,.3,1),box-shadow .25s cubic-bezier(.16,1,.3,1),background .25s;
     }
     .waitlist-input::placeholder{color:var(--muted-light)}
-    .waitlist-input:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(113,143,122,.12)}
+    .waitlist-input:focus{
+      border-color:var(--brand);
+      background:#fff;
+      box-shadow:0 0 0 4px rgba(113,143,122,.12);
+    }
     .waitlist-input:invalid:not(:placeholder-shown){border-color:#e0908a}
     .waitlist-btn{
       height:54px;padding:0 28px;flex-shrink:0;
       display:inline-flex;align-items:center;justify-content:center;gap:9px;
-      font-family:inherit;font-size:15px;font-weight:600;color:#fff;letter-spacing:-.2px;
-      background:var(--brand-dark);border:none;border-radius:16px;cursor:pointer;
-      transition:background .25s cubic-bezier(.16,1,.3,1),transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s cubic-bezier(.16,1,.3,1);
+      font-family:inherit;font-size:15px;font-weight:700;color:#fff;letter-spacing:-.2px;
+      background:linear-gradient(135deg,var(--brand-dark) 0%,var(--brand-darker) 100%);
+      border:none;border-radius:14px;cursor:pointer;
+      box-shadow:0 4px 16px rgba(71,110,84,.35);
+      transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s cubic-bezier(.16,1,.3,1);
     }
-    .waitlist-btn:hover{background:var(--brand-darker);transform:translateY(-2px);box-shadow:0 8px 24px rgba(71,110,84,.3)}
-    .waitlist-btn:active{transform:translateY(0) scale(.98)}
+    .waitlist-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(71,110,84,.45)}
+    .waitlist-btn:active{transform:translateY(0) scale(.98);box-shadow:0 2px 8px rgba(71,110,84,.25)}
     .waitlist-consent{display:flex;align-items:flex-start;gap:9px;cursor:pointer;user-select:none}
     .waitlist-consent input{
       appearance:none;-webkit-appearance:none;flex-shrink:0;
@@ -580,27 +623,34 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       content:"";position:absolute;left:5px;top:1.5px;width:5px;height:9px;
       border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
     }
-    .waitlist-consent span{font-size:12.5px;color:var(--muted);line-height:1.5}
+    .waitlist-consent span{font-size:12px;color:var(--muted);line-height:1.5}
     .waitlist-consent a{color:var(--brand-dark);text-decoration:underline}
-    .waitlist-note{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);font-weight:500}
-    .waitlist-note svg{width:15px;height:15px;stroke:var(--brand);flex-shrink:0}
+    .waitlist-note{
+      display:flex;align-items:center;gap:7px;
+      font-size:12.5px;color:var(--muted);font-weight:500;
+      padding-top:4px;border-top:1px solid rgba(0,0,0,.06);
+    }
+    .waitlist-note svg{width:14px;height:14px;stroke:var(--brand);flex-shrink:0}
     /* Etat succes */
     .waitlist-success{
-      display:none;flex-direction:column;gap:10px;padding:22px 24px;
-      background:var(--brand-light);border:1px solid rgba(113,143,122,.25);
-      border-radius:18px;max-width:440px;margin-bottom:40px;
+      display:none;flex-direction:column;gap:12px;
+      padding:24px 28px;
+      background:linear-gradient(135deg,#f0f9f4 0%,var(--brand-light) 100%);
+      border:1px solid rgba(113,143,122,.25);
+      border-radius:24px;max-width:480px;margin-bottom:40px;
       animation:fadeUp .5s cubic-bezier(.16,1,.3,1);
     }
     .waitlist-success.show{display:flex}
-    .waitlist-success-head{display:flex;align-items:center;gap:11px}
+    .waitlist-success-head{display:flex;align-items:center;gap:12px}
     .waitlist-success-icon{
-      width:40px;height:40px;flex-shrink:0;border-radius:12px;
-      background:var(--brand);display:flex;align-items:center;justify-content:center;
+      width:44px;height:44px;flex-shrink:0;border-radius:14px;
+      background:var(--brand-dark);display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 12px rgba(71,110,84,.3);
     }
     .waitlist-success-icon svg{width:22px;height:22px;stroke:#fff;stroke-width:2.5}
-    .waitlist-success-title{font-size:16px;font-weight:700;color:var(--brand-darker);letter-spacing:-.3px}
+    .waitlist-success-title{font-size:17px;font-weight:700;color:var(--brand-darker);letter-spacing:-.3px}
     .waitlist-success-text{font-size:14px;color:var(--brand-dark);line-height:1.6}
-    .waitlist.hide{display:none}
+    .waitlist-card.hide,.waitlist.hide{display:none}
   </style>
 <script type="application/ld+json">
 {
@@ -644,7 +694,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <a href="#tarifs">Tarifs</a>
       <a href="#confidentialite">Confidentialité</a>
     </nav>
-    <a href="#telecharger" class="nav-cta">Être prévenu</a>
+    <a href="#waitlistForm" class="nav-cta" onclick="document.getElementById('waitlistForm').scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('waitlistEmail').focus();return false;">Être prévenu</a>
   </div>
 </nav>
 
@@ -658,31 +708,35 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="hero-tag fade-up visible"><div class="hero-tag-dot"></div>Bientôt sur Google Play, puis App Store</div>
       <h1 class="fade-up visible fade-up-d1">Vos médicaments,<br><em>en 10 secondes</em></h1>
       <p class="hero-sub fade-up visible fade-up-d2">Photographiez votre ordonnance. Pilou la lit et prépare votre pilulier en quelques secondes. Vérifiez, ajustez si besoin, validez. Sans compte. Sans inscription.</p>
-      <form class="waitlist fade-up visible fade-up-d3" id="waitlistForm" novalidate>
-        <div class="waitlist-row">
-          <input
-            type="email"
-            class="waitlist-input"
-            id="waitlistEmail"
-            placeholder="Votre adresse email"
-            required
-            autocomplete="email"
-            aria-label="Votre adresse email"
-          >
-          <button type="submit" class="waitlist-btn" id="telecharger">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            Être prévenu
-          </button>
-        </div>
-        <label class="waitlist-consent">
-          <input type="checkbox" id="waitlistConsent" required>
-          <span>J'accepte de recevoir un email lorsque Pilou sera disponible. Aucun spam, désinscription en un clic. Voir la <a href="#confidentialite">politique de confidentialité</a>.</span>
-        </label>
-        <div class="waitlist-note">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Lancement en France · Android d'abord, puis iOS
-        </div>
-      </form>
+      <div class="waitlist-card fade-up visible fade-up-d3" id="waitlistCard">
+        <div class="waitlist-eyebrow">Lancement imminent</div>
+        <div class="waitlist-headline">Soyez parmi les premiers.</div>
+        <form class="waitlist" id="waitlistForm" novalidate>
+          <div class="waitlist-row">
+            <input
+              type="email"
+              class="waitlist-input"
+              id="waitlistEmail"
+              placeholder="Votre adresse email"
+              required
+              autocomplete="email"
+              aria-label="Votre adresse email"
+            >
+            <button type="submit" class="waitlist-btn" id="telecharger">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Être prévenu
+            </button>
+          </div>
+          <label class="waitlist-consent">
+            <input type="checkbox" id="waitlistConsent" required>
+            <span>J'accepte de recevoir un email au lancement de Pilou. Aucun spam, désinscription en un clic. <a href="#confidentialite">Politique de confidentialité</a>.</span>
+          </label>
+          <div class="waitlist-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Lancement en France · Android d'abord, puis iOS
+          </div>
+        </form>
+      </div>
       <div class="waitlist-success" id="waitlistSuccess">
         <div class="waitlist-success-head">
           <div class="waitlist-success-icon">
@@ -690,7 +744,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           </div>
           <div class="waitlist-success-title">C'est noté, merci !</div>
         </div>
-        <div class="waitlist-success-text">Vous serez parmi les premiers prévenus du lancement de Pilou. À très bientôt.</div>
+        <div class="waitlist-success-text">Vous serez parmi les premiers prévenus du lancement de Pilou sur Google Play. À très bientôt.</div>
       </div>
       <div class="trust-row fade-up visible fade-up-d4">
         <div class="trust-item">
@@ -1050,6 +1104,7 @@ if (reduceMotion) {
 (function () {
   var BREVO_FORM_URL = "https://f686612a.sibforms.com/serve/MUIFAEDv6KMCVUFlydVemhuSDcv7SSl5X6m7Yj644l8gVXooor9wx_vlNIbDwZvYIOI_B9YU0t6fPpVtXZ5RauPL3As5siK1NXIjjIRChMcshSkbfhyK224lgb9r9q_s_I9JTNWbCJFwkP2Bz82r1K-RLcCGUysk73mewSNAS_8FPiR1scZIPic81TVd3lY7UPz3HydNOpZdnHMRVA==";
 
+  var card = document.getElementById('waitlistCard');
   var form = document.getElementById('waitlistForm');
   var success = document.getElementById('waitlistSuccess');
   if (!form || !success) return;
@@ -1075,7 +1130,7 @@ if (reduceMotion) {
     }
 
     // 1. Afficher l'état de confirmation premium sur le site
-    form.classList.add('hide');
+    if(card){card.classList.add('hide');}else{form.classList.add('hide');}
     success.classList.add('show');
     success.setAttribute('role', 'status');
     success.setAttribute('aria-live', 'polite');

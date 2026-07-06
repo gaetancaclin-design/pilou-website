@@ -482,6 +482,18 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   font-size:12px;color:rgba(255,255,255,.28);
 }
 
+/* GALLERY */
+.gallery{padding:112px 40px;background:var(--white)}
+.gallery-wrap{max-width:var(--max-w);margin:0 auto;text-align:center}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:56px;margin-top:64px;align-items:start}
+.gallery-item{display:flex;flex-direction:column;align-items:center}
+.gallery-phone{width:100%;max-width:260px;background:white;border-radius:44px;border:1px solid rgba(0,0,0,.08);overflow:hidden;position:relative;box-shadow:var(--shadow-xl),0 0 0 1px rgba(255,255,255,.5) inset}
+.gallery-notch{height:28px;background:#f2f4f2;display:flex;align-items:center;justify-content:center}
+.gallery-notch-pill{width:80px;height:9px;background:#d0d8d0;border-radius:5px}
+.gallery-screen{display:block;width:100%;height:auto;border-bottom-left-radius:43px;border-bottom-right-radius:43px}
+.gallery-caption{margin-top:28px;max-width:280px}
+.gallery-title{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-.4px;margin-bottom:6px}
+.gallery-desc{font-size:14px;color:var(--muted);line-height:1.5}
 /* ── RESPONSIVE ── */
 @media(max-width:1024px){
   .hero{grid-template-columns:1fr;gap:64px;padding:72px 40px 64px;text-align:center}
@@ -493,6 +505,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   .feat-grid{grid-template-columns:1fr 1fr}
   .trust-grid{grid-template-columns:1fr 1fr}
   .footer-top{grid-template-columns:1fr 1fr}
+  .gallery-grid{gap:32px}
 }
 @media(max-width:768px){
   .section,.trust-section,.legal-section{padding:80px 24px}
@@ -513,18 +526,6 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   .trust-grid{grid-template-columns:1fr}
   .gallery-phone{max-width:280px}
 }
-/* GALLERY */
-.gallery{padding:112px 40px;background:var(--white)}
-.gallery-wrap{max-width:var(--max-w);margin:0 auto;text-align:center}
-.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:56px;margin-top:64px;align-items:start}
-.gallery-item{display:flex;flex-direction:column;align-items:center}
-.gallery-phone{width:100%;max-width:260px;background:white;border-radius:44px;border:1px solid rgba(0,0,0,.08);overflow:hidden;position:relative;box-shadow:var(--shadow-xl),0 0 0 1px rgba(255,255,255,.5) inset}
-.gallery-notch{height:28px;background:#f2f4f2;display:flex;align-items:center;justify-content:center}
-.gallery-notch-pill{width:80px;height:9px;background:#d0d8d0;border-radius:5px}
-.gallery-screen{display:block;width:100%;height:auto;border-bottom-left-radius:43px;border-bottom-right-radius:43px}
-.gallery-caption{margin-top:28px;max-width:280px}
-.gallery-title{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-.4px;margin-bottom:6px}
-.gallery-desc{font-size:14px;color:var(--muted);line-height:1.5}
 </style>
 <script type="application/ld+json">
 {

@@ -1046,8 +1046,10 @@ if (reduceMotion) {
   document.querySelectorAll('.fade-up:not(.visible)').forEach(el => observer.observe(el));
 }
 
-// ─── Formulaire de liste d'attente (lancement) ──────────────────────────
+// ─── Formulaire de liste d'attente — connecté à Brevo ──────────────────
 (function () {
+  var BREVO_FORM_URL = "https://f686612a.sibforms.com/serve/MUIFAEDv6KMCVUFlydVemhuSDcv7SSl5X6m7Yj644l8gVXooor9wx_vlNIbDwZvYIOI_B9YU0t6fPpVtXZ5RauPL3As5siK1NXIjjIRChMcshSkbfhyK224lgb9r9q_s_I9JTNWbCJFwkP2Bz82r1K-RLcCGUysk73mewSNAS_8FPiR1scZIPic81TVd3lY7UPz3HydNOpZdnHMRVA==";
+
   var form = document.getElementById('waitlistForm');
   var success = document.getElementById('waitlistSuccess');
   if (!form || !success) return;
@@ -1072,16 +1074,16 @@ if (reduceMotion) {
       return;
     }
 
-    // ── Branchement Brevo (à activer) ─────────────────────────────────
-    // Quand le compte Brevo sera prêt, remplacer ce bloc par l'appel API
-    // Brevo (fetch vers l'endpoint de double opt-in). Pour l'instant, on
-    // affiche l'état de confirmation premium sans dépendance externe.
-    // submitToBrevo(email);
-
+    // 1. Afficher l'état de confirmation premium sur le site
     form.classList.add('hide');
     success.classList.add('show');
     success.setAttribute('role', 'status');
     success.setAttribute('aria-live', 'polite');
+
+    // 2. Ouvrir le formulaire Brevo dans une nouvelle fenêtre
+    // pré-rempli avec l'email — double opt-in RGPD sans clé API exposée.
+    var brevoUrl = BREVO_FORM_URL + (BREVO_FORM_URL.indexOf('?') > -1 ? '&' : '?') + 'EMAIL=' + encodeURIComponent(email);
+    window.open(brevoUrl, '_blank', 'noopener,noreferrer,width=600,height=500');
   });
 })();
 

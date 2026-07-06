@@ -44,12 +44,13 @@
   --shadow-lg:0 20px 60px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.05);
   --shadow-xl:0 40px 100px rgba(0,0,0,.1),0 16px 40px rgba(0,0,0,.06);
 }
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:hidden}
 body{
   font-family:'Inter',system-ui,sans-serif;
   color:var(--ink);background:var(--white);
   line-height:1.6;-webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;width:100%;
 }
 a{text-decoration:none;color:inherit}
 
@@ -487,7 +488,6 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   .hero-sub{max-width:100%;margin-left:auto;margin-right:auto}
   .hero-actions{justify-content:center}
   .trust-row{justify-content:center}
-  .hero-visual{order:-1}
   .phone-float{animation:none}
   .nav-links{display:none}
   .feat-grid{grid-template-columns:1fr 1fr}

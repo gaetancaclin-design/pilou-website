@@ -393,6 +393,7 @@ h2{
   font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,color .15s;
 }
 .price-btn-s:hover{background:var(--ink);color:white}
+.price-note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.4}
 /* ── TRUST ── */
 .trust-section{
   background:linear-gradient(135deg,var(--brand-dark) 0%,#1a3321 100%);
@@ -510,7 +511,9 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 @media(max-width:768px){
   .section,.trust-section,.legal-section{padding:80px 24px}
   .hero{padding:64px 24px 56px}
-  .nav-inner{padding:0 24px}
+  .nav-inner{padding:0 16px;gap:12px}
+  .nav-badge{display:none}
+  .nav-cta{padding:9px 16px;white-space:nowrap}
   footer{padding:56px 24px 32px}
   .price-grid{grid-template-columns:1fr}
   .feat-grid{grid-template-columns:1fr}
@@ -723,6 +726,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Rappels illimités</li>
         </ul>
         <button class="price-btn-s">Commencer gratuitement</button>
+                <div class="price-note">Gratuit pour toujours · Aucune carte requise</div>
       </div>
       <div class="price-card fade-up fade-up-d2">
         <div class="price-tier">Essentiel</div>
@@ -737,6 +741,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Alertes fin de traitement</li>
         </ul>
         <button class="price-btn-s">Choisir Essentiel</button>
+                <div class="price-note">30 jours d'essai gratuit · Sans engagement, résiliable à tout moment</div>
       </div>
       <div class="price-card featured fade-up fade-up-d3">
         <div class="featured-badge">Le plus complet</div>
@@ -754,6 +759,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Export PDF médical</li>
         </ul>
         <button class="price-btn-p">Commencer avec Pilou+</button>
+                <div class="price-note">30 jours d'essai gratuit · Sans engagement, résiliable à tout moment</div>
       </div>
     </div>
   </div>

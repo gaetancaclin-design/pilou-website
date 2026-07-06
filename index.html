@@ -92,12 +92,12 @@ nav{
 .nav-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .nav-mark{
   width:36px;height:36px;
-  background:linear-gradient(135deg,var(--brand-mid),var(--brand-dark));
   border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 8px rgba(71,110,84,.3);
+  overflow:hidden;
+  flex-shrink:0;
 }
-.nav-mark svg{width:19px;height:19px;fill:white}
+.nav-mark img{width:36px;height:36px;display:block;object-fit:contain}
+
 .nav-name{font-size:17px;font-weight:700;letter-spacing:-0.5px;color:var(--ink)}
 .nav-badge{
   font-size:11px;font-weight:600;color:var(--brand);
@@ -684,7 +684,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   <div class="nav-inner">
     <div class="nav-logo">
       <div class="nav-mark">
-        <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="8" rx="4"/><circle cx="9" cy="10" r="3"/><circle cx="15" cy="10" r="3"/></svg>
+        <img src="/favicon-32x32.png" alt="Logo Pilou" width="36" height="36">
       </div>
       <span class="nav-name">Pilou</span>
       <span class="nav-badge">Application française</span>

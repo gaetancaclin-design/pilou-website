@@ -651,6 +651,79 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     .waitlist-success-title{font-size:17px;font-weight:700;color:var(--brand-darker);letter-spacing:-.3px}
     .waitlist-success-text{font-size:14px;color:var(--brand-dark);line-height:1.6}
     .waitlist-card.hide,.waitlist.hide{display:none}
+  
+    /* ─── Bloc signature développeur ───────────────────────────────────── */
+    .maker-section{
+      padding:80px 24px;
+      background:var(--white);
+      border-top:1px solid var(--border-light);
+    }
+    .maker-inner{
+      max-width:680px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:24px;
+    }
+    .maker-quote{
+      position:relative;
+      padding:32px 36px;
+      background:linear-gradient(135deg,#f6fbf7 0%,var(--brand-light) 100%);
+      border-radius:20px;
+      border-left:3px solid var(--brand-dark);
+    }
+    .maker-quote-mark{
+      font-size:72px;
+      line-height:1;
+      color:var(--brand);
+      opacity:.25;
+      position:absolute;
+      top:12px;left:20px;
+      font-family:Georgia,serif;
+      pointer-events:none;
+    }
+    .maker-quote-text{
+      font-size:18px;
+      line-height:1.7;
+      color:var(--ink);
+      font-weight:500;
+      letter-spacing:-.2px;
+      position:relative;
+      z-index:1;
+    }
+    .maker-quote-text em{
+      font-style:normal;
+      color:var(--brand-dark);
+      font-weight:700;
+    }
+    .maker-sig{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding-left:4px;
+    }
+    .maker-avatar{
+      width:48px;height:48px;flex-shrink:0;
+      border-radius:14px;
+      background:linear-gradient(135deg,var(--brand-mid),var(--brand-dark));
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 12px rgba(71,110,84,.25);
+    }
+    .maker-avatar span{
+      font-size:20px;font-weight:800;color:#fff;
+      letter-spacing:-.5px;font-family:Inter,system-ui,sans-serif;
+    }
+    .maker-sig-text{display:flex;flex-direction:column;gap:2px}
+    .maker-sig-name{
+      font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.2px;
+    }
+    .maker-sig-role{
+      font-size:13px;color:var(--muted);font-weight:500;
+    }
+    @media(max-width:600px){
+      .maker-quote{padding:24px 20px 24px 24px}
+      .maker-quote-text{font-size:16px}
+    }
   </style>
 <script type="application/ld+json">
 {
@@ -992,7 +1065,31 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   </div>
 </section>
 
-<!-- CGU -->
+
+  <!-- SIGNATURE DÉVELOPPEUR -->
+  <section class="maker-section" aria-label="À propos du créateur">
+    <div class="maker-inner">
+      <div class="maker-quote fade-up">
+        <div class="maker-quote-mark">"</div>
+        <p class="maker-quote-text">
+          Pilou est né d'une conviction simple : vos médicaments méritent
+          une app <em>vraiment française, vraiment privée, vraiment simple</em> —
+          pas une usine à abonnements. Pas de siège social à San Francisco.
+          Pas d'investisseurs à convaincre. Juste une application soignée,
+          qui respecte vos données et votre confiance.
+        </p>
+      </div>
+      <div class="maker-sig fade-up fade-up-d1">
+        <div class="maker-avatar"><span>G</span></div>
+        <div class="maker-sig-text">
+          <div class="maker-sig-name">Gaétan Caclin</div>
+          <div class="maker"-sig-role">Développeur indépendant français · Créateur de Pilou</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CGU -->
 <section class="legal-section" id="cgu">
 <div class="section-wrap">
 <div class="eyebrow">Légal</div>

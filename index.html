@@ -651,6 +651,13 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     .waitlist-success-title{font-size:17px;font-weight:700;color:var(--brand-darker);letter-spacing:-.3px}
     .waitlist-success-text{font-size:14px;color:var(--brand-dark);line-height:1.6}
     .waitlist-card.hide,.waitlist.hide{display:none}
+    .waitlist-sub{
+      font-size:14px;line-height:1.6;color:var(--muted);
+      margin-bottom:20px;font-weight:500;
+    }
+    .waitlist-btn-full{
+      width:100%;margin-bottom:16px;
+    }
   
     /* ─── Bloc signature développeur ───────────────────────────────────── */
     .maker-section{
@@ -831,7 +838,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <a href="#tarifs">Tarifs</a>
       <a href="#confidentialite">Confidentialité</a>
     </nav>
-    <a href="#waitlistForm" class="nav-cta" onclick="document.getElementById('waitlistForm').scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('waitlistEmail').focus();return false;">Être prévenu</a>
+    <a href="#waitlistCard" class="nav-cta" onclick="document.getElementById('waitlistCard').scrollIntoView({behavior:'smooth',block:'center'});return false;">Être prévenu</a>
   </div>
 </nav>
 
@@ -848,40 +855,15 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="waitlist-card fade-up visible fade-up-d3" id="waitlistCard">
         <div class="waitlist-eyebrow">Lancement imminent</div>
         <div class="waitlist-headline">Soyez parmi les premiers.</div>
-        <form class="waitlist" id="waitlistForm" novalidate>
-          <div class="waitlist-row">
-            <input
-              type="email"
-              class="waitlist-input"
-              id="waitlistEmail"
-              placeholder="Votre adresse email"
-              required
-              autocomplete="email"
-              aria-label="Votre adresse email"
-            >
-            <button type="submit" class="waitlist-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-              Être prévenu
-            </button>
-          </div>
-          <label class="waitlist-consent">
-            <input type="checkbox" id="waitlistConsent" required>
-            <span>J'accepte de recevoir un email au lancement de Pilou. Aucun spam, désinscription en un clic. <a href="#confidentialite">Politique de confidentialité</a>.</span>
-          </label>
-          <div class="waitlist-note">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Lancement en France · Android d'abord, puis iOS
-          </div>
-        </form>
-      </div>
-      <div class="waitlist-success" id="waitlistSuccess">
-        <div class="waitlist-success-head">
-          <div class="waitlist-success-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div class="waitlist-success-title">C'est noté, merci !</div>
+        <p class="waitlist-sub">Laissez-nous votre email et soyez prévenu dès que Pilou est disponible. Rien d'autre, aucun spam.</p>
+        <button type="button" class="waitlist-btn waitlist-btn-full" id="waitlistOpenBtn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Être prévenu du lancement
+        </button>
+        <div class="waitlist-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Lancement en France · Android d'abord, puis iOS
         </div>
-        <div class="waitlist-success-text">Vous serez parmi les premiers prévenus du lancement de Pilou sur Google Play. À très bientôt.</div>
       </div>
       <div class="trust-row fade-up visible fade-up-d4">
         <div class="trust-item">
@@ -1222,7 +1204,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         <div class="footer-col-title">Application</div>
         <a href="#fonctionnalites">Fonctionnalités</a>
         <a href="#tarifs">Tarifs</a>
-        <a href="#waitlistCard" onclick="var c=document.getElementById('waitlistCard');if(c){c.scrollIntoView({behavior:'smooth',block:'center'});}var e=document.getElementById('waitlistEmail');if(e){e.focus();}return false;">Être prévenu du lancement</a>
+        <a href="#waitlistCard" onclick="var c=document.getElementById('waitlistCard');if(c){c.scrollIntoView({behavior:'smooth',block:'center'});}return false;">Être prévenu du lancement</a>
       </div>
       <div class="footer-col">
         <div class="footer-col-title">Légal</div>
@@ -1262,21 +1244,21 @@ if (reduceMotion) {
 function initWaitlist() {
   var BREVO_FORM_URL = "https://f686612a.sibforms.com/serve/MUIFAEDv6KMCVUFlydVemhuSDcv7SSl5X6m7Yj644l8gVXooor9wx_vlNIbDwZvYIOI_B9YU0t6fPpVtXZ5RauPL3As5siK1NXIjjIRChMcshSkbfhyK224lgb9r9q_s_I9JTNWbCJFwkP2Bz82r1K-RLcCGUysk73mewSNAS_8FPiR1scZIPic81TVd3lY7UPz3HydNOpZdnHMRVA==";
 
-  var card    = document.getElementById('waitlistCard');
-  var form    = document.getElementById('waitlistForm');
-  var success = document.getElementById('waitlistSuccess');
+  var openBtn = document.getElementById('waitlistOpenBtn');
   var overlay = document.getElementById('brevoModalOverlay');
   var closeBtn= document.getElementById('brevoModalClose');
   var frame   = document.getElementById('brevoModalFrame');
 
-  if (!form || !success || !overlay) return;
+  if (!openBtn || !overlay || !frame) return;
 
-  var emailInput   = document.getElementById('waitlistEmail');
-  var consentInput = document.getElementById('waitlistConsent');
+  var frameLoaded = false;
 
-  function openModal(email) {
-    var url = BREVO_FORM_URL + (BREVO_FORM_URL.indexOf('?') > -1 ? '&' : '?') + 'EMAIL=' + encodeURIComponent(email);
-    frame.src = url;
+  function openModal() {
+    // Charger l'iframe une seule fois, a la premiere ouverture
+    if (!frameLoaded) {
+      frame.src = BREVO_FORM_URL;
+      frameLoaded = true;
+    }
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
     closeBtn.focus();
@@ -1285,9 +1267,9 @@ function initWaitlist() {
   function closeModal() {
     overlay.classList.remove('open');
     document.body.style.overflow = '';
-    frame.src = '';
   }
 
+  openBtn.addEventListener('click', openModal);
   closeBtn.addEventListener('click', closeModal);
 
   overlay.addEventListener('click', function(e) {
@@ -1296,31 +1278,6 @@ function initWaitlist() {
 
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
-  });
-
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    var email = (emailInput.value || '').trim();
-    var emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-    if (!emailValid) {
-      emailInput.focus();
-      emailInput.reportValidity && emailInput.reportValidity();
-      return;
-    }
-    if (!consentInput.checked) {
-      consentInput.focus();
-      consentInput.reportValidity && consentInput.reportValidity();
-      return;
-    }
-
-    if (card) { card.classList.add('hide'); } else { form.classList.add('hide'); }
-    success.classList.add('show');
-    success.setAttribute('role', 'status');
-    success.setAttribute('aria-live', 'polite');
-
-    openModal(email);
   });
 }
 // Executer apres chargement complet du DOM (la modale est placee avant </body>)

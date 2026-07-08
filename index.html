@@ -518,6 +518,22 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 .gallery-caption{margin-top:28px;max-width:280px}
 .gallery-title{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-.4px;margin-bottom:6px}
 .gallery-desc{font-size:14px;color:var(--muted);line-height:1.5}
+.faq-section{padding:112px 40px;background:var(--white)}
+.faq-wrap{max-width:760px;margin:0 auto;text-align:center}
+.faq-list{margin-top:48px;display:flex;flex-direction:column;gap:14px;text-align:left}
+.faq-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .3s ease}
+.faq-item[open]{border-color:var(--brand-mid)}
+.faq-q{list-style:none;cursor:pointer;padding:22px 26px;font-size:16px;font-weight:600;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.faq-q::-webkit-details-marker{display:none}
+.faq-icon{position:relative;flex-shrink:0;width:16px;height:16px}
+.faq-icon::before,.faq-icon::after{content:"";position:absolute;background:var(--brand-dark);border-radius:2px;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.faq-icon::before{top:7px;left:0;width:16px;height:2px}
+.faq-icon::after{top:0;left:7px;width:2px;height:16px}
+.faq-item[open] .faq-icon::after{transform:rotate(90deg);opacity:0}
+.faq-a{padding:0 26px 24px;font-size:15px;line-height:1.65;color:var(--muted)}
+.faq-more{display:inline-flex;align-items:center;gap:7px;margin-top:40px;font-size:15px;font-weight:600;color:var(--brand-dark);text-decoration:none;transition:gap .25s ease}
+.faq-more::after{content:"\2192";transition:transform .25s ease}
+.faq-more:hover::after{transform:translateX(4px)}
 /* ── RESPONSIVE ── */
 @media(max-width:1024px){
   .hero{grid-template-columns:1fr;gap:64px;padding:72px 40px 64px;text-align:center}
@@ -1101,6 +1117,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         <div class="price-sep"></div>
         <div class="price-desc">Pour découvrir Pilou et commencer votre suivi.</div>
         <ul class="price-list">
+          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Traitements jusqu’à 21 jours</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>5 médicaments</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>1 lecture d’ordonnance par mois</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>14 jours d'historique</li>
@@ -1116,6 +1133,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         <div class="price-sep"></div>
         <div class="price-desc">Pour les patients avec plusieurs traitements.</div>
         <ul class="price-list">
+          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Traitements jusqu’à 90 jours</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>8 médicaments</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>3 lectures d’ordonnance par mois</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>30 jours d'historique</li>
@@ -1134,6 +1152,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         <div class="price-sep"></div>
         <div class="price-desc">L'expérience Pilou complète, sans limite.</div>
         <ul class="price-list">
+          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Traitements de durée illimitée</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Médicaments illimités</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>30 lectures d’ordonnance par mois</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>90 jours d'historique</li>
@@ -1152,9 +1171,9 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 <!-- CTA RAPPEL 1 (apres tarifs) -->
   <div class="cta-band">
     <div class="cta-band-inner fade-up">
-      <div class="cta-band-eyebrow">Lancement imminent</div>
-      <div class="cta-band-title">Pilou arrive bientôt.</div>
-      <p class="cta-band-sub">Soyez prévenu en premier dès que l'application est disponible sur Google Play.</p>
+      <div class="cta-band-eyebrow">Convaincu&#8239;?</div>
+      <div class="cta-band-title">Prêt à ne plus rien oublier&#8239;?</div>
+      <p class="cta-band-sub">Soyez prévenu dès que Pilou est disponible sur Google Play.</p>
       <button type="button" class="cta-band-btn" onclick="var b=document.getElementById('waitlistOpenBtn');if(b){b.click();}">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         Être prévenu du lancement
@@ -1168,7 +1187,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   <div class="section-wrap">
     <div class="eyebrow fade-up">Confiance</div>
     <h2 class="fade-up fade-up-d1">Conçu pour vos données de santé</h2>
-    <p class="section-lead fade-up fade-up-d2">Pilou a été conçu avec une seule obsession : vos données de santé ne doivent jamais quitter votre téléphone.</p>
+    <p class="section-lead fade-up fade-up-d2">Pilou a été conçu avec une seule conviction : vos données de santé ne doivent jamais quitter votre téléphone.</p>
     <div class="trust-grid">
       <div class="trust-card fade-up fade-up-d1">
         <div class="trust-card-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
@@ -1215,7 +1234,35 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     </div>
   </section>
 
-  <!-- CTA RAPPEL 2 (apres signature) -->
+  <!-- MINI-FAQ (avant CTA final) -->
+  <section class="faq-section" aria-label="Questions fréquentes">
+    <div class="faq-wrap">
+      <div class="eyebrow fade-up">Questions fréquentes</div>
+      <h2 class="fade-up fade-up-d1">Tout ce que vous vous demandez</h2>
+      <div class="faq-list fade-up fade-up-d2">
+        <details class="faq-item">
+          <summary class="faq-q">Pilou est-il vraiment gratuit&#8239;?<span class="faq-icon"></span></summary>
+          <div class="faq-a">Oui. La formule Gratuite l’est pour toujours, sans carte bancaire ni inscription. Elle couvre les traitements jusqu’à 21 jours. Les formules payantes ajoutent plus de médicaments, de lectures d’ordonnance et de fonctionnalités, avec 30 jours d’essai gratuit.</div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Où sont stockées mes données de santé&#8239;?<span class="faq-icon"></span></summary>
+          <div class="faq-a">Uniquement sur votre téléphone. Vos médicaments, posologies et historique ne quittent jamais votre appareil et ne sont jamais envoyés sur nos serveurs. Pilou est conçu pour être conforme au RGPD.</div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Pilou fonctionne-t-il sans connexion internet&#8239;?<span class="faq-icon"></span></summary>
+          <div class="faq-a">Oui. Une fois vos médicaments enregistrés, Pilou fonctionne entièrement hors ligne&#8239;: rappels, validation des prises et suivi restent disponibles sans internet. Seule la lecture d’une ordonnance par photo nécessite une connexion.</div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Pilou remplace-t-il mon médecin&#8239;?<span class="faq-icon"></span></summary>
+          <div class="faq-a">Non. Pilou est un outil d’aide à l’observance, pas un dispositif médical. Il vous aide à suivre votre traitement, mais ne remplace jamais l’avis de votre médecin ou de votre pharmacien.</div>
+        </details>
+      </div>
+      <a class="faq-more fade-up" href="/support">Voir toutes les questions</a>
+    </div>
+  </section>
+
+
+    <!-- CTA RAPPEL 2 (apres signature) -->
   <div class="cta-band">
     <div class="cta-band-inner fade-up">
       <div class="cta-band-eyebrow">Rejoignez l'aventure</div>

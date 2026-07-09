@@ -531,119 +531,6 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   .gallery-phone{max-width:280px}
 }
 
-    /* ─── Waitlist premium 2026 ─────────────────────────────────────────── */
-    .waitlist-card{
-      background:#fff;
-      border-radius:24px;
-      padding:28px;
-      box-shadow:0 4px 24px rgba(71,110,84,.10),0 1px 4px rgba(0,0,0,.06);
-      border:1px solid rgba(113,143,122,.18);
-      max-width:480px;
-      margin-bottom:40px;
-      position:relative;
-      overflow:hidden;
-    }
-    .waitlist-card::before{
-      content:'';
-      position:absolute;
-      top:0;left:0;right:0;height:3px;
-      background:linear-gradient(90deg,var(--brand),var(--brand-mid),var(--brand-dark));
-      border-radius:24px 24px 0 0;
-    }
-    .waitlist-eyebrow{
-      font-size:11px;font-weight:700;letter-spacing:.08em;
-      text-transform:uppercase;color:var(--brand-dark);
-      margin-bottom:8px;
-      display:flex;align-items:center;gap:6px;
-    }
-    .waitlist-eyebrow::before{
-      content:'';width:6px;height:6px;border-radius:50%;
-      background:var(--brand);display:inline-block;
-      animation:pulse-dot 2s ease-in-out infinite;
-    }
-    @keyframes pulse-dot{
-      0%,100%{box-shadow:0 0 0 0 rgba(113,143,122,.5)}
-      50%{box-shadow:0 0 0 6px rgba(113,143,122,0)}
-    }
-    .waitlist-headline{
-      font-size:22px;font-weight:700;color:var(--ink);
-      letter-spacing:-.4px;line-height:1.2;margin-bottom:20px;
-    }
-    .waitlist{display:flex;flex-direction:column;gap:14px}
-    .waitlist-row{display:flex;gap:10px;flex-wrap:wrap}
-    .waitlist-input{
-      flex:1;min-width:180px;height:54px;padding:0 20px;
-      font-family:inherit;font-size:15px;color:var(--ink);
-      background:#f8faf9;border:1.5px solid rgba(113,143,122,.25);
-      border-radius:14px;outline:none;
-      transition:border-color .25s cubic-bezier(.16,1,.3,1),box-shadow .25s cubic-bezier(.16,1,.3,1),background .25s;
-    }
-    .waitlist-input::placeholder{color:var(--muted-light)}
-    .waitlist-input:focus{
-      border-color:var(--brand);
-      background:#fff;
-      box-shadow:0 0 0 4px rgba(113,143,122,.12);
-    }
-    .waitlist-input:invalid:not(:placeholder-shown){border-color:#e0908a}
-    .waitlist-btn{
-      height:54px;padding:0 28px;flex-shrink:0;
-      display:inline-flex;align-items:center;justify-content:center;gap:9px;
-      font-family:inherit;font-size:15px;font-weight:700;color:#fff;letter-spacing:-.2px;
-      background:linear-gradient(135deg,var(--brand-dark) 0%,var(--brand-darker) 100%);
-      border:none;border-radius:14px;cursor:pointer;
-      box-shadow:0 4px 16px rgba(71,110,84,.35);
-      transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s cubic-bezier(.16,1,.3,1);
-    }
-    .waitlist-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(71,110,84,.45)}
-    .waitlist-btn:active{transform:translateY(0) scale(.98);box-shadow:0 2px 8px rgba(71,110,84,.25)}
-    .waitlist-consent{display:flex;align-items:flex-start;gap:9px;cursor:pointer;user-select:none}
-    .waitlist-consent input{
-      appearance:none;-webkit-appearance:none;flex-shrink:0;
-      width:18px;height:18px;margin-top:1px;
-      border:1.5px solid var(--border);border-radius:6px;background:var(--white);cursor:pointer;
-      transition:background .2s,border-color .2s;position:relative;
-    }
-    .waitlist-consent input:checked{background:var(--brand-dark);border-color:var(--brand-dark)}
-    .waitlist-consent input:checked::after{
-      content:"";position:absolute;left:5px;top:1.5px;width:5px;height:9px;
-      border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
-    }
-    .waitlist-consent span{font-size:12px;color:var(--muted);line-height:1.5}
-    .waitlist-consent a{color:var(--brand-dark);text-decoration:underline}
-    .waitlist-note{
-      display:flex;align-items:center;gap:7px;
-      font-size:12.5px;color:var(--muted);font-weight:500;
-      padding-top:4px;border-top:1px solid rgba(0,0,0,.06);
-    }
-    .waitlist-note svg{width:14px;height:14px;stroke:var(--brand);flex-shrink:0}
-    /* Etat succes */
-    .waitlist-success{
-      display:none;flex-direction:column;gap:12px;
-      padding:24px 28px;
-      background:linear-gradient(135deg,#f0f9f4 0%,var(--brand-light) 100%);
-      border:1px solid rgba(113,143,122,.25);
-      border-radius:24px;max-width:480px;margin-bottom:40px;
-      animation:fadeUp .5s cubic-bezier(.16,1,.3,1);
-    }
-    .waitlist-success.show{display:flex}
-    .waitlist-success-head{display:flex;align-items:center;gap:12px}
-    .waitlist-success-icon{
-      width:44px;height:44px;flex-shrink:0;border-radius:14px;
-      background:var(--brand-dark);display:flex;align-items:center;justify-content:center;
-      box-shadow:0 4px 12px rgba(71,110,84,.3);
-    }
-    .waitlist-success-icon svg{width:22px;height:22px;stroke:#fff;stroke-width:2.5}
-    .waitlist-success-title{font-size:17px;font-weight:700;color:var(--brand-darker);letter-spacing:-.3px}
-    .waitlist-success-text{font-size:14px;color:var(--brand-dark);line-height:1.6}
-    .waitlist-card.hide,.waitlist.hide{display:none}
-    .waitlist-sub{
-      font-size:14px;line-height:1.6;color:var(--muted);
-      margin-bottom:20px;font-weight:500;
-    }
-    .waitlist-btn-full{
-      width:100%;margin-bottom:16px;
-    }
-  
     /* ─── Bloc signature développeur ───────────────────────────────────── */
     .maker-section{
       padding:80px 24px;
@@ -714,70 +601,6 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       .maker-quote{padding:24px 22px 26px}
       .maker-quote-text{font-size:16px}
       .maker-quote-mark{font-size:48px;height:26px}
-    }
-  
-    /* ─── Modale Brevo premium ───────────────────────────────────────────── */
-    .brevo-modal-overlay{
-      display:none;
-      position:fixed;inset:0;z-index:9999;
-      background:rgba(15,17,23,.6);
-      backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
-      align-items:center;justify-content:center;
-      padding:20px;
-      animation:overlayIn .3s cubic-bezier(.16,1,.3,1);
-    }
-    .brevo-modal-overlay.open{display:flex}
-    @keyframes overlayIn{from{opacity:0}to{opacity:1}}
-    .brevo-modal{
-      background:#fff;
-      border-radius:24px;
-      box-shadow:0 32px 80px rgba(0,0,0,.25),0 0 0 1px rgba(0,0,0,.06);
-      width:100%;max-width:500px;
-      overflow:hidden;
-      animation:modalIn .4s cubic-bezier(.16,1,.3,1);
-      position:relative;
-    }
-    @keyframes modalIn{
-      from{opacity:0;transform:translateY(20px) scale(.97)}
-      to{opacity:1;transform:translateY(0) scale(1)}
-    }
-    .brevo-modal-header{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:20px 24px 0;
-    }
-    .brevo-modal-title{
-      font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.2px;
-      display:flex;align-items:center;gap:8px;
-    }
-    .brevo-modal-title::before{
-      content:'';width:8px;height:8px;border-radius:50%;
-      background:var(--brand);display:inline-block;
-      animation:pulse-dot 2s ease-in-out infinite;
-    }
-    .brevo-modal-close{
-      width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
-      background:var(--border-light);color:var(--muted);
-      display:flex;align-items:center;justify-content:center;
-      transition:background .2s;font-size:18px;line-height:1;
-    }
-    .brevo-modal-close:hover{background:#e5e7eb}
-    .brevo-modal iframe{
-      display:block;width:100%;border:none;
-      min-height:320px;
-    }
-    .brevo-modal-note{
-      padding:12px 24px 20px;
-      font-size:12px;color:var(--muted);text-align:center;
-      border-top:1px solid var(--border-light);
-    }
-    .brevo-modal-note svg{
-      width:12px;height:12px;stroke:var(--muted);
-      vertical-align:middle;margin-right:4px;
-    }
-    @media(max-width:540px){
-      .brevo-modal{border-radius:20px}
-      .brevo-modal iframe{min-height:380px}
     }
   
     /* ─── CTA de rappel (mid-page) ───────────────────────────────────────── */
@@ -884,13 +707,13 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="ls-divider"></div>
       <div><div class="ls-title">5. Droit de rétractation</div><div class="ls-body"><p>Conformément au code de la consommation, vous disposez en principe d'un délai de quatorze (14) jours pour exercer votre droit de rétractation à compter de la souscription d'un abonnement.</p><p>L'accès aux fonctionnalités payantes étant fourni immédiatement après la souscription, vous demandez expressément l'exécution immédiate du service et <strong>renoncez à votre droit de rétractation</strong> une fois le service pleinement exécuté.</p><p>Les demandes de remboursement relèvent des conditions de la plateforme (Google Play ou App Store) auprès de laquelle l'abonnement a été souscrit.</p></div></div>
       <div class="ls-divider"></div>
-      <div><div class="ls-title">7. Responsabilités de l'utilisateur</div><div class="ls-body"><p>Vous êtes responsable de la vérification des informations extraites automatiquement de vos ordonnances. <strong>Vérifiez toujours les médicaments, posologies et durées avant de valider.</strong></p><p>Pilou ne se substitue en aucun cas à votre médecin, pharmacien ou tout professionnel de santé.</p></div></div>
+      <div><div class="ls-title">6. Responsabilités de l'utilisateur</div><div class="ls-body"><p>Vous êtes responsable de la vérification des informations extraites automatiquement de vos ordonnances. <strong>Vérifiez toujours les médicaments, posologies et durées avant de valider.</strong></p><p>Pilou ne se substitue en aucun cas à votre médecin, pharmacien ou tout professionnel de santé.</p></div></div>
       <div class="ls-divider"></div>
-      <div><div class="ls-title">8. Propriété intellectuelle</div><div class="ls-body">L'application Pilou, son design, son code source et ses contenus sont protégés par le droit de la propriété intellectuelle. Toute reproduction, modification ou distribution non autorisée est interdite.</div></div>
+      <div><div class="ls-title">7. Propriété intellectuelle</div><div class="ls-body">L'application Pilou, son design, son code source et ses contenus sont protégés par le droit de la propriété intellectuelle. Toute reproduction, modification ou distribution non autorisée est interdite.</div></div>
       <div class="ls-divider"></div>
-      <div><div class="ls-title">9. Limitation de responsabilité</div><div class="ls-body"><p>L'éditeur ne saurait être tenu responsable des conséquences liées à une mauvaise utilisation de l'application, à des erreurs dans la lecture automatisée des ordonnances, ou à des rappels non reçus en raison de paramètres système.</p><p>En cas de doute sur un traitement, consultez un professionnel de santé.</p></div></div>
+      <div><div class="ls-title">8. Limitation de responsabilité</div><div class="ls-body"><p>L'éditeur ne saurait être tenu responsable des conséquences liées à une mauvaise utilisation de l'application, à des erreurs dans la lecture automatisée des ordonnances, ou à des rappels non reçus en raison de paramètres système.</p><p>En cas de doute sur un traitement, consultez un professionnel de santé.</p></div></div>
       <div class="ls-divider"></div>
-      <div><div class="ls-title">10. Données personnelles</div><div class="ls-body">Le traitement de vos données est décrit dans notre <a href="/confidentialite">Politique de confidentialité</a>. Vos données de santé restent sur votre téléphone. La photo d'ordonnance est analysée de manière éphémère et n'est pas conservée.</div></div>
+      <div><div class="ls-title">9. Données personnelles</div><div class="ls-body">Le traitement de vos données est décrit dans notre <a href="/confidentialite">Politique de confidentialité</a>. Vos données de santé restent sur votre téléphone. La photo d'ordonnance est analysée de manière éphémère et n'est pas conservée.</div></div>
       <div class="ls-divider"></div>
       <div><div class="ls-title">10. Médiation de la consommation</div><div class="ls-body"><p>Conformément à l'article L.612-1 du code de la consommation, vous pouvez recourir gratuitement au service de médiation de la consommation dont nous relevons.</p><p>Après avoir adressé une réclamation écrite à <a href="mailto:agc.logiciels@gmail.com">agc.logiciels@gmail.com</a> et, à défaut de réponse satisfaisante dans un délai de deux mois, vous pouvez saisir gratuitement le médiateur suivant :</p><p><strong>CM2C — Centre de la Médiation de la Consommation de Conciliateurs de Justice</strong><br>49 rue de Ponthieu – 75 008 Paris<br>Tél.&nbsp;: 01 89 47 00 14<br>Site internet&nbsp;: <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a></p><p>AGC Logiciels est affilié au dispositif CM2C jusqu'au 09/07/2029 (attestation disponible sur demande).</p></div></div>
       <div class="ls-divider"></div>

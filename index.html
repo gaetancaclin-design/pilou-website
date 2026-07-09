@@ -570,16 +570,18 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   .gallery-phone{max-width:280px}
 }
 
-    /* ─── Badge store premium ─────────────────────────────────────────── */
-    .hero-store{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:8px}
-    .store-badge-btn{display:inline-flex;align-items:center;gap:13px;background:var(--ink);color:#fff;border-radius:14px;padding:11px 22px;text-decoration:none;transition:transform .2s cubic-bezier(.16,1,.3,1),box-shadow .2s;box-shadow:0 4px 18px rgba(0,0,0,.18)}
-    .store-badge-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.22)}
-    .store-badge-btn:active{transform:translateY(0) scale(.98);box-shadow:0 2px 8px rgba(0,0,0,.16)}
-    .store-badge-icon{width:26px;height:26px;flex-shrink:0;fill:#fff}
-    .store-badge-label{display:flex;flex-direction:column;align-items:flex-start;gap:1px;line-height:1}
-    .store-badge-sub{font-size:11px;opacity:.72;letter-spacing:.02em}
-    .store-badge-name{font-size:17px;font-weight:700;letter-spacing:-.01em}
-    .store-coming{font-size:13px;color:var(--muted);letter-spacing:.01em}
+    /* ─── Badge store (statique, pre-lancement) ───────────────────── */
+    .hero-store{display:flex;justify-content:center;margin-top:6px}
+    .store-badge{display:inline-flex;align-items:center;gap:12px;padding:10px 20px;border-radius:14px;background:transparent;color:var(--ink);border:1.5px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+    .store-badge-static{cursor:default;user-select:none}
+    .store-badge-icon{width:24px;height:24px;flex-shrink:0;fill:var(--brand-dark);opacity:.9}
+    .store-badge-label{display:flex;flex-direction:column;align-items:flex-start;gap:2px;line-height:1}
+    .store-badge-sub{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    .store-badge-name{font-size:16px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+    .cta-band .store-badge{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.28)}
+    .cta-band .store-badge-icon{fill:#fff;opacity:1}
+    .cta-band .store-badge-sub{color:rgba(255,255,255,.7)}
+    .cta-band .store-badge-name{color:#fff}
     .legal-mediateur{font-size:12px;color:var(--muted);line-height:1.6;margin-top:10px;max-width:760px}
     .legal-mediateur a{color:var(--brand-dark);text-decoration:underline}
 
@@ -789,7 +791,6 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <a href="#tarifs">Tarifs</a>
       <a href="/support">Aide</a>
     </nav>
-    <a href="#hero" class="nav-cta">L’application</a>
   </div>
 </nav>
 
@@ -804,14 +805,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <h1 class="fade-up visible fade-up-d1">Vos médicaments,<br><em>en 10 secondes</em></h1>
       <p class="hero-sub fade-up visible fade-up-d2">Photographiez votre ordonnance. Pilou la lit et prépare votre pilulier en quelques secondes. Vérifiez, ajustez si besoin, validez. Sans compte. Sans inscription.</p>
       <div class="hero-store fade-up visible fade-up-d3" id="heroStore">
-        <a class="store-badge-btn" href="https://play.google.com/store/apps/details?id=com.pilou.app" target="_blank" rel="noopener" aria-label="Télécharger Pilou sur Google Play">
-          <svg class="store-badge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3.18 23.76a2 2 0 0 1-1.1-1.8V2.04A2 2 0 0 1 3.18.28l12.1 11.74-12.1 11.74zm1.67-1.62 10.26-9.95-2.1-2.03-8.16 11.98zm0-22.28 8.16 11.98 2.1-2.03-10.26-9.95zm13.08 4.72-2.6 1.5-2.38-2.31 2.38-2.31 2.6 1.5a1 1 0 0 1 0 1.62zm-2.6 12.12 2.6-1.5a1 1 0 0 0 0-1.62l-2.6-1.5-2.38 2.31 2.38 2.31z"/></svg>
-          <span class="store-badge-label">
-            <span class="store-badge-sub">Disponible sur</span>
-            <span class="store-badge-name">Google Play</span>
-          </span>
-        </a>
-        <span class="store-coming">iOS — bientôt disponible</span>
+        <div class="store-badge store-badge-static" role="img" aria-label="Bientôt disponible sur Google Play"><svg class="store-badge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3.18 23.76a2 2 0 0 1-1.1-1.8V2.04A2 2 0 0 1 3.18.28l12.1 11.74-12.1 11.74zm1.67-1.62 10.26-9.95-2.1-2.03-8.16 11.98zm0-22.28 8.16 11.98 2.1-2.03-10.26-9.95zm13.08 4.72-2.6 1.5-2.38-2.31 2.38-2.31 2.6 1.5a1 1 0 0 1 0 1.62zm-2.6 12.12 2.6-1.5a1 1 0 0 0 0-1.62l-2.6-1.5-2.38 2.31 2.38 2.31z"/></svg><span class="store-badge-label"><span class="store-badge-sub">Bientôt sur</span><span class="store-badge-name">Google Play</span></span></div>
       </div>
       <div class="trust-row fade-up visible fade-up-d4">
         <div class="trust-item">
@@ -1054,8 +1048,8 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     <div class="cta-band-inner fade-up">
       <div class="cta-band-eyebrow">Convaincu&#8239;?</div>
       <div class="cta-band-title">Prêt à ne plus rien oublier&#8239;?</div>
-      <p class="cta-band-sub">Soyez prévenu dès que Pilou est disponible sur Google Play.</p>
-      <a href="https://play.google.com/store/apps/details?id=com.pilou.app" target="_blank" rel="noopener" class="cta-band-btn">Télécharger sur Google Play</a>
+      <p class="cta-band-sub">Pilou arrive très bientôt sur Google&nbsp;Play, puis sur l’App&nbsp;Store.</p>
+      <div class="store-badge store-badge-static" role="img" aria-label="Bientôt disponible sur Google Play"><svg class="store-badge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3.18 23.76a2 2 0 0 1-1.1-1.8V2.04A2 2 0 0 1 3.18.28l12.1 11.74-12.1 11.74zm1.67-1.62 10.26-9.95-2.1-2.03-8.16 11.98zm0-22.28 8.16 11.98 2.1-2.03-10.26-9.95zm13.08 4.72-2.6 1.5-2.38-2.31 2.38-2.31 2.6 1.5a1 1 0 0 1 0 1.62zm-2.6 12.12 2.6-1.5a1 1 0 0 0 0-1.62l-2.6-1.5-2.38 2.31 2.38 2.31z"/></svg><span class="store-badge-label"><span class="store-badge-sub">Bientôt sur</span><span class="store-badge-name">Google Play</span></span></div>
     </div>
   </div>
 
@@ -1139,17 +1133,6 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     </div>
   </section>
 
-
-    <!-- CTA RAPPEL 2 (apres signature) -->
-  <div class="cta-band">
-    <div class="cta-band-inner fade-up">
-      <div class="cta-band-eyebrow">Rejoignez l'aventure</div>
-      <div class="cta-band-title">Faites partie des premiers.</div>
-      <p class="cta-band-sub">Laissez votre email et accompagnez Pilou dès son lancement.</p>
-      <a href="https://play.google.com/store/apps/details?id=com.pilou.app" target="_blank" rel="noopener" class="cta-band-btn">Télécharger sur Google Play</a>
-    </div>
-  </div>
-
 </main>
 
 <footer>
@@ -1166,7 +1149,6 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         <div class="footer-col-title">Application</div>
         <a href="#fonctionnalites">Fonctionnalités</a>
         <a href="#tarifs">Tarifs</a>
-        <a href="#tarifs">Télécharger</a>
       </div>
       <div class="footer-col">
         <div class="footer-col-title">Légal</div>

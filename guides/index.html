@@ -116,10 +116,10 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     .nav-burger[aria-expanded="true"] .burger-close{display:block}
     .mobile-menu{
       position:fixed;top:64px;left:0;right:0;z-index:99;
-      background:rgba(255,255,255,.98);
-      backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
-      border-bottom:1px solid rgba(0,0,0,.06);
-      box-shadow:0 24px 48px rgba(0,0,0,.10);
+      height:auto;max-height:calc(100vh - 64px);overflow-y:auto;
+      background:var(--white);
+      border-bottom:1px solid var(--border);
+      box-shadow:0 24px 48px rgba(0,0,0,.12);
       padding:8px 20px 22px;
       display:flex;flex-direction:column;
       transform:translateY(-10px);opacity:0;visibility:hidden;pointer-events:none;

@@ -130,7 +130,7 @@ nav{
 
 .nav-name{font-size:17px;font-weight:700;letter-spacing:-0.5px;color:var(--ink)}
 .nav-badge{
-  font-size:11px;font-weight:600;color:var(--brand);
+  font-size:11px;font-weight:600;color:var(--brand-dark);
   background:var(--brand-light);
   border:1px solid rgba(71,110,84,.15);
   padding:3px 9px;border-radius:20px;
@@ -172,7 +172,7 @@ nav{
 }
 .hero-tag{
   display:inline-flex;align-items:center;gap:7px;
-  background:var(--brand-light);color:var(--brand);
+  background:var(--brand-light);color:var(--brand-dark);
   border:1px solid rgba(71,110,84,.15);
   padding:5px 12px;border-radius:20px;
   font-size:12px;font-weight:600;
@@ -333,7 +333,7 @@ h1 em{
 .section-alt{background:var(--surface)}
 .feat,.price-card,.trust-card,.legal-card{text-align:left}
 .eyebrow{
-  font-size:11px;font-weight:700;color:var(--brand);
+  font-size:11px;font-weight:700;color:var(--brand-dark);
   text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;
 }
 h2{
@@ -378,7 +378,7 @@ h2{
 .feat-desc{font-size:13px;color:var(--muted);line-height:1.65}
 .feat-badge{
   display:inline-block;font-size:11px;font-weight:600;
-  color:var(--brand);background:var(--brand-light);
+  color:var(--brand-dark);background:var(--brand-light);
   padding:3px 8px;border-radius:6px;margin-top:14px;
   border:1px solid rgba(71,110,84,.12);
 }
@@ -411,7 +411,7 @@ h2{
 .price-tier{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
 .price-amount{font-size:40px;font-weight:800;letter-spacing:-2px;color:var(--ink)}
 .price-period{font-size:15px;color:var(--muted);font-weight:400;margin-left:2px}
-.price-annual{font-size:12px;color:var(--brand);font-weight:600;margin-top:4px}
+.price-annual{font-size:12px;color:var(--brand-dark);font-weight:600;margin-top:4px}
 .price-sep{height:1px;background:var(--border);margin:18px 0}
 .price-desc{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6}
 .price-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:auto;padding-top:8px;margin-bottom:24px}
@@ -451,7 +451,7 @@ h2{
 }
 .trust-section .section-wrap{position:relative;z-index:1}
 .trust-section h2{color:white;letter-spacing:-1.5px}
-.trust-section .eyebrow{color:rgba(255,255,255,.5)}
+.trust-section .eyebrow{color:var(--brand-light)}
 .trust-section .section-lead{color:rgba(255,255,255,.65);max-width:520px}
 .trust-grid{
   display:grid;grid-template-columns:repeat(4,1fr);
@@ -490,7 +490,7 @@ h2{
 }
 .ls-body{font-size:14px;color:var(--muted);line-height:1.8}
 .ls-body strong{color:var(--ink);font-weight:600}
-.ls-body a{color:var(--brand);font-weight:500}
+.ls-body a{color:var(--brand-dark);font-weight:500}
 .ls-body a:hover{text-decoration:underline}
 .ls-body p+p{margin-top:10px}
 .ls-divider{height:1px;background:var(--border)}
@@ -728,6 +728,18 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       .cta-band-inner{padding:28px 22px}
       .cta-band-title{font-size:21px}
     }
+
+    /* A11y — lien d'evitement (WCAG 2.4.1) */
+    .skip-link{position:absolute;left:8px;top:-56px;z-index:1000;background:var(--brand-dark);color:#fff;padding:10px 16px;border-radius:8px;font-weight:600;font-size:14px;transition:top .2s ease}
+    .skip-link:focus{top:8px}
+
+    /* A11y — focus clavier visible et branche */
+    :where(a,button,summary,[tabindex]):focus-visible{outline:2px solid var(--brand-dark);outline-offset:3px;border-radius:6px}
+
+    /* A11y — respect de la preference "reduire les animations" */
+    @media (prefers-reduced-motion: reduce){
+      *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+    }
   </style>
 <script type="application/ld+json">
 {
@@ -798,6 +810,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 </script>
 </head>
 <body>
+<a class="skip-link" href="#main">Aller au contenu</a>
 
 <!-- NAV -->
 <nav>
@@ -817,7 +830,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   </div>
 </nav>
 
-<main>
+<main id="main">
 
 <!-- HERO -->
 <div class="hero-section">

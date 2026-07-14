@@ -1,7 +1,7 @@
 {
   "name": "Pilou — Votre pilulier numérique",
   "short_name": "Pilou",
-  "description": "Photographiez votre ordonnance, Pilou prépare votre pilulier. Rappels de prise, suivi des stocks, bilan pour votre médecin. Vos données restent sur votre téléphone.",
+  "description": "Photographiez votre ordonnance, Pilou prépare votre pilulier. Rappels de prise, suivi des stocks, journal de prises à partager avec votre médecin. Vos données restent sur votre téléphone.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f9fafb",

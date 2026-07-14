@@ -439,6 +439,8 @@ h2{
   font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,color .15s;
 }
 .price-btn-s:hover{background:var(--ink);color:white}
+.price-btn-soon{background:var(--surface);color:var(--muted);border:1.5px solid var(--border);box-shadow:none;cursor:default;font-weight:600}
+.price-btn-soon:hover{background:var(--surface);color:var(--muted);border-color:var(--border);box-shadow:none;transform:none}
 .price-note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.4}
 .price-reassurance{margin-top:40px;padding:18px 28px;background:var(--surface);border-radius:14px;font-size:13px;color:var(--muted);text-align:center;line-height:1.6;border:1px solid var(--border)}
 /* ── TRUST ── */
@@ -845,7 +847,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   <div class="hero-bg-blur"></div>
   <div class="hero">
     <div class="hero-text">
-      <div class="hero-tag fade-up visible"><div class="hero-tag-dot"></div>Bientôt sur Google Play, puis App Store</div>
+      <div class="hero-tag fade-up visible"><div class="hero-tag-dot"></div>Pré-lancement</div>
       <h1 class="fade-up visible fade-up-d1">Vos médicaments,<br><em>en 10 secondes</em></h1>
       <p class="hero-sub fade-up visible fade-up-d2">Photographiez votre ordonnance. Pilou la lit et prépare votre pilulier en quelques secondes. Vérifiez, ajustez si besoin, validez.</p>
       <div class="hero-store fade-up visible fade-up-d3" id="heroStore">
@@ -1042,7 +1044,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>14 jours d'historique</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Rappels illimités</li>
         </ul>
-        <button class="price-btn-s">Commencer gratuitement</button>
+        <button class="price-btn-s price-btn-soon" disabled>Bientôt disponible</button>
                 <div class="price-note">Gratuit pour toujours · Aucune carte requise</div>
       </div>
       <div class="price-card fade-up fade-up-d2">
@@ -1060,7 +1062,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Suivi des stocks</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Trousse de voyage</li>
         </ul>
-        <button class="price-btn-s">Choisir Essentiel</button>
+        <button class="price-btn-s price-btn-soon" disabled>Bientôt disponible</button>
                 <div class="price-note">Sans engagement, résiliable à tout moment</div>
       </div>
       <div class="price-card featured fade-up fade-up-d3">
@@ -1080,7 +1082,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Trousse de voyage</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Journal de prises à partager</li>
         </ul>
-        <button class="price-btn-p">Commencer avec Pilou+</button>
+        <button class="price-btn-p price-btn-soon" disabled>Bientôt disponible</button>
                 <div class="price-note">Sans engagement, résiliable à tout moment</div>
       </div>
     </div>

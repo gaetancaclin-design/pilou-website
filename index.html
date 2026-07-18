@@ -536,9 +536,9 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 /* GALLERY */
 .gallery{padding:112px 40px;background:var(--white)}
 .gallery-wrap{max-width:var(--max-w);margin:0 auto;text-align:center}
-.gallery-grid{display:flex;gap:30px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:10px 0 6px;padding-inline:max(24px,calc((100% - 300px)/2));scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.gallery-grid{display:flex;gap:30px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:10px 0 6px;padding-inline:clamp(20px,4vw,48px);scroll-padding-inline:clamp(20px,4vw,48px);scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .gallery-grid::-webkit-scrollbar{display:none}
-.gallery-item{display:flex;flex-direction:column;align-items:center;flex:0 0 clamp(248px,74vw,286px);scroll-snap-align:center}
+.gallery-item{display:flex;flex-direction:column;align-items:center;flex:0 0 clamp(248px,74vw,286px);scroll-snap-align:start}
 .gallery-phone{width:100%;max-width:260px;background:white;border-radius:44px;border:1px solid rgba(0,0,0,.08);overflow:hidden;position:relative;box-shadow:var(--shadow-xl),0 0 0 1px rgba(255,255,255,.5) inset;transition:transform .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)}
 .gallery-item:hover .gallery-phone{transform:translateY(-6px);box-shadow:0 50px 110px rgba(0,0,0,.12),0 20px 45px rgba(0,0,0,.08),0 0 0 1px rgba(255,255,255,.5) inset}
 .gallery-notch{height:28px;background:#f2f4f2;display:flex;align-items:center;justify-content:center}
@@ -603,7 +603,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   .legal-card{padding:28px}
   .footer-top{grid-template-columns:1fr;gap:32px}
   .gallery{padding:80px 24px}
-  .gallery-grid{gap:20px;padding-inline:max(20px,calc((100% - 76vw)/2))}
+  .gallery-grid{gap:20px}
 }
 @media(max-width:480px){
   h1{letter-spacing:-2px}
@@ -1444,8 +1444,8 @@ if (reduceMotion) {
   });
   var dots=[].slice.call(dotsWrap.children);
   function update(){
-    var vp=scroller.getBoundingClientRect(), vpc=vp.left+vp.width/2, best=0, bd=1e9;
-    cards.forEach(function(c,i){ var r=c.getBoundingClientRect(), cc=r.left+r.width/2, dd=Math.abs(cc-vpc); if(dd<bd){bd=dd;best=i;} });
+    var vp=scroller.getBoundingClientRect(), edge=vp.left+24, best=0, bd=1e9;
+    cards.forEach(function(c,i){ var r=c.getBoundingClientRect(), dd=Math.abs(r.left-edge); if(dd<bd){bd=dd;best=i;} });
     dots.forEach(function(d,i){ d.classList.toggle("on",i===best); });
   }
   scroller.addEventListener("scroll",function(){ window.requestAnimationFrame(update); },{passive:true});

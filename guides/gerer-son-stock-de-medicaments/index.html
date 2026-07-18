@@ -246,6 +246,12 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     body.menu-locked{overflow:hidden}
     @media(max-width:1024px){ .js .nav-burger{display:flex} }
     @media(min-width:1025px){ .mobile-menu,.menu-backdrop{display:none!important} }
+
+.guide-related{max-width:760px;margin:40px auto 0;padding:0 24px}
+.guide-related-title{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-dark);margin-bottom:14px}
+.guide-related a{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;margin-bottom:10px;background:#fff;border-radius:14px;box-shadow:0 0 0 1px rgba(0,0,0,.06);color:var(--ink);font-weight:600;text-decoration:none;transition:box-shadow .15s ease,transform .15s ease}
+.guide-related a:hover{box-shadow:0 6px 18px rgba(0,0,0,.08);transform:translateY(-1px)}
+.guide-related a::after{content:"→";color:var(--brand-dark);font-weight:700;flex:none}
 </style>
 <script type="application/ld+json">
 {
@@ -411,6 +417,13 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </div>
     </div>
   </div>
+
+    <nav class="guide-related" aria-label="Guides a lire aussi">
+    <div class="guide-related-title">À lire aussi</div>
+    <a href="/guides/ne-plus-oublier-ses-medicaments/">Ne plus oublier ses médicaments</a>
+    <a href="/guides/pilulier-numerique-ou-physique/">Pilulier numérique ou physique : comment choisir</a>
+    <a href="/guides/partir-en-voyage-avec-ses-medicaments/">Partir en voyage avec ses médicaments</a>
+  </nav>
 
   <div class="guide-disclaimer">
     <strong>Bon à savoir&nbsp;:</strong> Pilou est un outil d'organisation et de rappel, pas un dispositif médical. Les conseils de ce guide sont d'ordre organisationnel et ne remplacent pas l'avis de votre médecin ou de votre pharmacien, seuls à même de vous conseiller sur votre traitement.

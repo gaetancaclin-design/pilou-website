@@ -699,14 +699,28 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 .faq-q{padding:16px 20px;font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .faq-q::-webkit-details-marker{display:none}
 .faq-a{padding:0 20px 16px;font-size:14px;line-height:1.7;color:var(--muted)}
-.support-contact-block{margin-top:48px;background:linear-gradient(135deg,#f6fbf7 0%,var(--brand-light) 100%);border:1px solid rgba(113,143,122,.2);border-radius:20px;padding:36px 32px;text-align:center}
+.support-contact-block{margin-top:48px;background:var(--white);border:1px solid var(--border);box-shadow:var(--shadow-sm);border-radius:20px;padding:36px 32px;text-align:center}
 .support-contact-title{font-size:20px;font-weight:700;color:var(--ink);margin-bottom:8px}
 .support-contact-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
-.support-contact-btn{display:inline-flex;align-items:center;gap:8px;padding:0 28px;height:48px;background:linear-gradient(135deg,var(--brand-dark),var(--brand-darker));color:#fff;font-size:14px;font-weight:700;border-radius:12px;text-decoration:none;box-shadow:0 4px 14px rgba(71,110,84,.3)}
+.support-contact-btn{display:inline-flex;align-items:center;gap:8px;padding:0 28px;height:48px;background:var(--brand-dark);color:#fff;font-size:14px;font-weight:700;border-radius:12px;text-decoration:none;box-shadow:var(--shadow-sm)}
 @media(max-width:600px){.subpage-main{padding:32px 16px 60px}.faq-q{font-size:14px;padding:14px 16px}.faq-a{padding:0 16px 14px}.support-contact-block{padding:24px 20px}}
 </style>
+  <style>
+    /* A11y — lien d'evitement (WCAG 2.4.1) */
+    .skip-link{position:absolute;left:8px;top:-56px;z-index:1000;background:var(--brand-dark);color:#fff;padding:10px 16px;border-radius:8px;font-weight:600;font-size:14px;transition:top .2s ease}
+    .skip-link:focus{top:8px}
+    /* A11y — focus clavier visible et branche (WCAG 2.4.7) */
+    :where(a,button,summary,[tabindex]):focus-visible{outline:2px solid var(--brand-dark);outline-offset:3px;border-radius:6px}
+    /* A11y — respect de la preference reduire les animations */
+    @media (prefers-reduced-motion: reduce){
+      *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+    }
+    /* A11y — titres de section semantiques (h2) sans marge parasite */
+    .ls-title,.faq-group-title,.support-contact-title{margin-top:0}
+  </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Aller au contenu</a>
 <header class="subpage-header">
   <div class="subpage-header-inner">
     <a href="/" class="subpage-back">
@@ -719,13 +733,13 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     </a>
   </div>
 </header>
-<main class="subpage-main">
+<main id="main" class="subpage-main">
   <div class="subpage-wrap">
     <div class="eyebrow">Aide</div>
     <h1 class="subpage-title">Support & Questions fréquentes</h1>
     <p class="subpage-lead">Vous ne trouvez pas votre réponse ? Écrivez-nous à <a href="mailto:agc.logiciels@gmail.com" class="support-email-link">agc.logiciels@gmail.com</a> — nous répondons sous 48h.</p>
     <div class="faq-section">
-      <div class="faq-group-title">Général</div>
+      <h2 class="faq-group-title">Général</h2>
       <div class="faq-list">
         <details class="faq-item">
           <summary class="faq-q">Pilou est-il gratuit ?</summary>
@@ -746,7 +760,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </div>
     </div>
     <div class="faq-section">
-      <div class="faq-group-title">Fonctionnalités</div>
+      <h2 class="faq-group-title">Fonctionnalités</h2>
       <div class="faq-list">
         <details class="faq-item">
           <summary class="faq-q">Comment photographier mon ordonnance ?</summary>
@@ -767,7 +781,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </div>
     </div>
     <div class="faq-section">
-      <div class="faq-group-title">Abonnements</div>
+      <h2 class="faq-group-title">Abonnements</h2>
       <div class="faq-list">
         <details class="faq-item">
           <summary class="faq-q">Comment annuler mon abonnement ?</summary>
@@ -780,7 +794,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </div>
     </div>
     <div class="faq-section">
-      <div class="faq-group-title">Confidentialité</div>
+      <h2 class="faq-group-title">Confidentialité</h2>
       <div class="faq-list">
         <details class="faq-item">
           <summary class="faq-q">Mes données de santé sont-elles sécurisées ?</summary>
@@ -793,7 +807,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </div>
     </div>
     <div class="support-contact-block">
-      <div class="support-contact-title">Vous n'avez pas trouvé votre réponse ?</div>
+      <h2 class="support-contact-title">Vous n'avez pas trouvé votre réponse ?</h2>
       <p class="support-contact-sub">Notre équipe vous répond sous 48 heures.</p>
       <a href="mailto:agc.logiciels@gmail.com" class="support-contact-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>

@@ -704,8 +704,22 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 .support-contact-btn{display:inline-flex;align-items:center;gap:8px;padding:0 28px;height:48px;background:linear-gradient(135deg,var(--brand-dark),var(--brand-darker));color:#fff;font-size:14px;font-weight:700;border-radius:12px;text-decoration:none;box-shadow:0 4px 14px rgba(71,110,84,.3)}
 @media(max-width:600px){.subpage-main{padding:32px 16px 60px}.faq-q{font-size:14px;padding:14px 16px}.faq-a{padding:0 16px 14px}.support-contact-block{padding:24px 20px}}
 </style>
+  <style>
+    /* A11y — lien d'evitement (WCAG 2.4.1) */
+    .skip-link{position:absolute;left:8px;top:-56px;z-index:1000;background:var(--brand-dark);color:#fff;padding:10px 16px;border-radius:8px;font-weight:600;font-size:14px;transition:top .2s ease}
+    .skip-link:focus{top:8px}
+    /* A11y — focus clavier visible et branche (WCAG 2.4.7) */
+    :where(a,button,summary,[tabindex]):focus-visible{outline:2px solid var(--brand-dark);outline-offset:3px;border-radius:6px}
+    /* A11y — respect de la preference reduire les animations */
+    @media (prefers-reduced-motion: reduce){
+      *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+    }
+    /* A11y — titres de section semantiques (h2) sans marge parasite */
+    .ls-title,.faq-group-title,.support-contact-title{margin-top:0}
+  </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Aller au contenu</a>
 <header class="subpage-header">
   <div class="subpage-header-inner">
     <a href="/" class="subpage-back">
@@ -718,25 +732,25 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     </a>
   </div>
 </header>
-<main class="subpage-main">
+<main id="main" class="subpage-main">
   <div class="subpage-wrap">
     <div class="eyebrow">Légal</div>
     <h1 class="subpage-title">Mentions légales</h1>
     <p class="legal-update">Dernière mise à jour : juillet 2026</p>
     <div class="legal-card">
-      <div><div class="ls-title">1. Éditeur du site</div><div class="ls-body"><p>Le site <strong>pilou-app.fr</strong> et l'application mobile Pilou sont édités par :</p><p><strong>AGC Logiciels</strong> — Gaétan Caclin, entrepreneur individuel.<br>60 Le Clos du Village, 01480 Fareins, France.<br>Téléphone : <a href="tel:+33984694541">09 84 69 45 41</a><br>Courriel : <a href="mailto:agc.logiciels@gmail.com">agc.logiciels@gmail.com</a><br>SIRET : 952 541 340 00032 — SIREN : 952 541 340</p></div></div>
+      <div><h2 class="ls-title">1. Éditeur du site</h2><div class="ls-body"><p>Le site <strong>pilou-app.fr</strong> et l'application mobile Pilou sont édités par :</p><p><strong>AGC Logiciels</strong> — Gaétan Caclin, entrepreneur individuel.<br>60 Le Clos du Village, 01480 Fareins, France.<br>Téléphone : <a href="tel:+33984694541">09 84 69 45 41</a><br>Courriel : <a href="mailto:agc.logiciels@gmail.com">agc.logiciels@gmail.com</a><br>SIRET : 952 541 340 00032 — SIREN : 952 541 340</p></div></div>
       <div class="ls-divider"></div>
-      <div><div class="ls-title">2. Directeur de la publication</div><div class="ls-body"><p>Gaétan Caclin, en qualité d'éditeur du site.</p></div></div>
+      <div><h2 class="ls-title">2. Directeur de la publication</h2><div class="ls-body"><p>Gaétan Caclin, en qualité d'éditeur du site.</p></div></div>
       <div class="ls-divider"></div>
-      <div><div class="ls-title">3. Hébergement du site</div><div class="ls-body"><p>Le site est hébergé par :</p><p><strong>GitHub, Inc.</strong><br>88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.<br>Téléphone : +1 877 448 4820<br>Site : <a href="https://github.com" target="_blank" rel="noopener">github.com</a></p><p>Les pages du site sont servies depuis les infrastructures de GitHub, situées aux États-Unis. La consultation du site implique donc la transmission de votre adresse IP à cet hébergeur.</p></div></div>
+      <div><h2 class="ls-title">3. Hébergement du site</h2><div class="ls-body"><p>Le site est hébergé par :</p><p><strong>GitHub, Inc.</strong><br>88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.<br>Téléphone : +1 877 448 4820<br>Site : <a href="https://github.com" target="_blank" rel="noopener">github.com</a></p><p>Les pages du site sont servies depuis les infrastructures de GitHub, situées aux États-Unis. La consultation du site implique donc la transmission de votre adresse IP à cet hébergeur.</p></div></div>
       <div class="ls-divider"></div>
-      <div><div class="ls-title">4. Propriété intellectuelle</div><div class="ls-body"><p>L'ensemble du site — structure, textes, visuels, logo et code source — est protégé par le droit de la propriété intellectuelle. Toute reproduction, représentation ou adaptation, totale ou partielle, sans autorisation écrite préalable, est interdite.</p></div></div>
+      <div><h2 class="ls-title">4. Propriété intellectuelle</h2><div class="ls-body"><p>L'ensemble du site — structure, textes, visuels, logo et code source — est protégé par le droit de la propriété intellectuelle. Toute reproduction, représentation ou adaptation, totale ou partielle, sans autorisation écrite préalable, est interdite.</p></div></div>
       <div class="ls-divider"></div>
-      <div><div class="ls-title">5. Données personnelles</div><div class="ls-body"><p>Le traitement de vos données est décrit dans la <a href="/confidentialite">politique de confidentialité</a>. Vous y trouverez notamment la base légale des traitements, la liste des sous-traitants, les durées de conservation et les modalités d'exercice de vos droits.</p></div></div>
+      <div><h2 class="ls-title">5. Données personnelles</h2><div class="ls-body"><p>Le traitement de vos données est décrit dans la <a href="/confidentialite">politique de confidentialité</a>. Vous y trouverez notamment la base légale des traitements, la liste des sous-traitants, les durées de conservation et les modalités d'exercice de vos droits.</p></div></div>
       <div class="ls-divider"></div>
-      <div><div class="ls-title">6. Médiation de la consommation</div><div class="ls-body"><p>Conformément à l'article L.612-1 du code de la consommation, AGC Logiciels relève du dispositif de médiation <strong>CM2C</strong> — 49 rue de Ponthieu, 75 008 Paris — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Les modalités de saisine figurent à l'article 11 des <a href="/cgu">conditions générales d'utilisation</a>.</p></div></div>
+      <div><h2 class="ls-title">6. Médiation de la consommation</h2><div class="ls-body"><p>Conformément à l'article L.612-1 du code de la consommation, AGC Logiciels relève du dispositif de médiation <strong>CM2C</strong> — 49 rue de Ponthieu, 75 008 Paris — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Les modalités de saisine figurent à l'article 11 des <a href="/cgu">conditions générales d'utilisation</a>.</p></div></div>
       <div class="ls-divider"></div>
-      <div><div class="ls-title">7. Contact</div><div class="ls-body"><p>Pour toute question relative au site ou à l'application : <a href="mailto:agc.logiciels@gmail.com">agc.logiciels@gmail.com</a>.</p></div></div>
+      <div><h2 class="ls-title">7. Contact</h2><div class="ls-body"><p>Pour toute question relative au site ou à l'application : <a href="mailto:agc.logiciels@gmail.com">agc.logiciels@gmail.com</a>.</p></div></div>
     </div>
   </div>
 </main>

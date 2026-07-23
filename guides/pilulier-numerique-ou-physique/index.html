@@ -252,6 +252,23 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 .guide-related a{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;margin-bottom:10px;background:#fff;border-radius:14px;box-shadow:0 0 0 1px rgba(0,0,0,.06);color:var(--ink);font-weight:600;text-decoration:none;transition:box-shadow .15s ease,transform .15s ease}
 .guide-related a:hover{box-shadow:0 6px 18px rgba(0,0,0,.08);transform:translateY(-1px)}
 .guide-related a::after{content:"→";color:var(--brand-dark);font-weight:700;flex:none}
+/* ── En bref & FAQ (GEO) ── */
+.guide-tldr{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--brand-dark);border-radius:var(--r-lg);padding:18px 22px;margin:0 0 30px}
+.guide-tldr-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-dark);margin-bottom:6px}
+.guide-tldr p{margin:0;font-size:15px;line-height:1.7;color:var(--ink)}
+.guide-faq{margin:8px 0 4px}
+.guide-faq-title{font-size:22px;font-weight:700;color:var(--ink);margin:0 0 18px}
+.guide-faq .faq-list{display:flex;flex-direction:column;gap:12px}
+.guide-faq .faq-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .3s ease}
+.guide-faq .faq-item[open]{border-color:var(--brand-dark)}
+.guide-faq .faq-q{list-style:none;cursor:pointer;padding:18px 22px;font-size:16px;font-weight:600;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.guide-faq .faq-q::-webkit-details-marker{display:none}
+.guide-faq .faq-icon{position:relative;flex-shrink:0;width:16px;height:16px}
+.guide-faq .faq-icon::before,.guide-faq .faq-icon::after{content:"";position:absolute;background:var(--brand-dark);border-radius:2px;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.guide-faq .faq-icon::before{top:7px;left:0;width:16px;height:2px}
+.guide-faq .faq-icon::after{top:0;left:7px;width:2px;height:16px}
+.guide-faq .faq-item[open] .faq-icon::after{transform:rotate(90deg);opacity:0}
+.guide-faq .faq-a{padding:0 22px 22px;font-size:15px;line-height:1.7;color:var(--muted)}
 </style>
 <script type="application/ld+json">
 {
@@ -304,6 +321,62 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Vaut-il mieux un pilulier physique ou une application ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Aucun n’est meilleur dans l’absolu : ce sont deux réponses différentes au même besoin. Tout dépend de votre traitement, de vos habitudes et de votre aisance avec un smartphone. Et rien n’oblige à trancher — beaucoup de personnes gagnent à combiner les deux."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quels sont les avantages et les limites du pilulier physique ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ses forces : toute la semaine visible d’un coup d’œil, la case vide qui confirme la prise, aucune dépendance à la batterie, une simplicité totale. Ses limites : il faut le remplir soi-même sans se tromper de case, il peut être encombrant en déplacement, et surtout il ne vous prévient pas — il attend qu’on vienne à lui."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quels sont les avantages et les limites du pilulier numérique ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Son grand atout, c’est le rappel actif : le téléphone vous alerte à l’heure, enregistre les prises et suit le stock, sans rien de plus à emporter. En contrepartie, il dépend d’un téléphone chargé et à portée, et suppose une aisance minimale avec un smartphone — et il n’y a aucune honte à préférer une boîte que l’on tient dans la main."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pilulier ou application : comment choisir ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Posez-vous quelques questions : êtes-vous à l’aise avec un smartphone ? Votre traitement est-il simple ou complexe ? Avez-vous besoin qu’on vous prévienne, ou d’un simple repère visuel ? Êtes-vous souvent en déplacement ? Aucune réponse n’élimine une option : elles dessinent celle qui demandera le moins d’effort au quotidien."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Peut-on utiliser un pilulier et une application en même temps ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, et c’est souvent la combinaison la plus fiable. Le pilulier prépare et visualise la semaine ; l’application ajoute le rappel au bon moment et le suivi de ce qui a été pris. Chacun couvre l’angle mort de l’autre : la boîte ne sonne pas, le téléphone peut être déchargé. Ensemble, ils forment un filet à deux niveaux."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Le pilulier numérique convient-il aux personnes peu à l’aise avec un smartphone ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pas toujours, et c’est normal. Installer une application et gérer des notifications est naturel pour certains, stressant pour d’autres. Dans ce cas, le pilulier physique reste très fiable — éventuellement préparé en pharmacie (PDA). L’important est de choisir l’outil qu’on gardera vraiment au quotidien."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu</a>
@@ -340,7 +413,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 
 <!-- FIL D'ARIANE -->
 <div class="crumb-wrap">
-  <nav class="crumb" aria-label="Fil d'ariane">
+  <nav class="crumb" aria-label="Fil d'Ariane">
     <a href="/">Accueil</a>
     <span class="crumb-sep" aria-hidden="true">›</span>
     <a href="/guides/">Guides</a>
@@ -360,6 +433,11 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   </header>
 
   <div class="guide-body">
+    <div class="guide-tldr">
+      <div class="guide-tldr-label">En bref</div>
+      <p>Le pilulier physique et l’application visent le même but&nbsp;: ne rien oublier et savoir où l’on en est. Le premier montre la semaine d’un coup d’œil mais ne prévient pas&nbsp;; la seconde rappelle au bon moment mais dépend d’un téléphone chargé. Le meilleur choix dépend de vos habitudes — et souvent, les associer est la solution la plus fiable.</p>
+    </div>
+
     <h2>Deux outils, un même objectif</h2>
     <p>Boîte à compartiments posée sur la table de la cuisine ou application dans la poche&nbsp;: le pilulier physique et le pilulier numérique poursuivent exactement le même but. Ne rien oublier, savoir où l’on en est dans son traitement, et vivre plus sereinement au quotidien. Ce sont deux réponses différentes à la même question, et aucune n’est «&nbsp;meilleure&nbsp;» dans l’absolu.</p>
     <p>Le bon choix dépend de vous&nbsp;: de votre traitement, de vos habitudes, de votre aisance avec un smartphone, de votre rythme de vie. Cet article passe en revue les forces et les limites de chaque solution — honnêtement, dans les deux sens — pour vous aider à trouver celle qui vous correspond. Et, comme vous le verrez, la réponse est souvent&nbsp;: les deux.</p>
@@ -419,6 +497,36 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     <p>Si la voie numérique vous parle, c’est exactement ce que propose Pilou&nbsp;: des rappels à l’heure de chaque prise, le suivi de ce qui a été pris, la lecture de votre ordonnance en photo pour configurer vos rappels plus facilement, et le suivi de votre stock de boîtes. Le tout pensé pour rester simple — y compris pour ceux qui ne se sentent pas experts en technologie. Pilou sera bientôt disponible sur Google&nbsp;Play.</p>
   </div>
 
+  <section class="guide-faq" aria-label="Questions fréquentes">
+    <h2 class="guide-faq-title">Questions fréquentes</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary class="faq-q">Vaut-il mieux un pilulier physique ou une application&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Aucun n’est meilleur dans l’absolu&nbsp;: ce sont deux réponses différentes au même besoin. Tout dépend de votre traitement, de vos habitudes et de votre aisance avec un smartphone. Et rien n’oblige à trancher — beaucoup de personnes gagnent à combiner les deux.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Quels sont les avantages et les limites du pilulier physique&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Ses forces&nbsp;: toute la semaine visible d’un coup d’œil, la case vide qui confirme la prise, aucune dépendance à la batterie, une simplicité totale. Ses limites&nbsp;: il faut le remplir soi-même sans se tromper de case, il peut être encombrant en déplacement, et surtout il ne vous prévient pas — il attend qu’on vienne à lui.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Quels sont les avantages et les limites du pilulier numérique&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Son grand atout, c’est le rappel actif&nbsp;: le téléphone vous alerte à l’heure, enregistre les prises et suit le stock, sans rien de plus à emporter. En contrepartie, il dépend d’un téléphone chargé et à portée, et suppose une aisance minimale avec un smartphone — et il n’y a aucune honte à préférer une boîte que l’on tient dans la main.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Pilulier ou application&nbsp;: comment choisir&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Posez-vous quelques questions&nbsp;: êtes-vous à l’aise avec un smartphone&nbsp;? Votre traitement est-il simple ou complexe&nbsp;? Avez-vous besoin qu’on vous prévienne, ou d’un simple repère visuel&nbsp;? Êtes-vous souvent en déplacement&nbsp;? Aucune réponse n’élimine une option&nbsp;: elles dessinent celle qui demandera le moins d’effort au quotidien.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Peut-on utiliser un pilulier et une application en même temps&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Oui, et c’est souvent la combinaison la plus fiable. Le pilulier prépare et visualise la semaine&nbsp;; l’application ajoute le rappel au bon moment et le suivi de ce qui a été pris. Chacun couvre l’angle mort de l’autre&nbsp;: la boîte ne sonne pas, le téléphone peut être déchargé. Ensemble, ils forment un filet à deux niveaux.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Le pilulier numérique convient-il aux personnes peu à l’aise avec un smartphone&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Pas toujours, et c’est normal. Installer une application et gérer des notifications est naturel pour certains, stressant pour d’autres. Dans ce cas, le pilulier physique reste très fiable — éventuellement préparé en pharmacie (PDA). L’important est de choisir l’outil qu’on gardera vraiment au quotidien.</div>
+      </details>
+    </div>
+  </section>
+
   <div class="guide-cta">
     <div class="guide-cta-inner">
       <div class="guide-cta-title">Pilou, si le numérique vous parle</div>
@@ -430,7 +538,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     </div>
   </div>
 
-    <nav class="guide-related" aria-label="Guides a lire aussi">
+    <nav class="guide-related" aria-label="Guides à lire aussi">
     <div class="guide-related-title">À lire aussi</div>
     <a href="/guides/ne-plus-oublier-ses-medicaments/">Ne plus oublier ses médicaments</a>
     <a href="/guides/aider-un-proche-a-suivre-son-traitement/">Aider un proche à suivre son traitement</a>
@@ -478,7 +586,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </div>
     </div>
     <div class="footer-bottom">
-      <p class="legal-mediateur">Médiation&nbsp;: <strong>CM2C</strong> — 49 rue de Ponthieu, 75&nbsp;008 Paris — Tél.&nbsp;: 01 89 47 00 14 — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Conformément à l'art. L.612-1 du code de la consommation, vous pouvez recourir gratuitement à la médiation de la consommation après réclamation écrite préalable auprès d'AGC Logiciels.</p>
+      <p class="legal-mediateur">Médiation&nbsp;: <strong>CM2C</strong> — 49 rue de Ponthieu, 75008 Paris — Tél.&nbsp;: 01 89 47 00 14 — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Conformément à l'art. L.&nbsp;612-1 du code de la consommation, vous pouvez recourir gratuitement à la médiation de la consommation après réclamation écrite préalable auprès d'AGC Logiciels.</p>
       <span>© 2026 Pilou — Application française</span>
       <span>Non médical — Outil d'aide à l'observance</span>
     </div>

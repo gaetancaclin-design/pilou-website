@@ -252,6 +252,23 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 .guide-related a{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;margin-bottom:10px;background:#fff;border-radius:14px;box-shadow:0 0 0 1px rgba(0,0,0,.06);color:var(--ink);font-weight:600;text-decoration:none;transition:box-shadow .15s ease,transform .15s ease}
 .guide-related a:hover{box-shadow:0 6px 18px rgba(0,0,0,.08);transform:translateY(-1px)}
 .guide-related a::after{content:"→";color:var(--brand-dark);font-weight:700;flex:none}
+/* ── En bref & FAQ (GEO) ── */
+.guide-tldr{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--brand-dark);border-radius:var(--r-lg);padding:18px 22px;margin:0 0 30px}
+.guide-tldr-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-dark);margin-bottom:6px}
+.guide-tldr p{margin:0;font-size:15px;line-height:1.7;color:var(--ink)}
+.guide-faq{margin:8px 0 4px}
+.guide-faq-title{font-size:22px;font-weight:700;color:var(--ink);margin:0 0 18px}
+.guide-faq .faq-list{display:flex;flex-direction:column;gap:12px}
+.guide-faq .faq-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .3s ease}
+.guide-faq .faq-item[open]{border-color:var(--brand-dark)}
+.guide-faq .faq-q{list-style:none;cursor:pointer;padding:18px 22px;font-size:16px;font-weight:600;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.guide-faq .faq-q::-webkit-details-marker{display:none}
+.guide-faq .faq-icon{position:relative;flex-shrink:0;width:16px;height:16px}
+.guide-faq .faq-icon::before,.guide-faq .faq-icon::after{content:"";position:absolute;background:var(--brand-dark);border-radius:2px;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.guide-faq .faq-icon::before{top:7px;left:0;width:16px;height:2px}
+.guide-faq .faq-icon::after{top:0;left:7px;width:2px;height:16px}
+.guide-faq .faq-item[open] .faq-icon::after{transform:rotate(90deg);opacity:0}
+.guide-faq .faq-a{padding:0 22px 22px;font-size:15px;line-height:1.7;color:var(--muted)}
 </style>
 <script type="application/ld+json">
 {
@@ -304,6 +321,54 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Quelle quantité de médicaments emporter en voyage ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "De quoi couvrir toute la durée du séjour, plus une marge. Un vol retardé, un retour repoussé ou une valise égarée arrivent vite : quelques prises d’avance valent mieux qu’une pharmacie à chercher en terre inconnue. Pour plusieurs traitements, la trousse de voyage de Pilou calcule la quantité par médicament à partir du nombre de jours."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Faut-il mettre ses médicaments en bagage à main ou en soute ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En bagage à main. Vous gardez ainsi votre traitement avec vous même si votre valise voyage sans vous, et vous l’épargnez du froid de la soute, qui peut altérer certains médicaments. Conservez-les dans leur emballage d’origine avec la notice, et à l’abri de la chaleur pendant les trajets."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Peut-on voyager à l’étranger avec ses médicaments ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour la plupart des médicaments courants, l’ordonnance et les boîtes suffisent. Mais certains — notamment les stupéfiants ou traitements soumis à réglementation — demandent une autorisation : de l’ARS dans l’espace Schengen, parfois de l’ANSM hors Schengen. Ces démarches se préparent à l’avance. Votre pharmacien vous dira si l’un de vos médicaments est concerné."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment gérer ses prises avec le décalage horaire ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Changer de fuseau décale l’heure de vos prises. Pour beaucoup de traitements, un léger glissement est sans conséquence ; d’autres, plus sensibles à la régularité, demandent un ajustement préparé. Il n’existe pas de règle unique : avant un long voyage, demandez conseil à votre médecin ou à votre pharmacien."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quels papiers emporter avec ses médicaments ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Emportez votre ordonnance à jour — pour un voyage lointain, une version traduite facilite les échanges à un contrôle ou chez un médecin sur place. Gardez les médicaments dans leur emballage d’origine étiqueté. Pour les traitements réglementés, ajoutez l’autorisation nécessaire (ARS ou ANSM selon la destination)."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu</a>
@@ -340,7 +405,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 
 <!-- FIL D'ARIANE -->
 <div class="crumb-wrap">
-  <nav class="crumb" aria-label="Fil d'ariane">
+  <nav class="crumb" aria-label="Fil d'Ariane">
     <a href="/">Accueil</a>
     <span class="crumb-sep" aria-hidden="true">›</span>
     <a href="/guides/">Guides</a>
@@ -360,6 +425,11 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   </header>
 
   <div class="guide-body">
+    <div class="guide-tldr">
+      <div class="guide-tldr-label">En bref</div>
+      <p>Voyager avec un traitement est une affaire d’anticipation. Faites le point sur vos réserves avant de partir, emportez de quoi couvrir tout le séjour plus une marge, gardez vos médicaments en cabine dans leur emballage d’origine avec l’ordonnance, et vérifiez à l’avance les règles de votre destination pour les médicaments particuliers (autorisation ARS dans l’espace Schengen, parfois ANSM au-delà).</p>
+    </div>
+
     <p>Préparer sa valise est plutôt un plaisir&nbsp;; préparer sa trousse à pharmacie, beaucoup moins. Pourtant, c’est souvent elle qui décide de la sérénité du voyage. Oublier une boîte, tomber à court à l’étranger un dimanche, ou découvrir à la douane qu’un médicament demandait un papier particulier&nbsp;: rien de tout cela n’est une fatalité. Avec un peu d’avance et les bons réflexes, on part l’esprit léger — et on garde son traitement au bon rythme, où que l’on soit.</p>
 
     <h2>Faire le point avant de partir</h2>
@@ -394,6 +464,32 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     <p>Pilou vous accompagne sur ce chemin&nbsp;: sa <strong>trousse de voyage</strong> calcule les quantités à emporter pour la durée de votre séjour, le suivi du stock vous évite de partir avec une boîte presque vide, et les rappels veillent sur vos prises jour après jour. <strong>Pilou sera bientôt disponible sur Google&nbsp;Play.</strong> D’ici là, un coup d’œil à vos boîtes avant le prochain départ est déjà le bon réflexe.</p>
   </div>
 
+  <section class="guide-faq" aria-label="Questions fréquentes">
+    <h2 class="guide-faq-title">Questions fréquentes</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary class="faq-q">Quelle quantité de médicaments emporter en voyage&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">De quoi couvrir toute la durée du séjour, plus une marge. Un vol retardé, un retour repoussé ou une valise égarée arrivent vite&nbsp;: quelques prises d’avance valent mieux qu’une pharmacie à chercher en terre inconnue. Pour plusieurs traitements, la trousse de voyage de Pilou calcule la quantité par médicament à partir du nombre de jours.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Faut-il mettre ses médicaments en bagage à main ou en soute&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">En bagage à main. Vous gardez ainsi votre traitement avec vous même si votre valise voyage sans vous, et vous l’épargnez du froid de la soute, qui peut altérer certains médicaments. Conservez-les dans leur emballage d’origine avec la notice, et à l’abri de la chaleur pendant les trajets.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Peut-on voyager à l’étranger avec ses médicaments&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Pour la plupart des médicaments courants, l’ordonnance et les boîtes suffisent. Mais certains — notamment les stupéfiants ou traitements soumis à réglementation — demandent une autorisation&nbsp;: de l’ARS dans l’espace Schengen, parfois de l’ANSM hors Schengen. Ces démarches se préparent à l’avance. Votre pharmacien vous dira si l’un de vos médicaments est concerné.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Comment gérer ses prises avec le décalage horaire&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Changer de fuseau décale l’heure de vos prises. Pour beaucoup de traitements, un léger glissement est sans conséquence&nbsp;; d’autres, plus sensibles à la régularité, demandent un ajustement préparé. Il n’existe pas de règle unique&nbsp;: avant un long voyage, demandez conseil à votre médecin ou à votre pharmacien.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Quels papiers emporter avec ses médicaments&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Emportez votre ordonnance à jour — pour un voyage lointain, une version traduite facilite les échanges à un contrôle ou chez un médecin sur place. Gardez les médicaments dans leur emballage d’origine étiqueté. Pour les traitements réglementés, ajoutez l’autorisation nécessaire (ARS ou ANSM selon la destination).</div>
+      </details>
+    </div>
+  </section>
+
   <div class="guide-cta">
     <div class="guide-cta-inner">
       <div class="guide-cta-title">Pilou prépare votre trousse de voyage</div>
@@ -405,7 +501,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     </div>
   </div>
 
-    <nav class="guide-related" aria-label="Guides a lire aussi">
+    <nav class="guide-related" aria-label="Guides à lire aussi">
     <div class="guide-related-title">À lire aussi</div>
     <a href="/guides/gerer-son-stock-de-medicaments/">Gérer son stock de médicaments</a>
     <a href="/guides/ne-plus-oublier-ses-medicaments/">Ne plus oublier ses médicaments</a>
@@ -453,7 +549,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </div>
     </div>
     <div class="footer-bottom">
-      <p class="legal-mediateur">Médiation&nbsp;: <strong>CM2C</strong> — 49 rue de Ponthieu, 75&nbsp;008 Paris — Tél.&nbsp;: 01 89 47 00 14 — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Conformément à l'art. L.612-1 du code de la consommation, vous pouvez recourir gratuitement à la médiation de la consommation après réclamation écrite préalable auprès d'AGC Logiciels.</p>
+      <p class="legal-mediateur">Médiation&nbsp;: <strong>CM2C</strong> — 49 rue de Ponthieu, 75008 Paris — Tél.&nbsp;: 01 89 47 00 14 — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Conformément à l'art. L.&nbsp;612-1 du code de la consommation, vous pouvez recourir gratuitement à la médiation de la consommation après réclamation écrite préalable auprès d'AGC Logiciels.</p>
       <span>© 2026 Pilou — Application française</span>
       <span>Non médical — Outil d'aide à l'observance</span>
     </div>

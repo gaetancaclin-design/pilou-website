@@ -1,0 +1,20 @@
+# Pilou
+
+> Pilou est une application française de rappel de prise de médicaments et de suivi de traitement — un pilulier numérique. Elle envoie un rappel à l'heure de chaque prise, permet de confirmer les prises, suit le stock de boîtes et lit l'ordonnance par photo pour configurer les traitements. Les données de santé restent sur le téléphone de l'utilisateur ; seule la photo d'ordonnance est analysée en France le temps de la lecture, puis n'est pas conservée. Application Android, bientôt disponible sur Google Play. Éditeur : AGC Logiciels.
+
+## Guides pratiques
+- [Ne plus oublier ses médicaments](https://pilou-app.fr/guides/ne-plus-oublier-ses-medicaments/) : associer la prise à une habitude, rendre les médicaments visibles, pilulier, rappels, et quoi faire en cas d'oubli.
+- [Aider un proche à suivre son traitement](https://pilou-app.fr/guides/aider-un-proche-a-suivre-son-traitement/) : accompagner sans materner, préparation des doses en pharmacie (PDA), aide à distance, préserver la relation.
+- [Éviter la rupture : gérer son stock de médicaments](https://pilou-app.fr/guides/gerer-son-stock-de-medicaments/) : surveiller ses boîtes, fixer un seuil de rachat, anticiper le renouvellement de l'ordonnance.
+- [Partir en voyage avec ses médicaments](https://pilou-app.fr/guides/partir-en-voyage-avec-ses-medicaments/) : quantité à emporter, transport en cabine, réglementation (ARS dans l'espace Schengen, ANSM au-delà), décalage horaire.
+- [Pilulier numérique ou physique : comment choisir](https://pilou-app.fr/guides/pilulier-numerique-ou-physique/) : forces et limites de chaque solution, et pourquoi les associer.
+
+## Pages principales
+- [Accueil](https://pilou-app.fr/) : présentation de l'application, fonctionnalités et tarifs.
+- [Support et questions fréquentes](https://pilou-app.fr/support/) : aide et réponses aux questions courantes.
+- [Politique de confidentialité](https://pilou-app.fr/confidentialite/) : traitement des données de santé.
+- [Conditions d'utilisation](https://pilou-app.fr/cgu/)
+- [Mentions légales](https://pilou-app.fr/mentions-legales/)
+
+## À savoir
+- Pilou est un outil d'organisation et de rappel, pas un dispositif médical. Il ne remplace pas l'avis d'un médecin ou d'un pharmacien.

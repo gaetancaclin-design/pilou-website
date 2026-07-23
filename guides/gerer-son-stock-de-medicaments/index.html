@@ -252,6 +252,23 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 .guide-related a{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;margin-bottom:10px;background:#fff;border-radius:14px;box-shadow:0 0 0 1px rgba(0,0,0,.06);color:var(--ink);font-weight:600;text-decoration:none;transition:box-shadow .15s ease,transform .15s ease}
 .guide-related a:hover{box-shadow:0 6px 18px rgba(0,0,0,.08);transform:translateY(-1px)}
 .guide-related a::after{content:"→";color:var(--brand-dark);font-weight:700;flex:none}
+/* ── En bref & FAQ (GEO) ── */
+.guide-tldr{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--brand-dark);border-radius:var(--r-lg);padding:18px 22px;margin:0 0 30px}
+.guide-tldr-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-dark);margin-bottom:6px}
+.guide-tldr p{margin:0;font-size:15px;line-height:1.7;color:var(--ink)}
+.guide-faq{margin:8px 0 4px}
+.guide-faq-title{font-size:22px;font-weight:700;color:var(--ink);margin:0 0 18px}
+.guide-faq .faq-list{display:flex;flex-direction:column;gap:12px}
+.guide-faq .faq-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .3s ease}
+.guide-faq .faq-item[open]{border-color:var(--brand-dark)}
+.guide-faq .faq-q{list-style:none;cursor:pointer;padding:18px 22px;font-size:16px;font-weight:600;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.guide-faq .faq-q::-webkit-details-marker{display:none}
+.guide-faq .faq-icon{position:relative;flex-shrink:0;width:16px;height:16px}
+.guide-faq .faq-icon::before,.guide-faq .faq-icon::after{content:"";position:absolute;background:var(--brand-dark);border-radius:2px;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.guide-faq .faq-icon::before{top:7px;left:0;width:16px;height:2px}
+.guide-faq .faq-icon::after{top:0;left:7px;width:2px;height:16px}
+.guide-faq .faq-item[open] .faq-icon::after{transform:rotate(90deg);opacity:0}
+.guide-faq .faq-a{padding:0 22px 22px;font-size:15px;line-height:1.7;color:var(--muted)}
 </style>
 <script type="application/ld+json">
 {
@@ -304,6 +321,54 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Comment éviter de tomber à court de médicaments ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tout se joue sur l’anticipation. Gardez un œil régulier sur le niveau de vos boîtes — par exemple en préparant votre pilulier —, fixez-vous un seuil de rachat, et passez en pharmacie avant la dernière plaquette. Avec ces quelques réflexes, on ne se retrouve plus à sec."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "À partir de quand faut-il racheter une boîte ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Fixez-vous un repère personnel : un seuil en dessous duquel, pour vous, il est temps de racheter — « quand il me reste quelques jours », par exemple. L’important est qu’il se déclenche avant la boîte vide, pas au moment où elle l’est. Cette marge transforme une urgence en simple course de la semaine."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Est-ce une bonne idée de garder une avance de médicaments chez soi ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un petit stock d’avance, raisonnable et bien rangé, est utile : il absorbe les imprévus — pharmacie fermée, week-end, déplacement — sans qu’un contretemps devienne une interruption de traitement. Ce n’est pas de l’accumulation, juste un coussin de sécurité. Pensez à respecter les conditions de conservation indiquées sur chaque boîte."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment suivre son stock quand on prend plusieurs traitements ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Plusieurs boîtes se vident à des rythmes différents, et la mémoire seule montre vite ses limites. Le plus simple : laissez le traitement le plus contraignant — celui qui se termine le plus vite — donner le tempo de vos passages en pharmacie, et faites le point sur les autres boîtes au même moment. Un seul regard, un seul déplacement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment ne pas être bloqué par une ordonnance expirée ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Quand votre traitement touche à sa fin, regardez votre ordonnance avant d’être à court : c’est elle qui fait foi. Si une mise à jour ou un rendez-vous est nécessaire, prévoyez-le à l’avance — un rendez-vous anticipé se cale facilement, un rendez-vous en urgence rarement. Votre pharmacien ou votre médecin répondent pour votre cas précis."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu</a>
@@ -340,7 +405,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 
 <!-- FIL D'ARIANE -->
 <div class="crumb-wrap">
-  <nav class="crumb" aria-label="Fil d'ariane">
+  <nav class="crumb" aria-label="Fil d'Ariane">
     <a href="/">Accueil</a>
     <span class="crumb-sep" aria-hidden="true">›</span>
     <a href="/guides/">Guides</a>
@@ -360,6 +425,11 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   </header>
 
   <div class="guide-body">
+    <div class="guide-tldr">
+      <div class="guide-tldr-label">En bref</div>
+      <p>Se retrouver à court n’a rien d’une fatalité. Gardez un œil régulier sur vos boîtes, fixez-vous un seuil de rachat qui se déclenche quelques jours avant la fin, tenez compte des week-ends et jours fériés, et anticipez le renouvellement de l’ordonnance. Quand on suit plusieurs traitements, c’est le plus contraignant qui donne le tempo.</p>
+    </div>
+
     <p>C’est presque toujours au pire moment qu’on s’en aperçoit&nbsp;: un dimanche soir, la veille d’un départ, un jour férié. On ouvre la boîte, on soulève la plaquette… et il ne reste rien. Manquer d’un médicament arrive à tout le monde, même aux personnes les plus organisées. La bonne nouvelle, c’est que ce n’est jamais une fatalité. La rupture de stock à la maison n’est pas une question de chance, mais d’anticipation — et quelques réflexes simples, installés une fois pour toutes, suffisent à ne plus jamais se retrouver à court.</p>
 
     <h2>Savoir ce qu’il vous reste</h2>
@@ -407,6 +477,32 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     <p>Pilou a été conçu pour vous accompagner sur toute cette chaîne&nbsp;: le suivi du stock de vos boîtes avec une alerte quand le niveau est bas, les rappels de prise à l’heure, le suivi de vos prises et la lecture de votre ordonnance en photo pour configurer vos traitements plus simplement. <strong>Pilou sera bientôt disponible sur Google&nbsp;Play.</strong> D’ici là, un regard sur vos boîtes ce soir est déjà un excellent premier pas.</p>
   </div>
 
+  <section class="guide-faq" aria-label="Questions fréquentes">
+    <h2 class="guide-faq-title">Questions fréquentes</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary class="faq-q">Comment éviter de tomber à court de médicaments&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Tout se joue sur l’anticipation. Gardez un œil régulier sur le niveau de vos boîtes — par exemple en préparant votre pilulier —, fixez-vous un seuil de rachat, et passez en pharmacie avant la dernière plaquette. Avec ces quelques réflexes, on ne se retrouve plus à sec.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">À partir de quand faut-il racheter une boîte&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Fixez-vous un repère personnel&nbsp;: un seuil en dessous duquel, pour vous, il est temps de racheter — «&nbsp;quand il me reste quelques jours&nbsp;», par exemple. L’important est qu’il se déclenche avant la boîte vide, pas au moment où elle l’est. Cette marge transforme une urgence en simple course de la semaine.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Est-ce une bonne idée de garder une avance de médicaments chez soi&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Un petit stock d’avance, raisonnable et bien rangé, est utile&nbsp;: il absorbe les imprévus — pharmacie fermée, week-end, déplacement — sans qu’un contretemps devienne une interruption de traitement. Ce n’est pas de l’accumulation, juste un coussin de sécurité. Pensez à respecter les conditions de conservation indiquées sur chaque boîte.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Comment suivre son stock quand on prend plusieurs traitements&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Plusieurs boîtes se vident à des rythmes différents, et la mémoire seule montre vite ses limites. Le plus simple&nbsp;: laissez le traitement le plus contraignant — celui qui se termine le plus vite — donner le tempo de vos passages en pharmacie, et faites le point sur les autres boîtes au même moment. Un seul regard, un seul déplacement.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Comment ne pas être bloqué par une ordonnance expirée&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Quand votre traitement touche à sa fin, regardez votre ordonnance avant d’être à court&nbsp;: c’est elle qui fait foi. Si une mise à jour ou un rendez-vous est nécessaire, prévoyez-le à l’avance — un rendez-vous anticipé se cale facilement, un rendez-vous en urgence rarement. Votre pharmacien ou votre médecin répondent pour votre cas précis.</div>
+      </details>
+    </div>
+  </section>
+
   <div class="guide-cta">
     <div class="guide-cta-inner">
       <div class="guide-cta-title">Pilou veille sur votre stock</div>
@@ -418,7 +514,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     </div>
   </div>
 
-    <nav class="guide-related" aria-label="Guides a lire aussi">
+    <nav class="guide-related" aria-label="Guides à lire aussi">
     <div class="guide-related-title">À lire aussi</div>
     <a href="/guides/ne-plus-oublier-ses-medicaments/">Ne plus oublier ses médicaments</a>
     <a href="/guides/pilulier-numerique-ou-physique/">Pilulier numérique ou physique : comment choisir</a>
@@ -466,7 +562,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </div>
     </div>
     <div class="footer-bottom">
-      <p class="legal-mediateur">Médiation&nbsp;: <strong>CM2C</strong> — 49 rue de Ponthieu, 75&nbsp;008 Paris — Tél.&nbsp;: 01 89 47 00 14 — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Conformément à l'art. L.612-1 du code de la consommation, vous pouvez recourir gratuitement à la médiation de la consommation après réclamation écrite préalable auprès d'AGC Logiciels.</p>
+      <p class="legal-mediateur">Médiation&nbsp;: <strong>CM2C</strong> — 49 rue de Ponthieu, 75008 Paris — Tél.&nbsp;: 01 89 47 00 14 — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Conformément à l'art. L.&nbsp;612-1 du code de la consommation, vous pouvez recourir gratuitement à la médiation de la consommation après réclamation écrite préalable auprès d'AGC Logiciels.</p>
       <span>© 2026 Pilou — Application française</span>
       <span>Non médical — Outil d'aide à l'observance</span>
     </div>

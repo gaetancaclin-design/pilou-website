@@ -7,9 +7,9 @@
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <title>Ne plus oublier ses médicaments : méthodes simples | Pilou</title>
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-<meta name="description" content="Oublier une prise arrive à tout le monde. Méthodes simples pour ne plus oublier ses médicaments : associer la prise à une habitude, pilulier, rappels, aide d'un proche.">
+<meta name="description" content="Oublier une prise arrive à tout le monde. Méthodes simples pour ne plus oublier ses médicaments : associer la prise à une habitude, pilulier, rappels, aide d’un proche.">
 <meta property="og:title" content="Ne plus oublier ses médicaments : les méthodes simples qui marchent">
-<meta property="og:description" content="Des méthodes d'organisation simples pour prendre ses traitements plus régulièrement : habitudes, pilulier, rappels, soutien d'un proche.">
+<meta property="og:description" content="Des méthodes d’organisation simples pour prendre ses traitements plus régulièrement : habitudes, pilulier, rappels, soutien d’un proche.">
 <meta property="og:type" content="article">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Pilou">
@@ -97,7 +97,7 @@ nav{
 }
 .nav-links a:hover{color:var(--ink)}
 
-/* ── FIL D'ARIANE ── */
+/* ── FIL D’ARIANE ── */
 .crumb-wrap{background:var(--surface);border-bottom:1px solid var(--border)}
 .crumb{max-width:760px;margin:0 auto;padding:14px 24px;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .crumb a{color:var(--brand-dark);font-weight:500}
@@ -122,7 +122,7 @@ nav{
 .guide-body a{color:var(--brand-dark);font-weight:600}
 .guide-body a:hover{text-decoration:underline}
 
-/* Encadré « bon à savoir » (conduite en cas d'oubli) */
+/* Encadré « bon à savoir » (conduite en cas d’oubli) */
 .guide-callout{
   background:var(--surface);
   border:1px solid var(--border);
@@ -252,13 +252,30 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 .guide-related a{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;margin-bottom:10px;background:#fff;border-radius:14px;box-shadow:0 0 0 1px rgba(0,0,0,.06);color:var(--ink);font-weight:600;text-decoration:none;transition:box-shadow .15s ease,transform .15s ease}
 .guide-related a:hover{box-shadow:0 6px 18px rgba(0,0,0,.08);transform:translateY(-1px)}
 .guide-related a::after{content:"→";color:var(--brand-dark);font-weight:700;flex:none}
+/* ── En bref & FAQ (GEO) ── */
+    .guide-tldr{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--brand-dark);border-radius:var(--r-lg);padding:18px 22px;margin:0 0 30px}
+    .guide-tldr-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-dark);margin-bottom:6px}
+    .guide-tldr p{margin:0;font-size:15px;line-height:1.7;color:var(--ink)}
+    .guide-faq{margin:8px 0 4px}
+    .guide-faq-title{font-size:22px;font-weight:700;color:var(--ink);margin:0 0 18px}
+    .guide-faq .faq-list{display:flex;flex-direction:column;gap:12px}
+    .guide-faq .faq-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .3s ease}
+    .guide-faq .faq-item[open]{border-color:var(--brand-dark)}
+    .guide-faq .faq-q{list-style:none;cursor:pointer;padding:18px 22px;font-size:16px;font-weight:600;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .guide-faq .faq-q::-webkit-details-marker{display:none}
+    .guide-faq .faq-icon{position:relative;flex-shrink:0;width:16px;height:16px}
+    .guide-faq .faq-icon::before,.guide-faq .faq-icon::after{content:"";position:absolute;background:var(--brand-dark);border-radius:2px;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+    .guide-faq .faq-icon::before{top:7px;left:0;width:16px;height:2px}
+    .guide-faq .faq-icon::after{top:0;left:7px;width:2px;height:16px}
+    .guide-faq .faq-item[open] .faq-icon::after{transform:rotate(90deg);opacity:0}
+    .guide-faq .faq-a{padding:0 22px 22px;font-size:15px;line-height:1.7;color:var(--muted)}
 </style>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": "Ne plus oublier ses médicaments : les méthodes simples qui marchent",
-  "description": "Des méthodes d'organisation simples pour prendre ses traitements plus régulièrement : associer la prise à une habitude, rendre les médicaments visibles, pilulier, rappels, soutien d'un proche et anticipation des imprévus.",
+  "description": "Des méthodes d’organisation simples pour prendre ses traitements plus régulièrement : associer la prise à une habitude, rendre les médicaments visibles, pilulier, rappels, soutien d’un proche et anticipation des imprévus.",
   "inLanguage": "fr",
   "datePublished": "2026-07-14",
   "dateModified": "2026-07-14",
@@ -304,6 +321,62 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Comment ne plus oublier de prendre ses médicaments ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le plus simple est de ne pas compter sur sa mémoire. Associez chaque prise à un geste quotidien déjà automatique — le petit-déjeuner, le brossage des dents, le coucher —, gardez vos boîtes bien en vue, et ajoutez un rappel à l’heure prévue. Ces habitudes, mises bout à bout, laissent peu de place à l’oubli."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Est-ce grave d’oublier une prise de temps en temps ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un oubli occasionnel arrive à tout le monde et ne remet pas en cause un traitement. Ce qui compte, c’est la régularité d’ensemble, pas la perfection. Si les oublis deviennent fréquents, en revanche, parlez-en à votre médecin ou votre pharmacien : ils peuvent adapter le traitement ou proposer des solutions."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Que faire quand on oublie une prise ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Cela dépend du médicament et du temps écoulé. La règle prudente, valable pour la plupart des traitements, est de ne jamais doubler la dose suivante pour rattraper une prise manquée. En cas de doute, reportez-vous à la notice ou demandez conseil à votre pharmacien, qui saura vous répondre pour votre traitement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment penser à un médicament à prendre plusieurs fois par jour ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Associez chaque prise à un moment fixe et distinct : une au petit-déjeuner, une au déjeuner, une au coucher, par exemple. Pour les horaires moins évidents que les repas, un rappel sur téléphone est précieux : il sonne à l’heure prévue et vous laisse confirmer que la prise a bien eu lieu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Le pilulier hebdomadaire suffit-il pour ne rien oublier ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le pilulier aide beaucoup : d’un coup d’œil, vous voyez si la case du jour est encore pleine. Il a deux limites, toutefois — il faut le remplir à la main, et il ne vous prévient pas à l’heure. Accompagné d’un rappel qui sonne au bon moment, il devient vraiment fiable."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Une application de rappel est-elle plus efficace qu’une simple alarme ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Une alarme sonne, mais ne sait ni de quel médicament il s’agit, ni si vous l’avez pris. Une application comme Pilou rappelle chaque prise précisément, vous laisse la confirmer d’un geste, et garde une trace de votre régularité — utile à montrer, si vous le souhaitez, à votre médecin ou votre pharmacien."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu</a>
@@ -338,9 +411,9 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   <a href="/support">Aide</a>
 </nav>
 
-<!-- FIL D'ARIANE -->
+<!-- FIL D’ARIANE -->
 <div class="crumb-wrap">
-  <nav class="crumb" aria-label="Fil d'ariane">
+  <nav class="crumb" aria-label="Fil d’Ariane">
     <a href="/">Accueil</a>
     <span class="crumb-sep" aria-hidden="true">›</span>
     <a href="/guides/">Guides</a>
@@ -355,38 +428,43 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   <header class="article">
     <div class="article-eyebrow">Guide pratique</div>
     <h1>Ne plus oublier ses médicaments&nbsp;: les méthodes simples qui marchent</h1>
-    <p class="article-lede">Oublier une prise arrive à tout le monde. Voici des méthodes d'organisation simples, faciles à adopter dès aujourd'hui, pour suivre son traitement plus régulièrement — pour soi ou pour un proche.</p>
-    <p class="article-meta">Conseils d'organisation · Mis à jour le 14 juillet 2026</p>
+    <p class="article-lede">Oublier une prise arrive à tout le monde. Voici des méthodes d’organisation simples, faciles à adopter dès aujourd’hui, pour suivre son traitement plus régulièrement — pour soi ou pour un proche.</p>
+    <p class="article-meta">Conseils d’organisation · Mis à jour le 14 juillet 2026</p>
   </header>
 
   <div class="guide-body">
-    <p>Une journée chargée, un imprévu, une routine bousculée&nbsp;: oublier une prise de médicament arrive à tout le monde, et cela ne dit rien de votre sérieux ni de votre motivation. C'est humain, tout simplement. Cet article rassemble des méthodes d'organisation simples, faciles à adopter dès aujourd'hui, pour rendre la prise de vos traitements plus régulière — pour vous ou pour un proche que vous accompagnez.</p>
+    <div class="guide-tldr">
+      <div class="guide-tldr-label">En bref</div>
+      <p>Le plus efficace est de ne pas s’en remettre à sa mémoire. Rattachez chaque prise à un geste déjà automatique de votre journée, gardez vos boîtes en vue, et ajoutez un rappel à l’heure. Un pilulier aide à préparer la semaine&nbsp;; une application comme Pilou prévient au bon moment et note ce qui a été pris.</p>
+    </div>
+
+    <p>Une journée chargée, un imprévu, une routine bousculée&nbsp;: oublier une prise de médicament arrive à tout le monde, et cela ne dit rien de votre sérieux ni de votre motivation. C’est humain, tout simplement. Cet article rassemble des méthodes d’organisation simples, faciles à adopter dès aujourd’hui, pour rendre la prise de vos traitements plus régulière — pour vous ou pour un proche que vous accompagnez.</p>
 
     <h2>Associer la prise à un geste du quotidien</h2>
-    <p>Le moyen le plus doux de ne pas oublier, c'est de ne pas avoir à y penser. Plutôt que de compter sur votre mémoire, rattachez la prise à un repère déjà solidement ancré dans votre journée&nbsp;: le café du matin, le brossage des dents, le moment du coucher.</p>
-    <p>L'idée est simple&nbsp;: le geste existant devient le déclencheur du nouveau. Vous ne vous demandez plus «&nbsp;ai-je pris mon traitement&nbsp;?&nbsp;», parce que la prise fait partie du rituel lui-même. Choisissez un repère qui a lieu tous les jours, à peu près à la même heure, et qui correspond au moment où votre traitement doit être pris. Si votre prescription prévoit plusieurs prises, associez chacune à un geste différent&nbsp;: une au petit-déjeuner, une au dîner, une au coucher, par exemple.</p>
+    <p>Le moyen le plus doux de ne pas oublier, c’est de ne pas avoir à y penser. Plutôt que de compter sur votre mémoire, rattachez la prise à un repère déjà solidement ancré dans votre journée&nbsp;: le café du matin, le brossage des dents, le moment du coucher.</p>
+    <p>L’idée est simple&nbsp;: le geste existant devient le déclencheur du nouveau. Vous ne vous demandez plus «&nbsp;ai-je pris mon traitement&nbsp;?&nbsp;», parce que la prise fait partie du rituel lui-même. Choisissez un repère qui a lieu tous les jours, à peu près à la même heure, et qui correspond au moment où votre traitement doit être pris. Si votre prescription prévoit plusieurs prises, associez chacune à un geste différent&nbsp;: une au petit-déjeuner, une au dîner, une au coucher, par exemple.</p>
 
     <h2>Rendre les médicaments visibles</h2>
-    <p>Ce qu'on ne voit pas, on l'oublie plus facilement. Un flacon rangé au fond d'un placard a peu de chances de vous faire signe au bon moment. À l'inverse, une boîte posée à un endroit que vous regardez chaque jour — près de la bouilloire, à côté de la brosse à dents, sur la table de chevet — devient un rappel silencieux.</p>
-    <p>Un peu de bon sens dans le choix de l'emplacement&nbsp;: privilégiez un endroit à l'abri de la chaleur et de l'humidité, et toujours hors de portée des enfants. Il s'agit simplement de trouver le bon équilibre entre «&nbsp;visible pour vous&nbsp;» et «&nbsp;bien conservé, inaccessible aux plus petits&nbsp;». En cas de doute sur la conservation d'un médicament en particulier, sa notice et votre pharmacien restent vos meilleurs repères.</p>
+    <p>Ce qu’on ne voit pas, on l’oublie plus facilement. Un flacon rangé au fond d’un placard a peu de chances de vous faire signe au bon moment. À l’inverse, une boîte posée à un endroit que vous regardez chaque jour — près de la bouilloire, à côté de la brosse à dents, sur la table de chevet — devient un rappel silencieux.</p>
+    <p>Un peu de bon sens dans le choix de l’emplacement&nbsp;: privilégiez un endroit à l’abri de la chaleur et de l’humidité, et toujours hors de portée des enfants. Il s’agit simplement de trouver le bon équilibre entre «&nbsp;visible pour vous&nbsp;» et «&nbsp;bien conservé, inaccessible aux plus petits&nbsp;». En cas de doute sur la conservation d’un médicament en particulier, sa notice et votre pharmacien restent vos meilleurs repères.</p>
 
     <h2>Le pilulier physique&nbsp;: utile, avec ses limites</h2>
-    <p>Le pilulier hebdomadaire est un classique, et il a un vrai mérite&nbsp;: d'un seul coup d'œil, vous voyez si la case du jour est vide ou pleine. Fini le doute du «&nbsp;l'ai-je pris ce matin&nbsp;?&nbsp;». Pour les traitements comportant plusieurs médicaments, il aide aussi à préparer la semaine en une seule fois, l'esprit tranquille.</p>
-    <p>Il a cependant ses limites. Il faut le remplir à la main, régulièrement, et une erreur de case ou de comprimé est vite arrivée — surtout quand le traitement change ou que la fatigue s'en mêle. Et surtout, un pilulier ne vous prévient pas&nbsp;: si vous ne pensez pas à l'ouvrir, il reste muet.</p>
-    <p>C'est pourquoi le pilulier fonctionne mieux en tandem avec un rappel numérique&nbsp;: l'un montre ce qui est préparé et pris, l'autre vous fait signe au bon moment. Les deux se complètent, ils ne s'opposent pas.</p>
+    <p>Le pilulier hebdomadaire est un classique, et il a un vrai mérite&nbsp;: d’un seul coup d’œil, vous voyez si la case du jour est vide ou pleine. Fini le doute du «&nbsp;l’ai-je pris ce matin&nbsp;?&nbsp;». Pour les traitements comportant plusieurs médicaments, il aide aussi à préparer la semaine en une seule fois, l’esprit tranquille.</p>
+    <p>Il a cependant ses limites. Il faut le remplir à la main, régulièrement, et une erreur de case ou de comprimé est vite arrivée — surtout quand le traitement change ou que la fatigue s’en mêle. Et surtout, un pilulier ne vous prévient pas&nbsp;: si vous ne pensez pas à l’ouvrir, il reste muet.</p>
+    <p>C’est pourquoi le pilulier fonctionne mieux en tandem avec un rappel numérique&nbsp;: l’un montre ce qui est préparé et pris, l’autre vous fait signe au bon moment. Les deux se complètent, ils ne s’opposent pas.</p>
 
     <h2>Les rappels au bon moment</h2>
-    <p>Le téléphone est l'objet que nous avons presque toujours avec nous. Une application de rappel comme Pilou s'appuie sur cette présence&nbsp;: elle vous envoie une notification à l'heure prévue de chaque prise, puis vous laisse confirmer en un geste que le médicament a bien été pris.</p>
+    <p>Le téléphone est l’objet que nous avons presque toujours avec nous. Une application de rappel comme Pilou s’appuie sur cette présence&nbsp;: elle vous envoie une notification à l’heure prévue de chaque prise, puis vous laisse confirmer en un geste que le médicament a bien été pris.</p>
     <p>Ce suivi a un double intérêt. Sur le moment, il lève le doute&nbsp;: plus besoin de se fier à sa mémoire pour savoir si la prise du matin a eu lieu. Dans la durée, il donne une vision claire de la régularité du traitement, ce qui peut aussi nourrir la discussion avec votre médecin ou votre pharmacien.</p>
-    <p>Pilou peut également suivre le stock de vos boîtes&nbsp;: vous voyez venir la fin d'une boîte et pouvez anticiper le passage en pharmacie, plutôt que de le découvrir un dimanche soir. Rien de plus, rien de magique&nbsp;: un outil d'organisation, pensé pour être simple.</p>
+    <p>Pilou peut également suivre le stock de vos boîtes&nbsp;: vous voyez venir la fin d’une boîte et pouvez anticiper le passage en pharmacie, plutôt que de le découvrir un dimanche soir. Rien de plus, rien de magique&nbsp;: un outil d’organisation, pensé pour être simple.</p>
 
     <h2>Impliquer un proche</h2>
-    <p>On sous-estime souvent la force du duo. Pour les traitements qui s'étalent sur des mois ou des années, un proche bienveillant — conjoint, enfant, ami — peut devenir un allié précieux&nbsp;: un petit message le soir, un coup d'œil au pilulier lors d'une visite, une question posée sans insister.</p>
-    <p>L'essentiel est que ce soutien reste léger et choisi, jamais un contrôle. Le proche n'est pas là pour surveiller, mais pour partager la charge mentale. Beaucoup de personnes trouvent aussi qu'en parler ouvertement rend le traitement moins pesant&nbsp;: on oublie moins ce qui n'est plus un sujet tabou.</p>
+    <p>On sous-estime souvent la force du duo. Pour les traitements qui s’étalent sur des mois ou des années, un proche bienveillant — conjoint, enfant, ami — peut devenir un allié précieux&nbsp;: un petit message le soir, un coup d’œil au pilulier lors d’une visite, une question posée sans insister.</p>
+    <p>L’essentiel est que ce soutien reste léger et choisi, jamais un contrôle. Le proche n’est pas là pour surveiller, mais pour partager la charge mentale. Beaucoup de personnes trouvent aussi qu’en parler ouvertement rend le traitement moins pesant&nbsp;: on oublie moins ce qui n’est plus un sujet tabou.</p>
 
     <h2>Anticiper les moments à risque</h2>
-    <p>Les oublis surviennent rarement au cœur de la routine&nbsp;: ils profitent des moments où elle se dérègle. Un week-end chez des amis, un déplacement professionnel, des vacances, un déménagement, un simple changement d'horaires — autant d'occasions où les repères habituels disparaissent.</p>
-    <p>La parade tient en un mot&nbsp;: préparer. Avant un départ, glissez la quantité nécessaire dans votre bagage à main, plutôt que dans une valise qui peut s'égarer. Vérifiez que vous avez assez de boîtes pour couvrir toute l'absence, avec un peu de marge. Si vous changez de fuseau horaire ou de rythme, notez à l'avance vos nouveaux horaires de prise, et parlez-en à votre pharmacien si vous avez un doute. Quelques minutes d'anticipation évitent bien des improvisations.</p>
+    <p>Les oublis surviennent rarement au cœur de la routine&nbsp;: ils profitent des moments où elle se dérègle. Un week-end chez des amis, un déplacement professionnel, des vacances, un déménagement, un simple changement d’horaires — autant d’occasions où les repères habituels disparaissent.</p>
+    <p>La parade tient en un mot&nbsp;: préparer. Avant un départ, glissez la quantité nécessaire dans votre bagage à main, plutôt que dans une valise qui peut s’égarer. Vérifiez que vous avez assez de boîtes pour couvrir toute l’absence, avec un peu de marge. Si vous changez de fuseau horaire ou de rythme, notez à l’avance vos nouveaux horaires de prise, et parlez-en à votre pharmacien si vous avez un doute. Quelques minutes d’anticipation évitent bien des improvisations.</p>
 
     <h2>Un oubli&nbsp;: que faire&nbsp;?</h2>
     <p>Malgré toutes les précautions, un oubli finira par arriver. Deux réflexes de bon sens, valables pour la grande majorité des traitements&nbsp;:</p>
@@ -394,17 +472,47 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <p>Il ne faut <strong>jamais doubler la dose suivante</strong> pour «&nbsp;rattraper&nbsp;» une prise manquée.</p>
       <p>En cas de doute sur la conduite à tenir, le plus sage est d'<strong>attendre la prochaine prise prévue</strong> et de <strong>demander conseil à votre pharmacien ou à votre médecin</strong>, qui connaissent votre traitement et sauront vous répondre précisément.</p>
     </div>
-    <p>Un oubli isolé n'est pas un échec. L'important est de savoir comment réagir calmement, puis de reprendre le fil de sa routine.</p>
+    <p>Un oubli isolé n’est pas un échec. L’important est de savoir comment réagir calmement, puis de reprendre le fil de sa routine.</p>
 
-    <h2>S'organiser en douceur, un jour après l'autre</h2>
-    <p>Ne plus oublier ses médicaments ne demande ni volonté de fer ni organisation militaire&nbsp;: un geste du quotidien comme point d'ancrage, des boîtes visibles et bien conservées, un pilulier si cela vous aide, un rappel au bon moment, un proche dans la confidence et un peu d'anticipation avant les imprévus. Chacune de ces méthodes est simple&nbsp;; ensemble, elles forment un filet solide.</p>
-    <p>C'est exactement l'esprit de Pilou&nbsp;: une application française pensée pour vous aider à vous organiser, avec des rappels à l'heure prévue, le suivi de vos prises et de votre stock de boîtes. Pilou sera bientôt disponible sur Google&nbsp;Play — en attendant, les méthodes de ce guide sont déjà entre vos mains.</p>
+    <h2>S’organiser en douceur, un jour après l’autre</h2>
+    <p>Ne plus oublier ses médicaments ne demande ni volonté de fer ni organisation militaire&nbsp;: un geste du quotidien comme point d’ancrage, des boîtes visibles et bien conservées, un pilulier si cela vous aide, un rappel au bon moment, un proche dans la confidence et un peu d’anticipation avant les imprévus. Chacune de ces méthodes est simple&nbsp;; ensemble, elles forment un filet solide.</p>
+    <p>C’est exactement l’esprit de Pilou&nbsp;: une application française pensée pour vous aider à vous organiser, avec des rappels à l’heure prévue, le suivi de vos prises et de votre stock de boîtes. Pilou sera bientôt disponible sur Google&nbsp;Play — en attendant, les méthodes de ce guide sont déjà entre vos mains.</p>
   </div>
+
+  <section class="guide-faq" aria-label="Questions fréquentes">
+    <h2 class="guide-faq-title">Questions fréquentes</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary class="faq-q">Comment ne plus oublier de prendre ses médicaments&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Le plus simple est de ne pas compter sur sa mémoire. Associez chaque prise à un geste quotidien déjà automatique — le petit-déjeuner, le brossage des dents, le coucher —, gardez vos boîtes bien en vue, et ajoutez un rappel à l’heure prévue. Ces habitudes, mises bout à bout, laissent peu de place à l’oubli.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Est-ce grave d’oublier une prise de temps en temps&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Un oubli occasionnel arrive à tout le monde et ne remet pas en cause un traitement. Ce qui compte, c’est la régularité d’ensemble, pas la perfection. Si les oublis deviennent fréquents, en revanche, parlez-en à votre médecin ou votre pharmacien&nbsp;: ils peuvent adapter le traitement ou proposer des solutions.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Que faire quand on oublie une prise&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Cela dépend du médicament et du temps écoulé. La règle prudente, valable pour la plupart des traitements, est de ne jamais doubler la dose suivante pour rattraper une prise manquée. En cas de doute, reportez-vous à la notice ou demandez conseil à votre pharmacien, qui saura vous répondre pour votre traitement.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Comment penser à un médicament à prendre plusieurs fois par jour&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Associez chaque prise à un moment fixe et distinct&nbsp;: une au petit-déjeuner, une au déjeuner, une au coucher, par exemple. Pour les horaires moins évidents que les repas, un rappel sur téléphone est précieux&nbsp;: il sonne à l’heure prévue et vous laisse confirmer que la prise a bien eu lieu.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Le pilulier hebdomadaire suffit-il pour ne rien oublier&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Le pilulier aide beaucoup&nbsp;: d’un coup d’œil, vous voyez si la case du jour est encore pleine. Il a deux limites, toutefois — il faut le remplir à la main, et il ne vous prévient pas à l’heure. Accompagné d’un rappel qui sonne au bon moment, il devient vraiment fiable.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Une application de rappel est-elle plus efficace qu’une simple alarme&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Une alarme sonne, mais ne sait ni de quel médicament il s’agit, ni si vous l’avez pris. Une application comme Pilou rappelle chaque prise précisément, vous laisse la confirmer d’un geste, et garde une trace de votre régularité — utile à montrer, si vous le souhaitez, à votre médecin ou votre pharmacien.</div>
+      </details>
+    </div>
+  </section>
 
   <div class="guide-cta">
     <div class="guide-cta-inner">
       <div class="guide-cta-title">Pilou vous aide à vous organiser</div>
-      <p class="guide-cta-sub">Rappels à l'heure, suivi des prises et du stock, lecture de votre ordonnance. Sans compte. Vos données restent sur votre téléphone — seule la photo d'ordonnance est analysée en France le temps de la lecture, puis supprimée.</p>
+      <p class="guide-cta-sub">Rappels à l’heure, suivi des prises et du stock, lecture de votre ordonnance. Sans compte. Vos données restent sur votre téléphone — seule la photo d’ordonnance est analysée en France le temps de la lecture, puis supprimée.</p>
       <div class="store-badge store-badge-static" role="img" aria-label="Bientôt disponible sur Google Play">
         <svg class="store-badge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3.18 23.76a2 2 0 0 1-1.1-1.8V2.04A2 2 0 0 1 3.18.28l12.1 11.74-12.1 11.74zm1.67-1.62 10.26-9.95-2.1-2.03-8.16 11.98zm0-22.28 8.16 11.98 2.1-2.03-10.26-9.95zm13.08 4.72-2.6 1.5-2.38-2.31 2.38-2.31 2.6 1.5a1 1 0 0 1 0 1.62zm-2.6 12.12 2.6-1.5a1 1 0 0 0 0-1.62l-2.6-1.5-2.38 2.31 2.38 2.31z"/></svg>
         <span class="store-badge-label"><span class="store-badge-sub">Bientôt sur</span><span class="store-badge-name">Google Play</span></span>
@@ -412,7 +520,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     </div>
   </div>
 
-    <nav class="guide-related" aria-label="Guides a lire aussi">
+    <nav class="guide-related" aria-label="Guides à lire aussi">
     <div class="guide-related-title">À lire aussi</div>
     <a href="/guides/pilulier-numerique-ou-physique/">Pilulier numérique ou physique : comment choisir</a>
     <a href="/guides/aider-un-proche-a-suivre-son-traitement/">Aider un proche à suivre son traitement</a>
@@ -420,7 +528,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   </nav>
 
   <div class="guide-disclaimer">
-    <strong>Bon à savoir&nbsp;:</strong> Pilou est un outil d'organisation et de rappel, pas un dispositif médical. Les conseils de ce guide sont d'ordre organisationnel et ne remplacent pas l'avis de votre médecin ou de votre pharmacien, seuls à même de vous conseiller sur votre traitement.
+    <strong>Bon à savoir&nbsp;:</strong> Pilou est un outil d’organisation et de rappel, pas un dispositif médical. Les conseils de ce guide sont d’ordre organisationnel et ne remplacent pas l’avis de votre médecin ou de votre pharmacien, seuls à même de vous conseiller sur votre traitement.
   </div>
 
   <div class="guide-back">
@@ -450,7 +558,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="footer-col">
         <div class="footer-col-title">Légal</div>
         <a href="/confidentialite">Politique de confidentialité</a>
-        <a href="/cgu">Conditions d'utilisation</a>
+        <a href="/cgu">Conditions d’utilisation</a>
         <a href="/mentions-legales">Mentions légales</a>
       </div>
       <div class="footer-col">
@@ -460,9 +568,9 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </div>
     </div>
     <div class="footer-bottom">
-      <p class="legal-mediateur">Médiation&nbsp;: <strong>CM2C</strong> — 49 rue de Ponthieu, 75&nbsp;008 Paris — Tél.&nbsp;: 01 89 47 00 14 — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Conformément à l'art. L.612-1 du code de la consommation, vous pouvez recourir gratuitement à la médiation de la consommation après réclamation écrite préalable auprès d'AGC Logiciels.</p>
+      <p class="legal-mediateur">Médiation&nbsp;: <strong>CM2C</strong> — 49 rue de Ponthieu, 75008 Paris — Tél.&nbsp;: 01 89 47 00 14 — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Conformément à l’art. L.&nbsp;612-1 du code de la consommation, vous pouvez recourir gratuitement à la médiation de la consommation après réclamation écrite préalable auprès d’AGC Logiciels.</p>
       <span>© 2026 Pilou — Application française</span>
-      <span>Non médical — Outil d'aide à l'observance</span>
+      <span>Non médical — Outil d’aide à l’observance</span>
     </div>
   </div>
 </footer>

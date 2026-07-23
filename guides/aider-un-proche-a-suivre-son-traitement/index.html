@@ -252,6 +252,23 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 .guide-related a{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;margin-bottom:10px;background:#fff;border-radius:14px;box-shadow:0 0 0 1px rgba(0,0,0,.06);color:var(--ink);font-weight:600;text-decoration:none;transition:box-shadow .15s ease,transform .15s ease}
 .guide-related a:hover{box-shadow:0 6px 18px rgba(0,0,0,.08);transform:translateY(-1px)}
 .guide-related a::after{content:"→";color:var(--brand-dark);font-weight:700;flex:none}
+/* ── En bref & FAQ (GEO) ── */
+.guide-tldr{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--brand-dark);border-radius:var(--r-lg);padding:18px 22px;margin:0 0 30px}
+.guide-tldr-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-dark);margin-bottom:6px}
+.guide-tldr p{margin:0;font-size:15px;line-height:1.7;color:var(--ink)}
+.guide-faq{margin:8px 0 4px}
+.guide-faq-title{font-size:22px;font-weight:700;color:var(--ink);margin:0 0 18px}
+.guide-faq .faq-list{display:flex;flex-direction:column;gap:12px}
+.guide-faq .faq-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .3s ease}
+.guide-faq .faq-item[open]{border-color:var(--brand-dark)}
+.guide-faq .faq-q{list-style:none;cursor:pointer;padding:18px 22px;font-size:16px;font-weight:600;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.guide-faq .faq-q::-webkit-details-marker{display:none}
+.guide-faq .faq-icon{position:relative;flex-shrink:0;width:16px;height:16px}
+.guide-faq .faq-icon::before,.guide-faq .faq-icon::after{content:"";position:absolute;background:var(--brand-dark);border-radius:2px;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.guide-faq .faq-icon::before{top:7px;left:0;width:16px;height:2px}
+.guide-faq .faq-icon::after{top:0;left:7px;width:2px;height:16px}
+.guide-faq .faq-item[open] .faq-icon::after{transform:rotate(90deg);opacity:0}
+.guide-faq .faq-a{padding:0 22px 22px;font-size:15px;line-height:1.7;color:var(--muted)}
 </style>
 <script type="application/ld+json">
 {
@@ -304,6 +321,62 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Comment aider un proche à suivre son traitement sans le braquer ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Commencez par une conversation, pas par un dispositif. Demandez-lui comment il vit son traitement et ce dont il aurait envie, puis choisissez ensemble des repères simples — un pilulier, une routine, un rappel. L’aide qui dure est celle qu’il a acceptée, à son rythme."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Que faire si mon proche refuse qu’on l’aide ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Respectez sa réponse : « pas maintenant » est aussi une décision. Forcer un système braque et se retourne souvent contre l’intention de départ. Gardez le lien, proposez à nouveau plus tard, et concentrez-vous sur une présence chaleureuse. La porte reste ouverte, et c’est déjà beaucoup."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Qu’est-ce que la préparation des doses à administrer (PDA) en pharmacie ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "C’est un service proposé par certaines pharmacies : le pharmacien prépare lui-même le pilulier, ou des sachets-doses, à partir de l’ordonnance, en répartissant les médicaments par jour et par moment de prise. Il s’adresse souvent aux personnes âgées ou aux traitements au long cours. Toutes les officines ne le proposent pas : renseignez-vous auprès de la pharmacie habituelle."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment aider un proche qui vit loin ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "L’aide à distance prend d’autres formes, tout aussi utiles : un appel au moment du café, un message le dimanche pour le remplissage du pilulier, un passage en pharmacie lors d’une visite. La régularité chaleureuse compte plus que la fréquence. Vous pouvez aussi l’aider à installer une application de rappel lors d’un passage."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Peut-on suivre les prises d’un proche depuis son propre téléphone ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pilou est une application personnelle : elle s’installe sur le téléphone de la personne qui suit le traitement, et c’est elle qui reçoit ses rappels et coche ses prises. Vous pouvez l’aider à l’installer et à la régler sur son téléphone, lors d’une visite, puis le laisser vivre avec en autonomie."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "À qui s’adresser pour les questions sur le traitement lui-même ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour tout ce qui touche au traitement — son rôle, ses modalités, un doute — les bons interlocuteurs sont le médecin et le pharmacien. Le rôle d’un aidant, c’est plutôt d’aider son proche à poser ces questions : l’accompagner à un rendez-vous, ou noter ensemble ce qu’il souhaite demander."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu</a>
@@ -340,7 +413,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 
 <!-- FIL D'ARIANE -->
 <div class="crumb-wrap">
-  <nav class="crumb" aria-label="Fil d'ariane">
+  <nav class="crumb" aria-label="Fil d'Ariane">
     <a href="/">Accueil</a>
     <span class="crumb-sep" aria-hidden="true">›</span>
     <a href="/guides/">Guides</a>
@@ -360,6 +433,11 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   </header>
 
   <div class="guide-body">
+    <div class="guide-tldr">
+      <div class="guide-tldr-label">En bref</div>
+      <p>Aider un proche, c’est d’abord en parler avec lui et choisir ensemble des repères simples, sans jamais transformer l’aide en surveillance. Un pilulier, une routine, un rappel réglé sur son propre téléphone suffisent souvent&nbsp;; pour les traitements lourds, la pharmacie peut préparer les doses (PDA). L’objectif reste son autonomie et sa dignité.</p>
+    </div>
+
     <h2>Aider sans materner&nbsp;: un équilibre précieux</h2>
     <p>Accompagner un proche dans la prise de ses médicaments est l’une des formes d’attention les plus concrètes qui soient. Un parent qui avance en âge, un conjoint dont le traitement s’est complexifié, une personne fragile ou simplement débordée&nbsp;: on a envie d’aider, et c’est précieux.</p>
     <p>Mais l’équilibre est délicat. Trop en faire, c’est risquer de déposséder l’autre de ce qui lui appartient&nbsp;— sa santé, ses décisions, son quotidien. Pas assez, c’est le laisser seul face à une organisation parfois lourde. Ce guide propose un fil simple à tenir d’un bout à l’autre&nbsp;: aider, ce n’est pas contrôler. L’organisation est au service de l’autonomie et de la dignité de votre proche, jamais de sa surveillance. Tout ce qui suit se fait avec lui, avec son accord.</p>
@@ -413,6 +491,36 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     <p>Si un coup de pouce numérique peut aider, Pilou est pensé pour cela&nbsp;: des rappels de prise à l’heure, un suivi des prises, la photo de l’ordonnance pour la garder à portée de main et un suivi du stock de boîtes&nbsp;— le tout sur le téléphone de son utilisateur, pour s’organiser soi-même ou pour aider un proche à s’organiser sur son propre téléphone. Pilou sera bientôt disponible sur Google&nbsp;Play.</p>
   </div>
 
+  <section class="guide-faq" aria-label="Questions fréquentes">
+    <h2 class="guide-faq-title">Questions fréquentes</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary class="faq-q">Comment aider un proche à suivre son traitement sans le braquer&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Commencez par une conversation, pas par un dispositif. Demandez-lui comment il vit son traitement et ce dont il aurait envie, puis choisissez ensemble des repères simples — un pilulier, une routine, un rappel. L’aide qui dure est celle qu’il a acceptée, à son rythme.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Que faire si mon proche refuse qu’on l’aide&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Respectez sa réponse&nbsp;: «&nbsp;pas maintenant&nbsp;» est aussi une décision. Forcer un système braque et se retourne souvent contre l’intention de départ. Gardez le lien, proposez à nouveau plus tard, et concentrez-vous sur une présence chaleureuse. La porte reste ouverte, et c’est déjà beaucoup.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Qu’est-ce que la préparation des doses à administrer (PDA) en pharmacie&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">C’est un service proposé par certaines pharmacies&nbsp;: le pharmacien prépare lui-même le pilulier, ou des sachets-doses, à partir de l’ordonnance, en répartissant les médicaments par jour et par moment de prise. Il s’adresse souvent aux personnes âgées ou aux traitements au long cours. Toutes les officines ne le proposent pas&nbsp;: renseignez-vous auprès de la pharmacie habituelle.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Comment aider un proche qui vit loin&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">L’aide à distance prend d’autres formes, tout aussi utiles&nbsp;: un appel au moment du café, un message le dimanche pour le remplissage du pilulier, un passage en pharmacie lors d’une visite. La régularité chaleureuse compte plus que la fréquence. Vous pouvez aussi l’aider à installer une application de rappel lors d’un passage.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Peut-on suivre les prises d’un proche depuis son propre téléphone&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Pilou est une application personnelle&nbsp;: elle s’installe sur le téléphone de la personne qui suit le traitement, et c’est elle qui reçoit ses rappels et coche ses prises. Vous pouvez l’aider à l’installer et à la régler sur son téléphone, lors d’une visite, puis le laisser vivre avec en autonomie.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">À qui s’adresser pour les questions sur le traitement lui-même&nbsp;?<span class="faq-icon"></span></summary>
+        <div class="faq-a">Pour tout ce qui touche au traitement — son rôle, ses modalités, un doute — les bons interlocuteurs sont le médecin et le pharmacien. Le rôle d’un aidant, c’est plutôt d’aider son proche à poser ces questions&nbsp;: l’accompagner à un rendez-vous, ou noter ensemble ce qu’il souhaite demander.</div>
+      </details>
+    </div>
+  </section>
+
   <div class="guide-cta">
     <div class="guide-cta-inner">
       <div class="guide-cta-title">Pilou aide chacun à s'organiser</div>
@@ -424,7 +532,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     </div>
   </div>
 
-    <nav class="guide-related" aria-label="Guides a lire aussi">
+    <nav class="guide-related" aria-label="Guides à lire aussi">
     <div class="guide-related-title">À lire aussi</div>
     <a href="/guides/ne-plus-oublier-ses-medicaments/">Ne plus oublier ses médicaments</a>
     <a href="/guides/pilulier-numerique-ou-physique/">Pilulier numérique ou physique : comment choisir</a>
@@ -472,7 +580,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </div>
     </div>
     <div class="footer-bottom">
-      <p class="legal-mediateur">Médiation&nbsp;: <strong>CM2C</strong> — 49 rue de Ponthieu, 75&nbsp;008 Paris — Tél.&nbsp;: 01 89 47 00 14 — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Conformément à l'art. L.612-1 du code de la consommation, vous pouvez recourir gratuitement à la médiation de la consommation après réclamation écrite préalable auprès d'AGC Logiciels.</p>
+      <p class="legal-mediateur">Médiation&nbsp;: <strong>CM2C</strong> — 49 rue de Ponthieu, 75008 Paris — Tél.&nbsp;: 01 89 47 00 14 — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Conformément à l'art. L.&nbsp;612-1 du code de la consommation, vous pouvez recourir gratuitement à la médiation de la consommation après réclamation écrite préalable auprès d'AGC Logiciels.</p>
       <span>© 2026 Pilou — Application française</span>
       <span>Non médical — Outil d'aide à l'observance</span>
     </div>

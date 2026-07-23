@@ -36,7 +36,7 @@
 <link rel="preload" as="image" href="/pilou-hero-screen.webp" type="image/webp">
 <style>@font-face{font-family:'Nunito';font-style:normal;font-weight:800;font-display:swap;src:url(/fonts/nunito-latin-800.woff2) format('woff2')}
     /* ─── Inter, auto-hébergée (SIL OFL 1.1, voir /fonts/OFL.txt) ──────────── */
-    /* Servie depuis notre domaine : aucune adresse IP de visiteur n'est transmise
+    /* Servie depuis notre domaine : aucune adresse IP de visiteur n’est transmise
        à un tiers lors du chargement des polices. */
     /* latin-ext */
     @font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/inter-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
@@ -746,7 +746,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       .cta-band-title{font-size:21px}
     }
 
-    /* A11y — lien d'evitement (WCAG 2.4.1) */
+    /* A11y — lien d’evitement (WCAG 2.4.1) */
     .skip-link{position:absolute;left:8px;top:-56px;z-index:1000;background:var(--brand-dark);color:#fff;padding:10px 16px;border-radius:8px;font-weight:600;font-size:14px;transition:top .2s ease}
     .skip-link:focus{top:8px}
 
@@ -798,9 +798,9 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     }
     .menu-backdrop.open{opacity:1;visibility:visible;pointer-events:auto}
     body.menu-locked{overflow:hidden}
-    /* Le burger n'apparaît qu'avec JS, et seulement là où le menu horizontal est masqué */
+    /* Le burger n’apparaît qu’avec JS, et seulement là où le menu horizontal est masqué */
     @media(max-width:1024px){ .js .nav-burger{display:flex} }
-    /* Sécurité : jamais de menu mobile sur desktop, quel que soit l'état */
+    /* Sécurité : jamais de menu mobile sur desktop, quel que soit l’état */
     @media(min-width:1025px){ .mobile-menu,.menu-backdrop{display:none!important} }
   </style>
 <script type="application/ld+json">
@@ -993,19 +993,19 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 </div>
 
 <!-- GALLERY -->
-<section class="gallery" aria-label="Aperçu de l'application">
+<section class="gallery" aria-label="Aperçu de l’application">
   <div class="gallery-wrap">
     <div class="eyebrow fade-up">En images</div>
     <h2 class="fade-up fade-up-d1">Pensé pour votre quotidien</h2>
-    <p class="section-lead fade-up fade-up-d2">Une interface claire, conçue pour aller à l'essentiel. Voici Pilou en situation.</p>
+    <p class="section-lead fade-up fade-up-d2">Une interface claire, conçue pour aller à l’essentiel. Voici Pilou en situation.</p>
     <p class="gallery-hint"><b>‹</b>  glissez pour découvrir  <b>›</b></p>
     <div class="gallery-viewport">
       <button class="gallery-nav prev" type="button" aria-label="Écran précédent">‹</button>
-      <div class="gallery-grid" id="galleryScroller" tabindex="0" role="group" aria-label="Aperçu des écrans de l'application, défilement horizontal">
+      <div class="gallery-grid" id="galleryScroller" tabindex="0" role="group" aria-label="Aperçu des écrans de l’application, défilement horizontal">
       <div class="gallery-item fade-up fade-up-d1">
         <div class="gallery-phone">
           <div class="gallery-notch"><div class="gallery-notch-pill"></div></div>
-          <img class="gallery-screen" src="/pilou-gallery-scan.webp" alt="Écran Pilou confirmant les médicaments lus sur l'ordonnance, prêts à valider" width="640" height="1246" loading="eager">
+          <img class="gallery-screen" src="/pilou-gallery-scan.webp" alt="Écran Pilou confirmant les médicaments lus sur l’ordonnance, prêts à valider" width="640" height="1246" loading="eager">
         </div>
         <div class="gallery-caption">
           <div class="gallery-title">Votre ordonnance, déjà organisée</div>
@@ -1028,7 +1028,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <img class="gallery-screen" src="/pilou-gallery-traitements.webp" alt="Écran Pilou affichant la liste des traitements avec badges de durée et de stock" width="640" height="1254" loading="lazy">
         </div>
         <div class="gallery-caption">
-          <div class="gallery-title">Tout d'un coup d'œil</div>
+          <div class="gallery-title">Tout d’un coup d’œil</div>
           <div class="gallery-desc">Durée restante, stock, « si besoin » — chaque médicament affiche ce qui compte.</div>
         </div>
       </div>
@@ -1039,13 +1039,13 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         </div>
         <div class="gallery-caption">
           <div class="gallery-title">Le devoir accompli</div>
-          <div class="gallery-desc">La satisfaction, chaque jour, de n'avoir rien oublié.</div>
+          <div class="gallery-desc">La satisfaction, chaque jour, de n’avoir rien oublié.</div>
         </div>
       </div>
       <div class="gallery-item fade-up fade-up-d2">
         <div class="gallery-phone">
           <div class="gallery-notch"><div class="gallery-notch-pill"></div></div>
-          <img class="gallery-screen" src="/pilou-gallery-historique.webp" alt="Écran historique Pilou avec taux d'observance de 88 pourcent" width="640" height="1254" loading="lazy">
+          <img class="gallery-screen" src="/pilou-gallery-historique.webp" alt="Écran historique Pilou avec taux d’observance de 88 pourcent" width="640" height="1254" loading="lazy">
         </div>
         <div class="gallery-caption">
           <div class="gallery-title">Suivez votre observance</div>
@@ -1058,18 +1058,18 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <img class="gallery-screen" src="/pilou-gallery-voyage.webp" alt="Écran trousse de voyage Pilou calculant les quantités de médicaments à emporter" width="640" height="1254" loading="lazy">
         </div>
         <div class="gallery-caption">
-          <div class="gallery-title">Partez l'esprit tranquille</div>
+          <div class="gallery-title">Partez l’esprit tranquille</div>
           <div class="gallery-desc">Les bonnes quantités, calculées pour la durée de votre séjour.</div>
         </div>
       </div>
       <div class="gallery-item fade-up fade-up-d2">
         <div class="gallery-phone">
           <div class="gallery-notch"><div class="gallery-notch-pill"></div></div>
-          <img class="gallery-screen" src="/pilou-gallery-sibesoin.webp" alt="Écran Pilou affichant l'heure de la dernière prise d'un médicament « si besoin »" width="640" height="1254" loading="lazy">
+          <img class="gallery-screen" src="/pilou-gallery-sibesoin.webp" alt="Écran Pilou affichant l’heure de la dernière prise d’un médicament « si besoin »" width="640" height="1254" loading="lazy">
         </div>
         <div class="gallery-caption">
           <div class="gallery-title">Jamais deux fois trop tôt</div>
-          <div class="gallery-desc">Pour vos médicaments « si besoin », Pilou retient l'heure de votre dernière prise.</div>
+          <div class="gallery-desc">Pour vos médicaments « si besoin », Pilou retient l’heure de votre dernière prise.</div>
         </div>
       </div>
     </div>
@@ -1106,7 +1106,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="feat fade-up fade-up-d3">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1m-2 0H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h12"/><path d="M6 8V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"/></svg></div>
         <div class="feat-name">Rappels intelligents</div>
-        <div class="feat-desc">Notifications précises à chaque créneau de prise. Pilou vous rappelle même quand l'application est fermée.</div>
+        <div class="feat-desc">Notifications précises à chaque créneau de prise. Pilou vous rappelle même quand l’application est fermée.</div>
       </div>
       <div class="feat fade-up fade-up-d1">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></div>
@@ -1117,7 +1117,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="feat fade-up fade-up-d3">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
         <div class="feat-name">Médicaments « si besoin »</div>
-        <div class="feat-desc">Doliprane, Ibuprofène... Pilou enregistre l'heure exacte de chaque prise. Vous voyez le temps écoulé depuis la dernière prise — pour éviter de reprendre trop tôt.</div>
+        <div class="feat-desc">Doliprane, Ibuprofène... Pilou enregistre l’heure exacte de chaque prise. Vous voyez le temps écoulé depuis la dernière prise — pour éviter de reprendre trop tôt.</div>
       </div>
       <div class="feat fade-up fade-up-d1">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6m-4 5H8m4 4H8m2-8H8"/></svg></div>
@@ -1128,7 +1128,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="feat fade-up fade-up-d2">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
         <div class="feat-name">Suivi des stocks</div>
-        <div class="feat-desc">Saisissez la quantité dans votre boîte. Pilou calcule les jours restants et vous prévient avant d'être à court.</div>
+        <div class="feat-desc">Saisissez la quantité dans votre boîte. Pilou calcule les jours restants et vous prévient avant d’être à court.</div>
           <span class="feat-badge">Essentiel</span>
       </div>
       <div class="feat fade-up fade-up-d3">
@@ -1157,7 +1157,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Traitements jusqu’à 21 jours</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>5 médicaments</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>1 lecture d’ordonnance par mois</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>14 jours d'historique</li>
+          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>14 jours d’historique</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Rappels illimités</li>
         </ul>
         <button class="price-btn-s price-btn-soon" disabled>Bientôt disponible</button>
@@ -1174,7 +1174,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Traitements jusqu’à 90 jours</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>8 médicaments</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>3 lectures d’ordonnance par mois</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>30 jours d'historique</li>
+          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>30 jours d’historique</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Alertes fin de traitement</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Suivi des stocks</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Trousse de voyage</li>
@@ -1188,12 +1188,12 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         <div><span class="price-amount">2,99€</span><span class="price-period">/mois</span></div>
 <div class="price-annual">ou 26,99€/an · 3 mois offerts</div>
         <div class="price-sep"></div>
-        <div class="price-desc">L'expérience Pilou complète, sans limite.</div>
+        <div class="price-desc">L’expérience Pilou complète, sans limite.</div>
         <ul class="price-list">
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Traitements de durée illimitée</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Médicaments illimités</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>30 lectures d’ordonnance par mois</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>90 jours d'historique</li>
+          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>90 jours d’historique</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Alertes fin de traitement</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Suivi des stocks</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Trousse de voyage</li>
@@ -1243,7 +1243,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="trust-card fade-up fade-up-d4">
         <div class="trust-card-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
         <div class="trust-card-title">RGPD conforme</div>
-        <div class="trust-card-desc">Politique de confidentialité complète. Droit à l'effacement intégral dans l'application.</div>
+        <div class="trust-card-desc">Politique de confidentialité complète. Droit à l’effacement intégral dans l’application.</div>
       </div>
       <div class="trust-card fade-up fade-up-d1">
         <div class="trust-card-icon"><svg viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></div>
@@ -1266,8 +1266,8 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="maker-quote fade-up">
         <div class="maker-quote-mark">"</div>
         <p class="maker-quote-text">
-          J'ai créé Pilou avec une conviction simple : votre santé mérite une app soignée, française, et vraiment respectueuse de vos données.
-          C'est tout ce que Pilou est. C'est tout ce qu'il sera.
+          J’ai créé Pilou avec une conviction simple : votre santé mérite une app soignée, française, et vraiment respectueuse de vos données.
+          C’est tout ce que Pilou est. C’est tout ce qu’il sera.
         </p>
       </div>
       <div class="maker-sig fade-up fade-up-d1">
@@ -1348,7 +1348,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="footer-col">
         <div class="footer-col-title">Légal</div>
         <a href="/confidentialite">Politique de confidentialité</a>
-        <a href="/cgu">Conditions d'utilisation</a>
+        <a href="/cgu">Conditions d’utilisation</a>
         <a href="/mentions-legales">Mentions légales</a>
       </div>
       <div class="footer-col">
@@ -1360,7 +1360,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     <div class="footer-bottom">
                 <p class="legal-mediateur">Médiation : <strong>CM2C</strong> — 49 rue de Ponthieu, 75 008 Paris — Tél. : 01 89 47 00 14 — <a href="https://www.cm2c.net" target="_blank" rel="noopener">www.cm2c.net</a>. Conformément à l’art. L.612-1 du code de la consommation, vous pouvez recourir gratuitement à la médiation de la consommation après réclamation écrite préalable auprès d’AGC Logiciels.</p>
           <span>© 2026 Pilou — Application française</span>
-      <span>Non médical — Outil d'aide à l'observance</span>
+      <span>Non médical — Outil d’aide à l’observance</span>
     </div>
   </div>
 </footer>

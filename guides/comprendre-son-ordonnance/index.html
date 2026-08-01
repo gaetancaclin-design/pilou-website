@@ -139,6 +139,15 @@ nav{
   font-size:13.5px;line-height:1.65;color:var(--muted);
 }
 .guide-disclaimer strong{color:var(--ink);font-weight:600}
+.guide-sources{max-width:760px;margin:40px auto 0;padding:0 24px}
+.guide-sources-title{margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-dark)}
+.guide-sources-intro{margin:0 0 16px;font-size:14px;line-height:1.7;color:var(--muted)}
+.guide-sources-list{list-style:none;margin:0;padding:0}
+.guide-sources-list li{position:relative;padding-left:18px;margin-bottom:10px;font-size:14px;line-height:1.65;color:var(--muted)}
+.guide-sources-list li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--brand-dark)}
+.guide-sources-list a{color:var(--ink);font-weight:600;text-decoration:none;border-bottom:1px solid var(--border)}
+.guide-sources-list a:hover{border-bottom-color:var(--brand-dark)}
+.guide-sources-note{margin:16px 0 0;font-size:13px;line-height:1.65;color:var(--muted)}
 
 /* CTA honnête (pré-lancement) */
 .guide-cta{max-width:760px;margin:32px auto 0;padding:0 24px}
@@ -339,7 +348,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       "name": "Mon ordonnance date de plus de trois mois, puis-je encore aller à la pharmacie ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Le délai de trois mois s’applique à la première délivrance : au-delà, l’ordonnance ne permet plus d’ouvrir le traitement. Il existe cependant une dispensation exceptionnelle si vous suivez un traitement chronique, que votre ordonnance a expiré et que l’interrompre serait préjudiciable : le pharmacien peut alors délivrer par périodes d’un mois, dans la limite de trois mois. Les stupéfiants et certains psychotropes en sont exclus. C’est un dépannage, pas un renouvellement : la consultation reste à prendre."
+        "text": "Le délai de trois mois s’applique à la première délivrance : au-delà, l’ordonnance ne permet plus d’ouvrir le traitement. Il existe cependant une dispensation exceptionnelle si vous suivez un traitement chronique prescrit pour au moins trois mois, que votre ordonnance a expiré depuis moins d’un mois et que l’interrompre serait préjudiciable : le pharmacien peut alors délivrer par périodes d’un mois, dans la limite de trois mois. Les stupéfiants et certains psychotropes en sont exclus. C’est un dépannage, pas un renouvellement : la consultation reste à prendre."
       }
     },
     {
@@ -475,7 +484,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     <p>C’est la question qui revient le plus, et elle mélange en réalité deux délais différents.</p>
     <p>Le premier concerne la <strong>première délivrance</strong>. Pour obtenir vos médicaments en pharmacie une première fois, vous disposez de trois mois maximum à compter de la date de rédaction de l’ordonnance. Passé ce délai, elle ne permet plus d’ouvrir le traitement.</p>
     <p>Le second concerne la <strong>durée du traitement lui-même</strong>. Une ordonnance ne peut pas permettre de délivrances au-delà de douze mois&nbsp;: c’est le plafond légal, et non une durée par défaut. La durée effective est celle qu’indique le prescripteur, souvent bien plus courte. Certains médicaments sont plafonnés plus bas&nbsp;: certains anxiolytiques, par exemple, sont limités à douze semaines.</p>
-    <p>Deux cas particuliers méritent d’être connus. Pour les médicaments stupéfiants, l’ordonnance doit être présentée à la pharmacie dans les trois jours&nbsp;: passé ce délai, elle n’est pas annulée, mais le pharmacien ne peut plus délivrer que la quantité correspondant à la durée de traitement restant à courir. Et à l’inverse, si vous suivez un traitement chronique, que votre ordonnance vient d’expirer et que l’interrompre serait préjudiciable, le pharmacien peut, à titre exceptionnel, vous dépanner par périodes d’un mois dans la limite de trois mois — un dispositif qui exclut les stupéfiants et certains psychotropes, et qui ne remplace pas une nouvelle consultation.</p>
+    <p>Deux cas particuliers méritent d’être connus. Pour les médicaments stupéfiants, l’ordonnance doit être présentée à la pharmacie dans les trois jours&nbsp;: passé ce délai, elle n’est pas annulée, mais le pharmacien ne peut plus délivrer que la quantité correspondant à la durée de traitement restant à courir. Et à l’inverse, si vous suivez un traitement chronique prescrit pour au moins trois mois, que votre ordonnance a expiré depuis moins d’un mois et que l’interrompre serait préjudiciable, le pharmacien peut, à titre exceptionnel, vous dépanner par périodes d’un mois dans la limite de trois mois — un dispositif qui exclut les stupéfiants et certains psychotropes, et qui ne remplace pas une nouvelle consultation.</p>
 
     <h2>Du papier au quotidien</h2>
     <p>Comprendre son ordonnance, c’est une chose. La faire tenir dans une semaine réelle en est une autre — surtout avec plusieurs médicaments, des horaires différents et des durées qui ne se terminent pas le même jour.</p>
@@ -492,7 +501,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       </details>
       <details class="faq-item">
         <summary class="faq-q">Mon ordonnance date de plus de trois mois, puis-je encore aller à la pharmacie&nbsp;?<span class="faq-icon"></span></summary>
-        <div class="faq-a">Le délai de trois mois s’applique à la première délivrance&nbsp;: au-delà, l’ordonnance ne permet plus d’ouvrir le traitement. Il existe cependant une dispensation exceptionnelle si vous suivez un traitement chronique, que votre ordonnance a expiré et que l’interrompre serait préjudiciable&nbsp;: le pharmacien peut alors délivrer par périodes d’un mois, dans la limite de trois mois. Les stupéfiants et certains psychotropes en sont exclus. C’est un dépannage, pas un renouvellement&nbsp;: la consultation reste à prendre.</div>
+        <div class="faq-a">Le délai de trois mois s’applique à la première délivrance&nbsp;: au-delà, l’ordonnance ne permet plus d’ouvrir le traitement. Il existe cependant une dispensation exceptionnelle si vous suivez un traitement chronique prescrit pour au moins trois mois, que votre ordonnance a expiré depuis moins d’un mois et que l’interrompre serait préjudiciable&nbsp;: le pharmacien peut alors délivrer par périodes d’un mois, dans la limite de trois mois. Les stupéfiants et certains psychotropes en sont exclus. C’est un dépannage, pas un renouvellement&nbsp;: la consultation reste à prendre.</div>
       </details>
       <details class="faq-item">
         <summary class="faq-q">Que signifie «&nbsp;non substituable&nbsp;»&nbsp;?<span class="faq-icon"></span></summary>
@@ -511,6 +520,26 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         <div class="faq-a">Oui, et c’est précisément ce que fait Pilou&nbsp;: la photo est analysée pour en extraire les médicaments, les posologies et les durées, puis le pilulier est préparé automatiquement. Vous gardez évidemment l’ordonnance papier, qui reste le document exigé en pharmacie.</div>
       </details>
     </div>
+  </section>
+
+  <section class="guide-sources">
+    <h2 class="guide-sources-title">Sources</h2>
+    <p class="guide-sources-intro">Ce guide s’appuie sur les textes officiels français en vigueur et sur les publications des organismes publics de santé.</p>
+    <ul class="guide-sources-list">
+      <li><a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006915040" target="_blank" rel="noopener">Article R.&nbsp;5123-2 du code de la santé publique</a> — exécution des ordonnances et durée maximale de délivrance.</li>
+      <li><a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000048630320" target="_blank" rel="noopener">Article R.&nbsp;5132-22 du code de la santé publique</a> — délivrance et renouvellement des médicaments des listes I et II.</li>
+      <li><a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000046010116" target="_blank" rel="noopener">Article R.&nbsp;5132-33 du code de la santé publique</a> — délivrance des ordonnances de médicaments stupéfiants.</li>
+      <li><a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000048701765" target="_blank" rel="noopener">Article L.&nbsp;5121-1 du code de la santé publique</a> — définition de la spécialité générique.</li>
+      <li><a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000020892633" target="_blank" rel="noopener">Article L.&nbsp;5125-23-1 du code de la santé publique</a> — dispensation par le pharmacien lorsque l’ordonnance a expiré.</li>
+      <li><a href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000050668009" target="_blank" rel="noopener">Décret n°&nbsp;2024-1070 du 26&nbsp;novembre 2024</a> — dispensation supplémentaire exceptionnelle de médicaments et de dispositifs médicaux dans le cadre d’un traitement chronique.</li>
+      <li><a href="https://www.legifrance.gouv.fr/loda/id/LEGITEXT000020690355" target="_blank" rel="noopener">Arrêté du 7&nbsp;octobre 1991</a> — liste des substances à propriétés hypnotique ou anxiolytique dont la durée de prescription est réduite.</li>
+      <li><a href="https://www.legifrance.gouv.fr/loda/id/JORFTEXT000039393124/" target="_blank" rel="noopener">Arrêté du 12&nbsp;novembre 2019</a> — situations médicales dans lesquelles la substitution par un générique peut être exclue (mention «&nbsp;non substituable&nbsp;»).</li>
+      <li><a href="https://www.ameli.fr/assure/sante/utiliser-medicaments/lire-ordonnance-medicaments" target="_blank" rel="noopener">Bien lire et utiliser une ordonnance de médicaments</a> — Assurance Maladie (ameli.fr).</li>
+      <li><a href="https://www.ameli.fr/pharmacien/exercice-professionnel/delivrance-produits-sante/droits-prescription" target="_blank" rel="noopener">Droits de prescription</a> — Assurance Maladie (ameli.fr)&nbsp;: professionnels de santé habilités à prescrire.</li>
+      <li><a href="https://www.meddispar.fr/Substances-veneneuses/Medicaments-stupefiants-et-assimiles/Conditions-de-delivrance" target="_blank" rel="noopener">Médicaments stupéfiants et assimilés&nbsp;: conditions de délivrance</a> — Meddispar, Ordre national des pharmaciens.</li>
+      <li><a href="https://www.meddispar.fr/Substances-veneneuses/Medicaments-hypnotiques-ou-anxiolytiques/Conditions-de-prescription" target="_blank" rel="noopener">Médicaments hypnotiques ou anxiolytiques&nbsp;: conditions de prescription</a> — Meddispar, Ordre national des pharmaciens.</li>
+    </ul>
+    <p class="guide-sources-note">Textes vérifiés le 1<sup>er</sup>&nbsp;août 2026. Les règles peuvent évoluer&nbsp;: en cas de doute, votre pharmacien reste la référence.</p>
   </section>
 
   <div class="guide-cta">

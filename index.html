@@ -387,8 +387,11 @@ h2{
 
 /* ── PRICING ── */
 .price-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
+  display:grid;grid-template-columns:repeat(2,1fr);
   gap:20px;align-items:stretch;
+  /* Deux formules depuis la 1.1.0 : sans borne de largeur, deux cartes
+     setireraient sur toute la page. */
+  max-width:760px;margin-left:auto;margin-right:auto;
 }
 .price-card{
   background:white;border:1px solid var(--border);
@@ -850,7 +853,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       "name": "Pilou est-il vraiment gratuit ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Oui. La formule Gratuite l’est pour toujours, sans carte bancaire ni inscription. Elle couvre jusqu’à 5 médicaments et des traitements d’une durée maximale d’un mois. Les formules payantes ajoutent plus de médicaments, de lectures d’ordonnance et de fonctionnalités. Un essai gratuit d’1 mois est proposé sur les formules payantes, réservé aux nouveaux abonnés."
+        "text": "Oui. La formule Gratuite l’est pour toujours, sans carte bancaire ni inscription. Elle couvre jusqu’à 5 médicaments et des traitements d’une durée maximale d’un mois. La formule Pilou+ lève ces limites : nombre de médicaments et durées sans limite, 30 lectures d’ordonnance par mois, alertes de fin de traitement, suivi des stocks, trousse de voyage et journal de prises en PDF. Un essai gratuit d’1 mois est proposé, réservé aux nouveaux abonnés."
       }
     },
     {
@@ -1130,7 +1133,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></div>
         <div class="feat-name">Alertes de fin de traitement</div>
         <div class="feat-desc">Pilou vous prévient 7 jours et 3 jours avant la fin de chaque traitement. Jamais pris au dépourvu pour renouveler votre ordonnance.</div>
-        <span class="feat-badge">Essentiel</span>
+        <span class="feat-badge">Pilou+</span>
       </div>
       <div class="feat fade-up fade-up-d3">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
@@ -1147,13 +1150,13 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
         <div class="feat-name">Suivi des stocks</div>
         <div class="feat-desc">Saisissez la quantité dans votre boîte. Pilou calcule les jours restants et vous prévient avant d’être à court.</div>
-          <span class="feat-badge">Essentiel</span>
+          <span class="feat-badge">Pilou+</span>
       </div>
       <div class="feat fade-up fade-up-d3">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M20 7h-9m9 5h-7m7 5h-9M4 5l2-2 2 2M4 12l2-2 2 2M4 19l2-2 2 2"/></svg></div>
         <div class="feat-name">Trousse de voyage</div>
         <div class="feat-desc">Pilou calcule exactement la quantité à emporter pour la durée de votre séjour et génère votre liste complète.</div>
-          <span class="feat-badge">Essentiel</span>
+          <span class="feat-badge">Pilou+</span>
       </div>
     </div>
   </div>
@@ -1182,42 +1185,23 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
                 <div class="price-note">Gratuit pour toujours · Aucune carte requise</div>
       </div>
       <div class="price-card featured fade-up fade-up-d2">
-        <div class="featured-badge">Recommandé</div>
-        <div class="price-tier">Essentiel</div>
-        <div><span class="price-amount">1,49€</span><span class="price-period">/mois</span></div>
-<div class="price-annual">ou 14,90€/an · 2 mois offerts</div>
-        <div class="price-trial">1 mois d’essai gratuit pour les nouveaux abonnés</div>
-        <div class="price-sep"></div>
-        <div class="price-desc">Le bon choix pour la plupart des patients.</div>
-        <ul class="price-list">
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Traitements jusqu’à 90 jours</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>8 médicaments</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>3 lectures d’ordonnance par mois</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>30 jours d’historique</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Alertes fin de traitement</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Suivi des stocks</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Trousse de voyage</li>
-        </ul>
-        <a class="price-btn-s" href="https://play.google.com/store/apps/details?id=com.pilou.app">Télécharger l’app</a>
-                <div class="price-note">Sans engagement, résiliable à tout moment</div>
-      </div>
-      <div class="price-card fade-up fade-up-d3">
-        <div class="featured-badge">Le plus complet</div>
+        <div class="featured-badge">Formule complète</div>
         <div class="price-tier">Pilou+</div>
         <div><span class="price-amount">2,99€</span><span class="price-period">/mois</span></div>
 <div class="price-annual">ou 26,99€/an · 3 mois offerts</div>
         <div class="price-trial">1 mois d’essai gratuit pour les nouveaux abonnés</div>
         <div class="price-sep"></div>
-        <div class="price-desc">L’expérience Pilou complète, sans limite.</div>
+        <div class="price-desc">Toute l’ordonnance, du premier au dernier jour.</div>
         <ul class="price-list">
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Traitements de durée illimitée</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Médicaments illimités</li>
+          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Rappels de prise illimités</li>
+          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Traitements de toute durée, y compris sans date de fin</li>
+          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Nombre de médicaments sans limite</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>30 lectures d’ordonnance par mois</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>90 jours d’historique</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Alertes fin de traitement</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Suivi des stocks</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Trousse de voyage</li>
-          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Journal de prises à partager</li>
+          <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Journal de prises à remettre à votre médecin</li>
         </ul>
         <a class="price-btn-p" href="https://play.google.com/store/apps/details?id=com.pilou.app">Télécharger l’app</a>
                 <div class="price-note">Sans engagement, résiliable à tout moment</div>
@@ -1308,7 +1292,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="faq-list fade-up fade-up-d2">
         <details class="faq-item">
           <summary class="faq-q">Pilou est-il vraiment gratuit&#8239;?<span class="faq-icon"></span></summary>
-          <div class="faq-a">Oui. La formule Gratuite l’est pour toujours, sans carte bancaire ni inscription. Elle couvre jusqu’à 5 médicaments et des traitements d’une durée maximale d’un mois. Les formules payantes ajoutent plus de médicaments, de lectures d’ordonnance et de fonctionnalités. Un essai gratuit d’1 mois est proposé sur les formules payantes, réservé aux nouveaux abonnés.</div>
+          <div class="faq-a">Oui. La formule Gratuite l’est pour toujours, sans carte bancaire ni inscription. Elle couvre jusqu’à 5 médicaments et des traitements d’une durée maximale d’un mois. La formule Pilou+ lève ces limites : nombre de médicaments et durées sans limite, 30 lectures d’ordonnance par mois, alertes de fin de traitement, suivi des stocks, trousse de voyage et journal de prises en PDF. Un essai gratuit d’1 mois est proposé, réservé aux nouveaux abonnés.</div>
         </details>
         <details class="faq-item">
           <summary class="faq-q">Où sont stockées mes données de santé&#8239;?<span class="faq-icon"></span></summary>

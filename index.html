@@ -1188,7 +1188,10 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         <div class="featured-badge">Formule complète</div>
         <div class="price-tier">Pilou+</div>
         <div><span class="price-amount">2,99€</span><span class="price-period">/mois</span></div>
-<div class="price-annual">ou 26,99€/an · 3 mois offerts</div>
+<!-- « soit 2,24€/mois » : valeur servie par Google Play (pricePerMonthString),
+     qui TRONQUE au lieu d'arrondir (26,99 / 12 = 2,2492). Ecrire 2,25 ici
+     contredirait ce que le store affiche. A resynchroniser a tout changement de prix. -->
+<div class="price-annual">ou 26,99€/an · 3 mois offerts · soit 2,24€/mois</div>
         <div class="price-trial">1 mois d’essai gratuit pour les nouveaux abonnés</div>
         <div class="price-sep"></div>
         <div class="price-desc">Toute l’ordonnance, du premier au dernier jour.</div>
@@ -1207,7 +1210,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
                 <div class="price-note">Sans engagement, résiliable à tout moment</div>
       </div>
     </div>
-    <div class="price-reassurance fade-up">Inclus dans toutes les formules · Rappels de prise illimités · Médicaments « si besoin » · Zéro compte requis · Zéro publicité</div>
+    <div class="price-reassurance fade-up">Inclus en Gratuit comme en Pilou+ · Rappels de prise illimités · Médicaments « si besoin » · Zéro compte requis · Zéro publicité</div>
   </div>
 </section>
 

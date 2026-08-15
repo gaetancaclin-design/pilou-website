@@ -1104,6 +1104,66 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     <div class="gallery-dots" id="galleryDots" aria-hidden="true"></div>
   </div>
 </section>
+<!-- Film de presentation : lecteur differe. Aucun appel a Google avant le clic. -->
+<style>
+.film-section{background:var(--surface);padding:88px 24px}
+.film-wrap{max-width:900px;margin:0 auto;text-align:center}
+.film-eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--brand-dark);font-weight:600;margin-bottom:14px}
+.film-title{font-size:clamp(28px,4vw,40px);line-height:1.15;color:var(--ink);margin:0 0 14px}
+.film-sub{font-size:17px;color:var(--muted);margin:0 0 34px}
+.film-frame{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-lg);background:#0f1a15;aspect-ratio:16/9}
+.film-facade{display:block;width:100%;height:100%;position:relative}
+.film-facade img{display:block;width:100%;height:100%;object-fit:cover}
+.film-play{position:absolute;inset:0;display:grid;place-items:center}
+.film-play i{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.94);box-shadow:0 10px 34px rgba(0,0,0,.32);display:grid;place-items:center;transition:transform .22s ease,background .22s ease}
+.film-play i::after{content:"";width:0;height:0;margin-left:7px;border-style:solid;border-width:15px 0 15px 25px;border-color:transparent transparent transparent var(--brand-darker)}
+.film-facade:hover .film-play i,.film-facade:focus-visible .film-play i{transform:scale(1.07);background:#fff}
+.film-facade:focus-visible{outline:3px solid var(--brand-dark);outline-offset:3px}
+.film-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.film-note{font-size:13px;color:var(--muted-light);margin:18px 0 0}
+@media(max-width:640px){.film-section{padding:60px 18px}.film-play i{width:66px;height:66px}}
+</style>
+<section class="film-section" aria-labelledby="film-titre">
+  <div class="film-wrap">
+    <div class="film-eyebrow">En vidéo</div>
+    <h2 class="film-title" id="film-titre">Pilou en vingt secondes</h2>
+    <p class="film-sub">Une photo de votre ordonnance, et votre pilulier est prêt.</p>
+    <div class="film-frame">
+      <a class="film-facade" href="https://www.youtube.com/watch?v=Wdt5yfLllcM" data-yt="Wdt5yfLllcM" rel="noopener">
+        <img src="/affiche-film.jpg" width="1280" height="720" loading="lazy" decoding="async" alt="Pilou : une photo suffit, votre pilulier est prêt">
+        <span class="film-play" aria-hidden="true"><i></i></span>
+      </a>
+    </div>
+    <p class="film-note">Vidéo hébergée sur YouTube. Rien n’est envoyé à Google tant que vous ne lancez pas la lecture.</p>
+  </div>
+</section>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "Pilou — une photo suffit, votre pilulier est prêt",
+  "description": "Présentation de Pilou, pilulier numérique français : une photo de l’ordonnance, et les rappels de prise, les durées et les stocks sont prêts.",
+  "thumbnailUrl": "https://pilou-app.fr/affiche-film.jpg",
+  "uploadDate": "2026-08-14",
+  "duration": "PT19S",
+  "embedUrl": "https://www.youtube-nocookie.com/embed/Wdt5yfLllcM",
+  "publisher": { "@id": "https://pilou-app.fr/#organization" }
+}
+</script>
+<script>
+(function(){
+  var a=document.querySelector(".film-facade"); if(!a) return;
+  a.addEventListener("click",function(e){
+    e.preventDefault();
+    var f=document.createElement("iframe");
+    f.src="https://www.youtube-nocookie.com/embed/"+a.getAttribute("data-yt")+"?autoplay=1&rel=0&modestbranding=1&hl=fr";
+    f.title="Pilou, une photo suffit, votre pilulier est pret";
+    f.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    f.setAttribute("allowfullscreen","");
+    a.parentNode.replaceChild(f,a);
+  });
+})();
+</script>
 
 <!-- FEATURES -->
 <section class="section section-alt" id="fonctionnalites">
@@ -1380,6 +1440,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="footer-col">
         <div class="footer-col-title">Contact</div>
         <a href="/support">Aide &amp; FAQ</a>
+        <a href="https://www.youtube.com/@PilouApp" rel="noopener">Chaîne YouTube</a>
         <a href="mailto:agc.logiciels@gmail.com">agc.logiciels@gmail.com</a>
       </div>
     </div>

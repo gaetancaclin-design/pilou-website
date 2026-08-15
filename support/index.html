@@ -850,6 +850,44 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     <div class="eyebrow">Aide</div>
     <h1 class="subpage-title">Support & Questions fréquentes</h1>
     <p class="subpage-lead">Vous ne trouvez pas votre réponse ? Écrivez-nous à <a href="mailto:agc.logiciels@gmail.com" class="support-email-link">agc.logiciels@gmail.com</a> — nous répondons sous 48h.</p>
+    <!-- Film de presentation : lecteur differe. Aucun appel a Google avant le clic. -->
+    <style>
+    .film-section{margin:6px 0 42px}
+    .film-frame{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-lg);background:#0f1a15;aspect-ratio:16/9}
+    .film-facade{display:block;width:100%;height:100%;position:relative}
+    .film-facade img{display:block;width:100%;height:100%;object-fit:cover}
+    .film-play{position:absolute;inset:0;display:grid;place-items:center}
+    .film-play i{width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.94);box-shadow:0 10px 34px rgba(0,0,0,.32);display:grid;place-items:center;transition:transform .22s ease,background .22s ease}
+    .film-play i::after{content:"";width:0;height:0;margin-left:7px;border-style:solid;border-width:14px 0 14px 23px;border-color:transparent transparent transparent var(--brand-darker)}
+    .film-facade:hover .film-play i,.film-facade:focus-visible .film-play i{transform:scale(1.07);background:#fff}
+    .film-facade:focus-visible{outline:3px solid var(--brand-dark);outline-offset:3px}
+    .film-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .film-note{font-size:13px;color:var(--muted-light);margin:14px 0 0}
+    @media(max-width:640px){.film-play i{width:62px;height:62px}}
+    </style>
+    <section class="film-section" aria-label="Pilou en vidéo">
+      <div class="film-frame">
+        <a class="film-facade" href="https://www.youtube.com/watch?v=Wdt5yfLllcM" data-yt="Wdt5yfLllcM" rel="noopener">
+          <img src="/affiche-film.jpg" width="1280" height="720" loading="lazy" decoding="async" alt="Pilou : une photo suffit, votre pilulier est prêt">
+          <span class="film-play" aria-hidden="true"><i></i></span>
+        </a>
+      </div>
+      <p class="film-note">Vidéo hébergée sur YouTube. Rien n’est envoyé à Google tant que vous ne lancez pas la lecture.</p>
+    </section>
+    <script>
+    (function(){
+      var a=document.querySelector(".film-facade"); if(!a) return;
+      a.addEventListener("click",function(e){
+        e.preventDefault();
+        var f=document.createElement("iframe");
+        f.src="https://www.youtube-nocookie.com/embed/"+a.getAttribute("data-yt")+"?autoplay=1&rel=0&modestbranding=1&hl=fr";
+        f.title="Pilou, une photo suffit, votre pilulier est pret";
+        f.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+        f.setAttribute("allowfullscreen","");
+        a.parentNode.replaceChild(f,a);
+      });
+    })();
+    </script>
     <div class="faq-section">
       <h2 class="faq-group-title">Général</h2>
       <div class="faq-list">
@@ -958,6 +996,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="footer-col">
         <div class="footer-col-title">Contact</div>
         <a href="/support">Aide &amp; FAQ</a>
+        <a href="https://www.youtube.com/@PilouApp" rel="noopener">Chaîne YouTube</a>
         <a href="mailto:agc.logiciels@gmail.com">agc.logiciels@gmail.com</a>
       </div>
     </div>

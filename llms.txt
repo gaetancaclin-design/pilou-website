@@ -1,6 +1,6 @@
 # Pilou
 
-> Pilou est une application française de rappel de prise de médicaments et de suivi de traitement — un pilulier numérique. Elle envoie un rappel à l'heure de chaque prise, permet de confirmer les prises, suit le stock de boîtes et lit l'ordonnance par photo pour configurer les traitements. Les données de santé restent sur le téléphone de l'utilisateur ; seule la photo d'ordonnance est analysée en France le temps de la lecture, puis n'est pas conservée. Application Android, disponible sur Google Play : https://play.google.com/store/apps/details?id=com.pilou.app Éditeur : AGC Logiciels.
+> Pilou est une application française de rappel de prise de médicaments et de suivi de traitement — un pilulier numérique. Elle envoie un rappel à l'heure de chaque prise, permet de confirmer les prises, suit le stock de boîtes et lit l'ordonnance par photo pour configurer les traitements. Les médicaments sont stockés sur le téléphone ; seule la photo d'ordonnance est analysée au sein de l'Union européenne le temps de la lecture, puis n'est pas conservée. Application Android, disponible sur Google Play : https://play.google.com/store/apps/details?id=com.pilou.app Éditeur : AGC Logiciels.
 
 ## Guides pratiques
 - [Ne plus oublier ses médicaments](https://pilou-app.fr/guides/ne-plus-oublier-ses-medicaments/) : associer la prise à une habitude, rendre les médicaments visibles, pilulier, rappels, et quoi faire en cas d'oubli.

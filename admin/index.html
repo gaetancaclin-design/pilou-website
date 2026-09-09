@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Console Pilou</title>
+<!--
+  ============================================================================
+  CONSOLE D'ADMINISTRATION PILOU — AGC Logiciels — 09/09/2026
+  ============================================================================
+  Cette page NE CONTIENT AUCUN SECRET. La cle ci-dessous est la cle PUBLIQUE
+  du projet : elle est deja publiee dans l'application Android installee chez
+  les utilisateurs. Elle n'ouvre RIEN toute seule — l'epreuve du 09/09 l'a
+  montre : les huit vues repondent « permission denied » a un visiteur non
+  connecte, et rendent ZERO LIGNE a un compte connecte qui n'est pas celui de
+  Gaetan.
+
+  TROIS VERROUS, ET AUCUN NE SUFFIT SEUL :
+    1. inscription publique fermee dans Supabase ;
+    2. aucun droit sur les vues pour `anon` ;
+    3. garde `auth.uid() = <identifiant de Gaetan>` DANS chaque vue.
+
+  LA BIBLIOTHEQUE EST HEBERGEE ICI, PAS SUR UN CDN. Fichier
+  `supabase-js-2.105.4.umd.js`, copie exacte du paquet npm officiel
+  (md5 42b77e7d5603a897aed5de2077e7f651, 197 447 octets). Trois raisons :
+  aucune requete vers un tiers depuis cette page, aucun risque qu'un CDN
+  compromis lise vos donnees, et une version qui ne bougera jamais dans votre
+  dos. Meme version majeure que l'application (^2.105.4).
+
+  ⚠️ LA CLE UTILISEE EST L'ANCIENNE CLE `anon` (un jeton JWT). C'est
+  DELIBERE : cette version de la bibliotheque ne connait pas le nouveau format
+  `sb_publishable_...` et se contente de le recopier en en-tete. L'ancienne
+  cle est garantie compatible. Si elle etait un jour desactivee dans Supabase,
+  remplacer la constante CLE_PUBLIQUE par la cle publiable moderne.
+  ============================================================================
+-->
+<style>
+:root{
+  --fond:#f4f7f4; --carte:#ffffff; --carte-2:#f9fbf9;
+  --trait:#dfe6e0; --trait-fort:#c6d2c8;
+  --encre:#16241c; --encre-2:#5b6f61; --encre-3:#87988c;
+  --accent:#305a40; --accent-doux:#e7f1ea; --accent-encre:#2a5138;
+  --ok:#2f7d4f; --ok-fond:#e6f4ea;
+  --attention:#9a6b12; --attention-fond:#fbf1dc;
+  --critique:#a92f27; --critique-fond:#fbe9e7;
+  --neutre-fond:#eef1ee;
+  --ombre:0 1px 2px rgba(22,36,28,.05), 0 8px 24px -12px rgba(22,36,28,.18);
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --fond:#0c120e; --carte:#141d17; --carte-2:#1a241d;
+    --trait:#26332a; --trait-fort:#35473a;
+    --encre:#e6efe8; --encre-2:#a3b5a8; --encre-3:#7c8f82;
+    --accent:#7fb894; --accent-doux:#1b2b21; --accent-encre:#9ccfae;
+    --ok:#6fc38d; --ok-fond:#152a1d;
+    --attention:#d9a441; --attention-fond:#2c2313;
+    --critique:#e8776c; --critique-fond:#2e1614;
+    --neutre-fond:#1a241d;
+    --ombre:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--fond); color:var(--encre);
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.num{font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0; font-weight:650; letter-spacing:-.01em; text-wrap:balance}
+
+/* ── Connexion ───────────────────────────────────────────────────────────── */
+#connexion{min-height:100dvh; display:grid; place-items:center; padding:24px}
+.boite{
+  width:100%; max-width:380px; background:var(--carte);
+  border:1px solid var(--trait); border-radius:var(--r);
+  box-shadow:var(--ombre); padding:30px 26px 26px;
+}
+.marque{display:flex; align-items:baseline; gap:8px; margin-bottom:4px}
+.marque b{font-size:20px; letter-spacing:-.02em}
+.marque span{font-size:12px; text-transform:uppercase; letter-spacing:.09em; color:var(--encre-3)}
+.boite p.intro{margin:6px 0 22px; color:var(--encre-2); font-size:13.5px}
+label{display:block; font-size:12px; font-weight:600; text-transform:uppercase;
+  letter-spacing:.06em; color:var(--encre-2); margin:0 0 6px}
+input{
+  width:100%; padding:11px 13px; font:inherit; color:var(--encre);
+  background:var(--carte-2); border:1px solid var(--trait-fort);
+  border-radius:9px; margin-bottom:16px;
+}
+input:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:transparent}
+button{
+  font:inherit; font-weight:600; cursor:pointer; border-radius:9px;
+  border:1px solid transparent; padding:11px 16px;
+  background:var(--accent); color:#fff; width:100%;
+}
+button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+button[disabled]{opacity:.55; cursor:progress}
+button.discret{
+  width:auto; background:var(--carte); color:var(--encre-2);
+  border-color:var(--trait-fort); padding:8px 13px; font-size:13px; font-weight:600;
+}
+#erreur-connexion{
+  display:none; margin:0 0 16px; padding:10px 12px; border-radius:9px;
+  background:var(--critique-fond); color:var(--critique);
+  font-size:13.5px; border:1px solid color-mix(in srgb, var(--critique) 30%, transparent);
+}
+
+/* ── Console ─────────────────────────────────────────────────────────────── */
+#console{display:none; max-width:1120px; margin:0 auto; padding:20px 18px 64px}
+header.haut{
+  display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+  justify-content:space-between; margin-bottom:18px;
+}
+header.haut .droite{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.horodatage{font-size:12.5px; color:var(--encre-3)}
+
+.etat{
+  display:flex; gap:12px; align-items:flex-start; padding:14px 16px;
+  border-radius:var(--r); margin-bottom:22px; font-size:14px;
+  border:1px solid transparent;
+}
+.etat b{display:block; margin-bottom:2px}
+.etat.ok{background:var(--ok-fond); color:var(--ok);
+  border-color:color-mix(in srgb, var(--ok) 26%, transparent)}
+.etat.attention{background:var(--attention-fond); color:var(--attention);
+  border-color:color-mix(in srgb, var(--attention) 30%, transparent)}
+.etat.critique{background:var(--critique-fond); color:var(--critique);
+  border-color:color-mix(in srgb, var(--critique) 34%, transparent)}
+.pastille{width:9px; height:9px; border-radius:50%; background:currentColor;
+  flex:0 0 auto; margin-top:7px}
+
+section{margin:0 0 30px}
+.titre{
+  display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+  margin:0 0 4px; padding-bottom:8px; border-bottom:1px solid var(--trait);
+}
+.titre h2{font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--encre-2)}
+.titre .sous{font-size:12.5px; color:var(--encre-3)}
+.note{
+  margin:10px 0 0; font-size:12.5px; color:var(--encre-3); line-height:1.5;
+  border-left:2px solid var(--trait-fort); padding-left:10px;
+}
+
+.grille{display:grid; gap:12px; margin-top:14px;
+  grid-template-columns:repeat(auto-fill,minmax(228px,1fr))}
+.ind{
+  background:var(--carte); border:1px solid var(--trait); border-radius:var(--r);
+  padding:14px 15px; box-shadow:var(--ombre);
+  border-left:3px solid var(--trait-fort);
+}
+.ind.ok{border-left-color:var(--ok)}
+.ind.attention{border-left-color:var(--attention)}
+.ind.critique{border-left-color:var(--critique)}
+.ind .quoi{font-size:12px; text-transform:uppercase; letter-spacing:.05em;
+  color:var(--encre-2); font-weight:600}
+.ind .valeur{font-size:27px; font-weight:660; letter-spacing:-.02em; margin:4px 0 0}
+.ind.ok .valeur{color:var(--ok)}
+.ind.attention .valeur{color:var(--attention)}
+.ind.critique .valeur{color:var(--critique)}
+.ind .detail{font-size:12.5px; color:var(--encre-3); margin-top:3px}
+
+.cadre{overflow-x:auto; margin-top:14px; border:1px solid var(--trait);
+  border-radius:var(--r); background:var(--carte); box-shadow:var(--ombre)}
+table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:min-content}
+th,td{padding:9px 13px; text-align:right; white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{
+  font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--encre-2); font-weight:650; background:var(--carte-2);
+  border-bottom:1px solid var(--trait); position:sticky; top:0;
+}
+tbody tr+tr td{border-top:1px solid var(--trait)}
+tbody tr.grisee td{color:var(--encre-3); font-style:italic}
+td.rouge{color:var(--critique); font-weight:650}
+td.vide{color:var(--encre-3)}
+.brut{font-size:11px; color:var(--encre-3); letter-spacing:.02em}
+.etiq{
+  display:inline-block; padding:1px 8px; border-radius:999px; font-size:11.5px;
+  font-weight:650; background:var(--neutre-fond); color:var(--encre-2);
+}
+.etiq.prod{background:var(--accent-doux); color:var(--accent-encre)}
+.etiq.bac{background:var(--attention-fond); color:var(--attention)}
+.etiq.ok{background:var(--ok-fond); color:var(--ok)}
+.etiq.non{background:var(--critique-fond); color:var(--critique)}
+.rien{padding:16px; color:var(--encre-3); font-size:13.5px}
+footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
+  font-size:12px; color:var(--encre-3); line-height:1.6}
+@media (max-width:520px){
+  .ind .valeur{font-size:24px}
+  #console{padding:16px 13px 56px}
+}
+</style>
+</head>
+<body>
+
+<!-- ─────────────────────────── CONNEXION ─────────────────────────── -->
+<div id="connexion">
+  <form class="boite" id="form-connexion" autocomplete="on">
+    <div class="marque"><b>Pilou</b><span>Console</span></div>
+    <p class="intro">Espace de pilotage. Lecture seule : aucune action de cette
+      page ne peut modifier quoi que ce soit.</p>
+    <div id="erreur-connexion" role="alert"></div>
+    <label for="email">Adresse e-mail</label>
+    <input id="email" type="email" autocomplete="username" required>
+    <label for="mdp">Mot de passe</label>
+    <input id="mdp" type="password" autocomplete="current-password" required>
+    <button type="submit" id="btn-connexion">Se connecter</button>
+  </form>
+</div>
+
+<!-- ──────────────────────────── CONSOLE ──────────────────────────── -->
+<main id="console">
+  <header class="haut">
+    <div>
+      <div class="marque"><b>Pilou</b><span>Console</span></div>
+      <div class="horodatage" id="horodatage"></div>
+    </div>
+    <div class="droite">
+      <button class="discret" id="btn-recharger" type="button">Recharger</button>
+      <button class="discret" id="btn-deconnexion" type="button">Se déconnecter</button>
+    </div>
+  </header>
+
+  <div class="etat" id="etat-console"><span class="pastille"></span><div id="etat-texte"></div></div>
+
+  <section id="s-alertes">
+    <div class="titre"><h2>Alertes</h2><span class="sous">ce qui doit réveiller la nuit</span></div>
+    <div class="grille" id="grille-alertes"></div>
+  </section>
+
+  <section id="s-argent">
+    <div class="titre"><h2>Argent</h2>
+      <span class="sous">jamais additionné entre environnements ni entre devises</span></div>
+    <div class="cadre" id="cadre-abonnes"></div>
+    <div class="cadre" id="cadre-argent"></div>
+    <p class="note"><b>SANDBOX n'est pas une recette.</b> Ce sont les essais de
+      paiement, pas de l'argent encaissé. Les deux lignes ne se totalisent pas —
+      ni entre elles, ni entre euros et dollars.</p>
+  </section>
+
+  <section id="s-scans">
+    <div class="titre"><h2>Scan d'ordonnance</h2><span class="sous">60 derniers jours</span></div>
+    <div class="cadre" id="cadre-scans"></div>
+    <p class="note"><b>Vos appareils de test sont comptés dedans, et on ne peut
+      pas les séparer</b> : la table de mesure ne porte aucune colonne
+      d'appareil. À dix utilisateurs, vos propres essais pèsent lourd dans ces
+      chiffres. La colonne <b>non classés</b> doit toujours valoir 0 : une autre
+      valeur signifie qu'un code de réponse échappe à tous les compteurs.</p>
+  </section>
+
+  <section id="s-parcours">
+    <div class="titre"><h2>Parcours d'entrée</h2><span class="sous">par semaine</span></div>
+    <div class="cadre" id="cadre-parcours"></div>
+    <p class="note"><b>Par semaine, et c'est volontaire.</b> Au jour, plusieurs
+      cases ne contiennent qu'une seule personne — ce n'est plus une statistique,
+      c'est un individu. La semaine en cours est grisée : elle est incomplète et
+      ne se compare à aucune autre. Appareils de test exclus.</p>
+  </section>
+
+  <section id="s-officine">
+    <div class="titre"><h2>Canal officine</h2><span class="sous">codes et attributions</span></div>
+    <div class="cadre" id="cadre-codes"></div>
+    <div class="cadre" id="cadre-attributions"></div>
+    <p class="note">Aucun identifiant d'installation n'est affiché ici, et la
+      console est techniquement incapable d'en lire un.</p>
+  </section>
+
+  <footer>
+    Console en lecture seule — aucun bouton de cette page ne peut écrire dans la
+    base. Les huit vues interrogées ne contiennent que des agrégats : ni
+    pseudonyme, ni identifiant de transaction, ni adresse IP, ni commune, ni
+    modèle d'appareil. <span id="pied-version"></span>
+  </footer>
+</main>
+
+<script src="./supabase-js-2.105.4.umd.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var URL_PROJET   = "https://kxjgzyhbefucxdgjraju.supabase.co";
+  // Cle PUBLIQUE (role `anon`). Deja publiee dans l'application. N'ouvre rien
+  // seule : verifie le 09/09, les huit vues lui repondent « permission denied ».
+  var CLE_PUBLIQUE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4amd6eWhiZWZ1Y3hkZ2pyYWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NTMxMDUsImV4cCI6MjA5ODIyOTEwNX0.y7K3jYREwyVCg4UuSDy9-d3opHHtGfA4oeWvZ3UjwEU";
+
+  var sb = window.supabase.createClient(URL_PROJET, CLE_PUBLIQUE, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+  });
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  // ── Outils d'affichage ────────────────────────────────────────────────────
+  var fmtDate = new Intl.DateTimeFormat('fr-FR', {
+    timeZone:'Europe/Paris', day:'2-digit', month:'2-digit', year:'numeric',
+    hour:'2-digit', minute:'2-digit'
+  });
+  var fmtJour = new Intl.DateTimeFormat('fr-FR', {
+    timeZone:'Europe/Paris', day:'2-digit', month:'2-digit', year:'2-digit'
+  });
+
+  function quandTexte(v){ return v ? fmtDate.format(new Date(v)) : "jamais"; }
+  function jourTexte(v){
+    if(!v) return "—";
+    // Les colonnes `date` arrivent en "AAAA-MM-JJ" : on les lit telles quelles,
+    // sans conversion de fuseau, sinon le 1er du mois recule d'un jour.
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v));
+    if(m) return m[3]+"/"+m[2]+"/"+m[1].slice(2);
+    return fmtJour.format(new Date(v));
+  }
+  function heuresDepuis(v){
+    if(!v) return Infinity;
+    return (Date.now() - new Date(v).getTime()) / 3600000;
+  }
+  function dureeTexte(h){
+    if(!isFinite(h)) return "jamais";
+    if(h < 1)  return Math.round(h*60) + " min";
+    if(h < 48) return (Math.round(h*10)/10) + " h";
+    return Math.round(h/24) + " j";
+  }
+  function ech(s){
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;");
+  }
+  function nb(v){ return (v == null) ? "—" : String(v); }
+
+  // ── Traductions ───────────────────────────────────────────────────────────
+  // ⚠️ LE NOM D'ORIGINE EST TOUJOURS AFFICHE EN GRIS A COTE. Le francais est
+  // NOTRE lecture ; le nom technique est le FAIT. Si une traduction est
+  // imparfaite, rien n'est perdu : le nom brut reste sous les yeux.
+  // Les listes ci-dessous ne sont pas inventees :
+  //  • durees : contrainte `codes_duree_offerte_check` de la base, dix valeurs ;
+  //  • etats  : contrainte `attributions_etat_check`, trois valeurs ;
+  //  • types  : les vingt-et-un types de `TYPES_CONNUS` dans `logique.ts`.
+  var DUREES = {
+    daily:"1 jour", three_day:"3 jours", weekly:"1 semaine", two_week:"2 semaines",
+    monthly:"1 mois", two_month:"2 mois", three_month:"3 mois", six_month:"6 mois",
+    yearly:"1 an", lifetime:"à vie"
+  };
+  var ETATS = { en_attente:"en attente", accorde:"accordé", echoue:"échoué" };
+  var PLATEFORMES = { android:"Android", ios:"iOS" };
+  var TYPES = {
+    TEST:"Test",
+    INITIAL_PURCHASE:"Premier achat",
+    RENEWAL:"Renouvellement",
+    CANCELLATION:"Annulation",
+    UNCANCELLATION:"Réactivation",
+    NON_RENEWING_PURCHASE:"Achat sans renouvellement",
+    SUBSCRIPTION_PAUSED:"Abonnement en pause",
+    EXPIRATION:"Fin d’accès",
+    BILLING_ISSUE:"Problème de paiement",
+    PRODUCT_CHANGE:"Changement d’offre",
+    SUBSCRIPTION_EXTENDED:"Abonnement prolongé",
+    REFUND_REVERSED:"Remboursement annulé",
+    INVOICE_ISSUANCE:"Émission de facture",
+    TRANSFER:"Transfert d’achats",
+    PURCHASE_REDEEMED:"Achat réclamé",
+    TEMPORARY_ENTITLEMENT_GRANT:"Accès temporaire accordé",
+    VIRTUAL_CURRENCY_TRANSACTION:"Monnaie virtuelle",
+    EXPERIMENT_ENROLLMENT:"Entrée en test A/B",
+    SUBSCRIBER_ALIAS:"Fusion d’identifiants",
+    PRICE_INCREASE_CONSENT_REQUIRED:"Hausse de prix : accord demandé",
+    PRICE_INCREASE_CONSENT_APPROVED:"Hausse de prix : accord donné"
+  };
+  // `garderBrut` : on ne montre le nom technique que la ou il sert vraiment —
+  // les types d'evenement et les durees, qu'on retrouve tels quels dans
+  // RevenueCat. Pour « accordé » ou « iOS », il n'apporte rien.
+  function traduit(table, v, garderBrut){
+    if(v == null) return '<span class="vide">—</span>';
+    var fr = table[v];
+    if(!fr) return ech(v);   // valeur inconnue : le brut, jamais une invention
+    return garderBrut ? ech(fr) + ' <span class="brut">' + ech(v) + '</span>' : ech(fr);
+  }
+
+  function indicateur(quoi, valeur, etat, detail){
+    return '<div class="ind '+etat+'">'
+         + '<div class="quoi">'+ech(quoi)+'</div>'
+         + '<div class="valeur num">'+ech(valeur)+'</div>'
+         + (detail ? '<div class="detail">'+ech(detail)+'</div>' : '')
+         + '</div>';
+  }
+
+  function tableau(titre, colonnes, lignes, vide){
+    if(!lignes || !lignes.length)
+      return '<div class="rien"><b>'+ech(titre)+'</b> — '+ech(vide||"aucune donnée")+'</div>';
+    var h = '<table><thead><tr>';
+    for(var i=0;i<colonnes.length;i++) h += '<th>'+ech(colonnes[i])+'</th>';
+    h += '</tr></thead><tbody>';
+    for(var j=0;j<lignes.length;j++){
+      h += '<tr'+(lignes[j].grisee?' class="grisee"':'')+'>';
+      for(var k=0;k<lignes[j].cases.length;k++){
+        var c = lignes[j].cases[k];
+        h += '<td class="num '+(c.classe||'')+'">'+(c.html || ech(c.texte))+'</td>';
+      }
+      h += '</tr>';
+    }
+    return h + '</tbody></table>';
+  }
+
+  // ── Chargement ────────────────────────────────────────────────────────────
+  function lire(vue, ordre){
+    var q = sb.from(vue).select('*');
+    if(ordre) q = q.order(ordre.col, { ascending: !!ordre.asc });
+    return q;
+  }
+
+  function afficherEtat(classe, titre, texte){
+    var e = $('etat-console');
+    e.className = 'etat ' + classe;
+    $('etat-texte').innerHTML = '<b>'+ech(titre)+'</b>'+ech(texte);
+  }
+
+  function masquerBlocs(masquer){
+    var ids = ['s-alertes','s-argent','s-scans','s-parcours','s-officine'];
+    for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
+  }
+
+  function charger(){
+    $('btn-recharger').disabled = true;
+    $('horodatage').textContent = 'chargement…';
+
+    // ⚠️ LE TEMOIN D'ABORD. Si la garde se refermait, toutes les autres vues
+    // rendraient zero ligne et la page afficherait des zeros partout — une
+    // panne qui ressemble a la bonne sante. On refuse ce mode de panne.
+    lire('v_admin_ping').then(function(r){
+      if(r.error) throw r.error;
+      if(!r.data || !r.data.length){
+        masquerBlocs(true);
+        afficherEtat('critique','CONSOLE FERMÉE — données non lues. ',
+          "La base a répondu, mais elle ne vous reconnaît pas comme le compte "
+          + "administrateur. N'interprétez aucun chiffre de cette page : "
+          + "l'absence de données n'est pas une absence de problème.");
+        $('horodatage').textContent = '';
+        $('btn-recharger').disabled = false;
+        return null;
+      }
+      masquerBlocs(false);
+      afficherEtat('ok','Console ouverte. ',
+        'Les huit vues répondent. Les chiffres ci-dessous sont ceux de la base.');
+      return Promise.all([
+        lire('v_admin_alertes'),
+        lire('v_admin_abonnes'),
+        lire('v_admin_argent_mois',    {col:'mois',    asc:false}),
+        lire('v_admin_scans_jour',     {col:'jour',    asc:false}),
+        lire('v_admin_parcours_semaine',{col:'semaine',asc:false}),
+        lire('v_admin_codes'),
+        lire('v_admin_attributions_semaine',{col:'semaine',asc:false})
+      ]);
+    }).then(function(res){
+      if(!res) return;
+      for(var i=0;i<res.length;i++) if(res[i].error) throw res[i].error;
+      rendre({
+        alertes:      res[0].data[0] || null,
+        abonnes:      res[1].data,
+        argent:       res[2].data,
+        scans:        res[3].data,
+        parcours:     res[4].data,
+        codes:        res[5].data,
+        attributions: res[6].data
+      });
+      $('horodatage').textContent = 'relevé le ' + fmtDate.format(new Date()) + ' (heure de Paris)';
+      $('btn-recharger').disabled = false;
+    }).catch(function(e){
+      masquerBlocs(true);
+      afficherEtat('critique','LECTURE IMPOSSIBLE. ',
+        'La base n’a pas répondu comme prévu : ' + (e && e.message ? e.message : e)
+        + ". Aucun chiffre n'est affiché — mieux vaut rien qu'un chiffre faux.");
+      $('horodatage').textContent = '';
+      $('btn-recharger').disabled = false;
+    });
+  }
+
+  // ── Rendu ─────────────────────────────────────────────────────────────────
+  function rendre(d){
+    var compte = rendreAlertes(d.alertes);
+    // ⚠️ LE BANDEAU RESUME LE PIRE DE CE QUI EST EN DESSOUS.
+    // Defaut trouve au banc d'essai le 09/09 : le bandeau affichait « Console
+    // ouverte » en vert alors que sept voyants etaient rouges. Un bandeau vert
+    // au-dessus d'un tableau en feu, c'est un tableau de bord qui ment par
+    // hierarchie visuelle. Il dit maintenant ce que disent les voyants.
+    if(compte.critique > 0){
+      afficherEtat('critique',
+        compte.critique + (compte.critique > 1 ? ' alertes rouges. ' : ' alerte rouge. '),
+        'Regardez les voyants ci-dessous avant toute autre chose.');
+    } else if(compte.attention > 0){
+      afficherEtat('attention',
+        compte.attention + (compte.attention > 1 ? ' points à surveiller. ' : ' point à surveiller. '),
+        'Rien de rouge, mais quelque chose mérite un coup d’œil.');
+    } else {
+      afficherEtat('ok','Tout est au vert. ',
+        'Les huit vues répondent et aucun voyant n’est allumé.');
+    }
+    rendreAbonnes(d.abonnes);
+    rendreArgent(d.argent);
+    rendreScans(d.scans);
+    rendreParcours(d.parcours);
+    rendreCodes(d.codes);
+    rendreAttributions(d.attributions);
+  }
+
+  function rendreAlertes(a){
+    if(!a){
+      $('grille-alertes').innerHTML = '<div class="rien">Alertes illisibles.</div>';
+      return { critique:1, attention:0 };
+    }
+    var h = '', compte = { critique:0, attention:0 };
+    function ind(quoi, valeur, etat, detail){
+      if(etat === 'critique') compte.critique++;
+      else if(etat === 'attention') compte.attention++;
+      return indicateur(quoi, valeur, etat, detail);
+    }
+
+    // 1. Quarantaine — de l'argent annonce que la chaine n'a pas su enregistrer.
+    h += ind('Quarantaine non rejouée', nb(a.quarantaine_non_rejouee),
+          a.quarantaine_non_rejouee > 0 ? 'critique' : 'ok',
+          a.quarantaine_non_rejouee > 0
+            ? 'Des événements de paiement attendent d’être rejoués.'
+            : 'Aucun paiement en attente.');
+
+    // 2. L'alarme est-elle vivante ? Une alarme morte affiche du vert.
+    var hAlarme = heuresDepuis(a.alarme_derniere_mesure);
+    h += ind('Alarme quarantaine', dureeTexte(hAlarme),
+          hAlarme > 26 ? 'critique' : 'ok',
+          hAlarme > 26
+            ? 'L’alarme ne mesure plus. Le « 0 » ci-contre ne prouve rien.'
+            : 'Dernière mesure : ' + quandTexte(a.alarme_derniere_mesure));
+
+    // 3. Webhook : rouge SEULEMENT si le dernier echec est postérieur au dernier
+    //    succes. Sinon on regarde un incident deja clos.
+    var ech_ = a.webhook_dernier_echec ? new Date(a.webhook_dernier_echec).getTime() : 0;
+    var suc_ = a.webhook_dernier_succes ? new Date(a.webhook_dernier_succes).getTime() : 0;
+    var enPanne = ech_ > suc_;
+    h += ind('Webhook de paiement',
+          enPanne ? 'en échec' : 'répond',
+          enPanne ? 'critique' : 'ok',
+          enPanne
+            ? 'Dernier échec ' + quandTexte(a.webhook_dernier_echec) + ', postérieur au dernier succès.'
+            : (a.webhook_non_2xx_7j > 0
+                ? a.webhook_non_2xx_7j + ' échec(s) sur 7 jours, tous antérieurs au dernier succès du '
+                  + quandTexte(a.webhook_dernier_succes)
+                : 'Dernier succès ' + quandTexte(a.webhook_dernier_succes)));
+
+    // 4. Ecart de scan. Un ecart NEGATIF n'est pas un bon signe : c'est le
+    //    signe que le calcul ne tient plus. Orange, jamais vert.
+    var e = a.ecart_scans;
+    var etatEcart = (e == null) ? 'attention' : (e < 0 ? 'attention' : (e > 0 ? 'critique' : 'ok'));
+    h += ind('Échecs silencieux de scan',
+          (e == null || e < 0) ? 'non calculable' : String(e), etatEcart,
+          (e < 0 ? 'Écart négatif : bord de purge ou collecteur en avance. '
+                 : (e > 0 ? 'Des scans engagés sans réponse enregistrée. ' : 'Tout appel engagé a sa réponse. '))
+          + a.appels_engages_comparables + ' engagés / ' + a.reponses_comparables + ' réponses.');
+
+    // 5. Fraicheur de la mesure. Retard mesure au dossier : 50 a 441 minutes.
+    var hArch = heuresDepuis(a.dernier_archivage);
+    h += ind('Dernier archivage', dureeTexte(hArch),
+          hArch > 12 ? 'attention' : 'ok',
+          hArch > 12
+            ? 'Les chiffres de scan datent. Le collecteur a peut-être décroché.'
+            : quandTexte(a.dernier_archivage));
+
+    // 6. Comptes. Le reglage « inscription fermee » n'est PAS lisible en base :
+    //    on mesure son EFFET a la place.
+    if('comptes_auth' in a && a.comptes_auth != null){
+      var c = a.comptes_auth;
+      h += ind('Comptes sur le projet', nb(c),
+            c === 1 ? 'ok' : 'critique',
+            c === 1
+              ? 'Le vôtre, et lui seul.'
+              : 'UN COMPTE EST APPARU. L’inscription publique s’est rouverte. Dernier créé : '
+                + quandTexte(a.dernier_compte_cree));
+    }
+
+    // 7. Information, pas alerte.
+    h += ind('Codes à quota épuisé', nb(a.codes_epuises),
+          a.codes_epuises > 0 ? 'attention' : 'ok',
+          a.codes_epuises > 0 ? 'Ces codes ne donnent plus rien en pharmacie.' : 'Aucun code bloqué.');
+
+    $('grille-alertes').innerHTML = h;
+    return compte;
+  }
+
+  function envEtiq(v){
+    var c = (v === 'PRODUCTION') ? 'prod' : (v === 'SANDBOX' ? 'bac' : '');
+    return '<span class="etiq '+c+'">'+ech(v || '—')+'</span>';
+  }
+
+  function rendreAbonnes(rows){
+    var lignes = (rows||[]).map(function(r){
+      return { cases:[
+        {html: envEtiq(r.environnement)},
+        {texte: nb(r.actifs)},
+        {texte: nb(r.acces_offerts_en_cours)},
+        {texte: nb(r.ont_paye)},
+        {texte: nb(r.annulations_30j)},
+        {texte: nb(r.expirations_30j)},
+        {texte: nb(r.personnes_cet_env)}
+      ]};
+    });
+    var total = (rows && rows.length) ? rows[0].personnes_tous_env : null;
+    $('cadre-abonnes').innerHTML = tableau('Abonnés',
+      ['Environnement','Actifs','Accès offerts','Ont payé','Annul. 30 j','Expir. 30 j','Personnes'],
+      lignes, 'aucun événement de facturation')
+      + (total != null
+          ? '<div class="rien">Personnes distinctes, tous environnements confondus : <b class="num">'
+            + ech(total) + '</b> — une même personne peut apparaître dans les deux lignes.</div>'
+          : '');
+  }
+
+  function rendreArgent(rows){
+    var lignes = (rows||[]).map(function(r){
+      return { cases:[
+        {texte: jourTexte(r.mois)},
+        {html: envEtiq(r.environnement)},
+        {texte: r.devise || '—'},
+        {html: traduit(TYPES, r.type, true)},
+        {texte: nb(r.evenements)},
+        {texte: (r.montant_total == null) ? '—'
+                : (Number(r.montant_total).toFixed(2) + ' ' + (r.devise || ''))}
+      ]};
+    });
+    $('cadre-argent').innerHTML = tableau('Événements de facturation',
+      ['Mois','Environnement','Devise','Type','Événements','Montant brut'],
+      lignes, 'aucun événement enregistré');
+  }
+
+  function rendreScans(rows){
+    var lignes = (rows||[]).map(function(r){
+      var nc = r.non_classes;
+      return { cases:[
+        {texte: jourTexte(r.jour)},
+        {texte: nb(r.tentatives)},
+        {texte: nb(r.reussites)},
+        {texte: nb(r.refus_4xx)},
+        {texte: nb(r.delais_depasses)},
+        {texte: nb(r.autres_echecs_5xx)},
+        {texte: nb(nc), classe: (nc && nc !== 0) ? 'rouge' : 'vide'},
+        {texte: (r.latence_mediane_s == null) ? '—' : r.latence_mediane_s + ' s'},
+        {texte: (r.latence_min_s == null) ? '—' : r.latence_min_s + ' s'},
+        {texte: (r.latence_max_s == null) ? '—' : r.latence_max_s + ' s'}
+      ]};
+    });
+    $('cadre-scans').innerHTML = tableau('Scans par jour',
+      ['Jour','Tentatives','Réussites','Refus 4xx','Délai dépassé','Autres 5xx',
+       'Non classés','Latence médiane','Min','Max'],
+      lignes, 'aucun scan sur 60 jours');
+  }
+
+  function rendreParcours(rows){
+    var lignes = (rows||[]).map(function(r){
+      return { grisee: !!r.semaine_en_cours, cases:[
+        {texte: 'sem. du ' + jourTexte(r.semaine) + (r.semaine_en_cours ? ' (en cours)' : '')},
+        {texte: nb(r.installations)},
+        {texte: nb(r.ont_tente_un_scan)},
+        {texte: nb(r.premier_par_scan)},
+        {texte: nb(r.premier_a_la_main)},
+        {texte: nb(r.aucun_traitement)}
+      ]};
+    });
+    $('cadre-parcours').innerHTML = tableau('Parcours d’entrée',
+      ['Semaine','Installations','Ont tenté un scan','1er par scan','1er à la main','Aucun traitement'],
+      lignes, 'aucun parcours enregistré');
+  }
+
+  function rendreCodes(rows){
+    var lignes = (rows||[]).map(function(r){
+      var expire = r.expire_le ? new Date(r.expire_le).getTime() < Date.now() : false;
+      return { cases:[
+        {texte: r.code},
+        {html: traduit(DUREES, r.duree_offerte, true)},
+        {texte: r.quota_illimite ? 'illimité' : nb(r.quota_max)},
+        {texte: nb(r.quota_utilise)},
+        {texte: r.quota_illimite ? '—' : nb(r.quota_restant),
+         classe: (!r.quota_illimite && r.quota_restant === 0) ? 'rouge' : ''},
+        {texte: (r.quota_jour_max == null) ? 'illimité' : String(r.quota_jour_max)},
+        {texte: r.expire_le ? quandTexte(r.expire_le) : 'sans date', classe: expire ? 'rouge' : ''},
+        {html: '<span class="etiq '+(r.actif && !expire ? 'ok' : 'non')+'">'
+               + (r.actif ? (expire ? 'expiré' : 'actif') : 'inactif') + '</span>'}
+      ]};
+    });
+    $('cadre-codes').innerHTML = tableau('Codes pharmacie',
+      ['Code','Durée offerte','Quota max','Utilisé','Restant','Max / jour','Expiration','État'],
+      lignes, 'aucun code');
+  }
+
+  function rendreAttributions(rows){
+    var lignes = (rows||[]).map(function(r){
+      return { cases:[
+        {texte: 'sem. du ' + jourTexte(r.semaine)},
+        {html: traduit(ETATS, r.etat)},
+        {html: traduit(PLATEFORMES, r.plateforme)},
+        {texte: nb(r.nombre)}
+      ]};
+    });
+    $('cadre-attributions').innerHTML = tableau('Attributions',
+      ['Semaine','État','Plateforme','Nombre'], lignes, 'aucune attribution');
+  }
+
+  // ── Connexion / deconnexion ───────────────────────────────────────────────
+  function montrerConsole(oui){
+    $('connexion').style.display = oui ? 'none' : 'grid';
+    $('console').style.display   = oui ? 'block' : 'none';
+  }
+
+  $('form-connexion').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var err = $('erreur-connexion');
+    err.style.display = 'none';
+    $('btn-connexion').disabled = true;
+    $('btn-connexion').textContent = 'Connexion…';
+    sb.auth.signInWithPassword({
+      email: $('email').value.trim(),
+      password: $('mdp').value
+    }).then(function(r){
+      $('btn-connexion').disabled = false;
+      $('btn-connexion').textContent = 'Se connecter';
+      if(r.error){
+        err.textContent = (r.error.message === 'Invalid login credentials')
+          ? 'Adresse e-mail ou mot de passe incorrect.'
+          : r.error.message;
+        err.style.display = 'block';
+        return;
+      }
+      $('mdp').value = '';
+      montrerConsole(true);
+      charger();
+    });
+  });
+
+  $('btn-deconnexion').addEventListener('click', function(){
+    sb.auth.signOut().then(function(){ montrerConsole(false); });
+  });
+  $('btn-recharger').addEventListener('click', charger);
+
+  // Session deja ouverte ?
+  sb.auth.getSession().then(function(r){
+    if(r.data && r.data.session){ montrerConsole(true); charger(); }
+    else { montrerConsole(false); }
+  });
+
+  $('pied-version').textContent =
+    'Bibliothèque supabase-js 2.105.4, hébergée sur ce site — aucune requête vers un tiers.';
+})();
+</script>
+</body>
+</html>

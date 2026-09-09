@@ -1,0 +1,31 @@
+# =============================================================================
+# admin/ — regle de fin de ligne pour la bibliotheque embarquee.
+# Portee : CE DOSSIER UNIQUEMENT. Rien ailleurs dans le depot n'est affecte —
+# en particulier pas `confidentialite/index.html`, qui porte 805 CRLF voulus.
+# =============================================================================
+#
+# `supabase-js-2.105.4.umd.js` est une copie EXACTE du paquet npm officiel
+# @supabase/supabase-js@2.105.4 : 197 447 octets, md5
+# 42b77e7d5603a897aed5de2077e7f651. `-text` interdit a Git toute conversion de
+# fin de ligne dessus, dans un sens comme dans l'autre.
+#
+# POURQUOI, ET CE N'EST PAS UNE PRECAUTION DE PRINCIPE.
+# Ce fichier minifie contient VINGT-TROIS sauts de ligne, et les vingt-trois
+# sont A L'INTERIEUR DE GABARITS (backticks) — donc a l'interieur de CHAINES DE
+# CARACTERES, verifie caractere par caractere le 09/09/2026. Les convertir en
+# CRLF ne changerait pas la mise en forme du code : cela changerait le CONTENU
+# de ces chaines. Trois exemples releves :
+#   • un `join()` qui compose le message signe de `signInWithSolana` ;
+#   • un jeu de caracteres d'espacement " \t\n\r=" ;
+#   • le code source d'un Web Worker construit a la volee.
+# Rien de tout cela n'est utilise par la console Pilou. Mais un fichier dont on
+# publie l'empreinte doit garder cette empreinte, sinon l'empreinte ne prouve
+# plus rien — et c'est justement ce qu'on lui demande.
+#
+# ⚠️ Ce que cette regle NE corrige PAS, parce qu'il n'y avait rien a corriger :
+# le fichier PUBLIE par GitHub Pages etait deja juste. Avec `core.autocrlf=true`
+# Git reconvertit en LF au moment d'enregistrer, donc l'objet du depot — celui
+# que le site sert — porte les bons octets depuis le premier commit. La regle
+# protege la COPIE DE TRAVAIL sur le disque de Windows, pour que son md5
+# corresponde toujours a celui qui est ecrit au dossier.
+supabase-js-2.105.4.umd.js -text

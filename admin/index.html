@@ -621,13 +621,33 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
                  : (e > 0 ? 'Des scans engagés sans réponse enregistrée. ' : 'Tout appel engagé a sa réponse. '))
           + a.appels_engages_comparables + ' engagés / ' + a.reponses_comparables + ' réponses.');
 
-    // 5. Fraicheur de la mesure. Retard mesure au dossier : 50 a 441 minutes.
-    var hArch = heuresDepuis(a.dernier_archivage);
-    h += ind('Dernier archivage', dureeTexte(hArch),
-          hArch > 12 ? 'attention' : 'ok',
-          hArch > 12
-            ? 'Les chiffres de scan datent. Le collecteur a peut-être décroché.'
-            : quandTexte(a.dernier_archivage));
+    // 5. ⚠️ CORRIGE LE 10/09 — ON MESURE UN MANQUE, PLUS UN AGE.
+    // L'ancienne version lisait l'age de la derniere INSERTION. Or
+    // `collected_at` ne bouge que lorsqu'une ligne est inseree : sans scan,
+    // rien n'est insere, et le voyant passait a l'orange pour une machine en
+    // parfait etat. Mesure du 10/09 : archivage passe a 18:56 avec succes,
+    // zero insertion, parce qu'aucun scan depuis 07:26. Presque chaque matin
+    // aurait ete orange.
+    // Maintenant : en retard SEULEMENT s'il existe un scan ENGAGE posterieur
+    // au dernier evenement archive et deja vieux de plus de huit heures — soit
+    // plus d'un cycle complet de la tache, qui passe toutes les six heures.
+    if('engagees_non_archivees' in a && a.engagees_non_archivees != null){
+      var manque = a.engagees_non_archivees;
+      h += ind('Archivage des mesures',
+            manque > 0 ? (manque + ' en retard') : 'à jour',
+            manque > 0 ? 'attention' : 'ok',
+            manque > 0
+              ? manque + ' scan(s) engagé(s) il y a plus de 8 h ne sont toujours pas archivés.'
+              : (a.scans_engages_24h > 0
+                  ? a.scans_engages_24h + ' scan(s) sur 24 h, tous archivés. Dernier le '
+                    + quandTexte(a.dernier_scan_archive) + '.'
+                  : 'Aucun scan depuis le ' + quandTexte(a.dernier_scan_archive)
+                    + ' — rien à archiver. Ce n’est pas une panne.'));
+    } else {
+      // Vue d'avant la v5 : on affiche, on n'alarme pas.
+      h += ind('Dernière insertion', dureeTexte(heuresDepuis(a.dernier_archivage)), 'ok',
+            quandTexte(a.dernier_archivage) + ' — voyant d’archivage indisponible (migration v5 non appliquée).');
+    }
 
     // 6. Comptes. Le reglage « inscription fermee » n'est PAS lisible en base :
     //    on mesure son EFFET a la place.
@@ -697,7 +717,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + 'téléphone deux jours de suite. C’est voulu. <b>Ces deux chiffres se lisent '
       + 'dans la Play Console et App Store Connect</b>, qui les mesurent au niveau du '
       + 'système. Les ' + nb(r.installations_de_test) + ' installations marquées '
-      + '« appareil de test » sont exclues du compteur ci-dessus.';
+      + '« appareil de test » sont exclues du compteur ci-dessus — mais ce marquage '
+      + 'ne repère que les versions de développement : <b>vos propres téléphones, s’ils '
+      + 'ont installé l’application depuis le magasin, sont comptés comme de vraies '
+      + 'installations.</b> Enfin, les chiffres d’argent sont <b>ce qui nous est '
+      + 'parvenu</b> : ils dépendent des annonces de RevenueCat, dont on sait qu’une '
+      + 'au moins ne nous est jamais arrivée. Pour un état des ventes qui fait foi, '
+      + 'la référence reste le tableau de bord RevenueCat.';
   }
 
   function envEtiq(v){

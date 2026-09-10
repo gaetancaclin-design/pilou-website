@@ -145,11 +145,12 @@ section{margin:0 0 30px}
   border-left:2px solid var(--trait-fort); padding-left:10px;
 }
 /* ── Replis ──────────────────────────────────────────────────────────────
-   ⚠️ UN REPLI, PAS UNE INFOBULLE. Une infobulle au survol n'existe pas sur
-   telephone — or c'est de son telephone que la console est consultee. Et une
-   reserve qui compte ne se cache pas derriere un survol : elle reste a un
-   clic, visible, et son TITRE porte deja l'avertissement. Le corps n'explique
-   que le pourquoi. */
+   DEUX MECANISMES, DEUX USAGES, decides le 10/09 :
+     • REPLI (ici) pour les reserves de SECTION — leur titre porte deja
+       l'avertissement, visible en permanence, et le corps explique le pourquoi ;
+     • BULLE D'AIDE (plus bas) pour les tuiles du bandeau, qui doivent rester
+       nues : un chiffre, ses lignes, et un « ? ».
+   Dans les deux cas l'information reste a UN GESTE, jamais supprimee. */
 details.repli{
   margin:10px 0 0; border-left:2px solid var(--trait-fort); padding-left:10px;
 }
@@ -175,7 +176,36 @@ details.repli .corps{
   color:var(--encre-2); font-weight:650}
 .res .valeur{font-size:32px; font-weight:660; letter-spacing:-.025em; margin:2px 0 0;
   line-height:1.1}
-.res .detail{font-size:12px; color:var(--encre-3); margin-top:4px; line-height:1.45}
+.res{position:relative}
+.res .detail{font-size:12px; color:var(--encre-3); margin-top:6px; line-height:1.45}
+/* Une ligne par chiffre : « 7 jours ... 11 », alignes, lisibles en diagonale. */
+.res .ligne{display:flex; justify-content:space-between; gap:10px; padding:1px 0}
+.res .ligne b{color:var(--encre-2); font-variant-numeric:tabular-nums}
+.res .ligne.total{border-top:1px solid var(--trait); margin-top:4px; padding-top:4px}
+
+/* ── Bulle d'aide ────────────────────────────────────────────────────────
+   ⚠️ SURVOL *ET* APPUI. `:focus-within` est ce qui la rend utilisable au
+   doigt : un appui donne le focus au bouton, donc la bulle s'ouvre sur
+   telephone aussi. Une aide qui n'existerait qu'a la souris ne servirait a
+   rien ici — la console se consulte depuis un mobile. */
+.aide{position:relative; display:inline-block; vertical-align:middle; margin-left:5px}
+.aide>button{
+  all:unset; cursor:pointer; display:grid; place-items:center;
+  width:14px; height:14px; border-radius:50%; font-size:10px; font-weight:700;
+  background:var(--neutre-fond); color:var(--encre-2); line-height:1;
+}
+.aide>button:hover{background:var(--accent-doux); color:var(--accent-encre)}
+.aide>button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.aide>.bulle{
+  display:none; position:absolute; z-index:20; left:-6px; top:calc(100% + 7px);
+  width:max-content; max-width:min(290px, calc(100vw - 44px));
+  background:var(--carte); color:var(--encre-2);
+  border:1px solid var(--trait-fort); border-radius:11px;
+  box-shadow:0 6px 28px -8px rgba(0,0,0,.3);
+  padding:11px 13px; font-size:12px; font-weight:400; line-height:1.55;
+  text-transform:none; letter-spacing:0; white-space:normal;
+}
+.aide:hover>.bulle, .aide:focus-within>.bulle{display:block}
 .res.alerte{border-color:color-mix(in srgb, var(--critique) 35%, transparent)}
 .res.alerte .valeur{color:var(--critique)}
 .plier{width:auto; display:block; margin:0; border-radius:0;
@@ -730,95 +760,85 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return compte;
   }
 
-  function res(quoi, valeur, detail, alerte){
-    return '<div class="res'+(alerte?' alerte':'')+'">'
-         + '<div class="quoi">'+ech(quoi)+'</div>'
-         + '<div class="valeur num">'+ech(valeur)+'</div>'
-         + '<div class="detail">'+detail+'</div></div>';
+  // `lignes` : [[libelle, valeur], ...] — une par ligne, alignees.
+  // `aide`   : le texte de la bulle. Absent => pas de « ? ».
+  function res(quoi, valeur, lignes, aide, alerte){
+    var h = '<div class="res'+(alerte?' alerte':'')+'">'
+          + '<div class="quoi">'+ech(quoi)
+          + (aide
+              ? '<span class="aide"><button type="button" aria-label="Explication">?</button>'
+                + '<span class="bulle">'+aide+'</span></span>'
+              : '')
+          + '</div>'
+          + '<div class="valeur num">'+ech(valeur)+'</div>';
+    if(lignes && lignes.length){
+      h += '<div class="detail">';
+      for(var i=0;i<lignes.length;i++){
+        h += '<div class="ligne'+(lignes[i][2]?' total':'')+'"><span>'+ech(lignes[i][0])
+           + '</span><b>'+ech(lignes[i][1])+'</b></div>';
+      }
+      h += '</div>';
+    }
+    return h + '</div>';
   }
 
   function rendreResume(r){
-    if(!r){ $('resume').innerHTML = ''; $('resume-note').textContent = ''; return; }
-    var h = '';
+    if(!r){ $('resume').innerHTML = ''; $('resume-note').innerHTML = ''; return; }
+    var h = '', aJour = ('installations_30j' in r && r.installations_30j != null);
 
-    // ⚠️ CE N'EST PAS UN COMPTEUR DE TELECHARGEMENTS, et le detail le dit.
-    // « Signalement » et non « installation » : le mot compte. Une ligne = un
-    // premier demarrage annonce au serveur, une a sept jours plus tard.
     // ⚠️ LE GRAND CHIFFRE EST CELUI DES 30 DERNIERS JOURS, PAS LE CUMUL.
-    // Corrige le 10/09, et c'est Gaetan qui a raison : un cumul ne fait que
-    // monter, il compte des installations depuis longtemps supprimees, et il
-    // ne repond a aucune question de pilotage. « Combien de nouveaux ce
-    // mois-ci » se compare d'un mois sur l'autre ; « 32 depuis toujours », non.
-    // Le cumul reste, en petit, parce qu'il situe la profondeur de la mesure.
-    var aJour = ('installations_30j' in r && r.installations_30j != null);
+    // Un cumul ne fait que monter, il compte des installations depuis longtemps
+    // supprimees, et il ne se compare a rien. « Combien de nouveaux ce mois-ci »
+    // se compare au mois d'avant. Le cumul reste, en bas, en petit.
     h += res('Nouveaux démarrages · 30 jours',
       aJour ? nb(r.installations_30j) : nb(r.installations_mesurees),
-      (aJour
-        ? '7 jours <b>' + nb(r.installations_7j) + '</b> · reçus aujourd’hui <b>'
-          + nb(r.installations_aujourd_hui) + '</b>.<br>'
-        : '')
-      + nb(r.installations_mesurees) + ' au total depuis le ' + jourTexte(r.mesure_depuis)
-      + '. <b>Des arrivées, pas un parc</b> : les désinstallations ne sont pas ici.');
+      aJour
+        ? [['7 jours', nb(r.installations_7j)],
+           ['Aujourd’hui', nb(r.installations_aujourd_hui)],
+           ['Total', nb(r.installations_mesurees), true]]
+        : [['Total', nb(r.installations_mesurees), true]],
+      'Une ligne par <b>installation</b>, envoyée une seule fois, une à cinq minutes après '
+      + 'le premier lancement. « Aujourd’hui » = signalements <b>arrivés</b> aujourd’hui ; '
+      + 'un zéro est banal.<br><br>Ce sont des <b>arrivées, pas un parc</b> : personne n’est '
+      + 'retiré quand il désinstalle. Ni des téléchargements, ni des personnes — une '
+      + 'réinstallation compte deux fois. Les installations d’avant la 1.4.3 et celles '
+      + 'opposées à la mesure ne comptent pas.<br><br>Téléchargements, désinstallations et '
+      + 'utilisateurs réguliers : <b>Play Console et App Store Connect</b>.');
 
-    // ⚠️ SOURCE = NOTRE TABLE. Et l'ecart avec RevenueCat est AFFICHE, pas absorbe.
-    // ⚠️ PLUS AUCUNE COULEUR ICI — corrige le 10/09.
-    // Ce voyant restait ROUGE en permanence jusqu'au 05/10, pour un ecart
-    // CONNU, EXPLIQUE et a ZERO EURO : un octroi du 05/09 n'a jamais produit
-    // d'evenement chez RevenueCat. Un rouge qu'on ne peut pas eteindre cesse
-    // d'etre lu, et finit par masquer les vrais. C'est un RENSEIGNEMENT.
-    // L'alarme qui compte est ailleurs : « octrois bloques », dans les alertes.
     var vus = r.acces_offerts_vus_par_revenuecat;
     var ecart = r.acces_offerts_en_cours - vus;
+    // ⚠️ AUCUNE COULEUR ICI. Ce voyant serait reste rouge en permanence pour un
+    // ecart connu, explique et a zero euro. L'alarme qui compte est « octrois
+    // de code », dans les alertes.
     h += res('Accès offerts en cours', nb(r.acces_offerts_en_cours),
-      nb(r.acces_offerts_total) + ' accordé(s) en tout. '
+      [['Accordés en tout', nb(r.acces_offerts_total)],
+       ['Vus par RevenueCat', nb(vus)]],
+      'Source : <b>notre</b> table d’attributions, écrite au moment de l’octroi — pas le '
+      + 'journal de RevenueCat.'
       + (ecart > 0
-          ? 'RevenueCat n’en annonce que ' + vus + ' : ' + ecart + ' octroi(s) ne nous '
-            + 'ont jamais été signalés. Sans conséquence — ces accès valent zéro euro, '
-            + 'et notre propre table fait foi.'
-          : 'Cohérent avec ce que RevenueCat annonce.'));
+          ? '<br><br>' + ecart + ' octroi(s) ne nous ont jamais été annoncés par RevenueCat. '
+            + '<b>Sans conséquence</b> : ces accès valent zéro euro, et notre table fait foi.'
+          : '<br><br>Cohérent avec ce que RevenueCat annonce.'));
 
     // ⚠️ LE ZERO DOIT SE VOIR. C'est le chiffre qui compte vraiment.
     h += res('Clients payants', nb(r.clients_payants),
-      r.clients_payants > 0
-        ? 'En production, hors essais.'
-        : 'Aucune vente à ce jour. Les ' + nb(r.achats_de_test)
-          + ' achat(s) SANDBOX sont vos essais.');
+      [['Achats de test', nb(r.achats_de_test)]],
+      'En production, hors essais. '
+      + (r.clients_payants > 0 ? '' : '<b>Aucune vente à ce jour.</b> ')
+      + 'Les achats SANDBOX sont vos propres essais de paiement.<br><br>Ce chiffre est '
+      + '<b>ce qui nous est parvenu</b> : il dépend des annonces de RevenueCat, dont on sait '
+      + 'qu’une au moins n’est jamais arrivée. Pour un état des ventes qui fait foi, la '
+      + 'référence reste le tableau de bord RevenueCat.');
 
     h += res('Scans sur 30 jours', nb(r.scans_30j),
-      nb(r.scans_30j_reussis) + ' réussis. <b>Vos appareils de test compris</b> — '
-      + 'non séparables.');
+      [['Réussis', nb(r.scans_30j_reussis)]],
+      '<b>Vos appareils de test sont comptés dedans</b>, et on ne peut pas les séparer : la '
+      + 'table de mesure ne porte aucune colonne d’appareil.<br><br>Ne comptent que les scans '
+      + 'ayant <b>reçu une réponse</b>. Un scan engagé resté sans réponse ne figure pas ici — '
+      + 'c’est le voyant « échecs silencieux ».');
 
     $('resume').innerHTML = h;
-    // ⚠️ REPLI, ET LE TITRE PORTE DEJA L'AVERTISSEMENT. Replie par defaut pour
-    // que le bandeau reste lisible ; jamais supprime, parce que ces reserves
-    // sont ce qui empeche de lire les chiffres de travers.
-    $('resume-note').innerHTML =
-      '<details class="repli"><summary>Ce que ces chiffres ne disent pas — '
-      + 'ni téléchargements, ni personnes, ni utilisateurs réguliers</summary>'
-      + '<div class="corps">'
-      + '<b>« Nouveaux démarrages ».</b> Une ligne par <b>installation</b>, envoyée '
-      + '<b>une seule fois</b>, une à cinq minutes après le premier lancement. Si le '
-      + 'téléphone est hors ligne, elle réessaie sept jours puis renonce. Donc « reçus '
-      + 'aujourd’hui » = signalements arrivés aujourd’hui : le plus souvent le jour même. '
-      + 'Un zéro est banal.<br><br>'
-      + '<b>Ce sont des arrivées, pas un parc.</b> Personne n’est retiré du compte quand '
-      + 'il désinstalle — cette information n’existe pas ici. C’est pourquoi le grand '
-      + 'chiffre est celui des 30 derniers jours : il se compare d’un mois sur l’autre.<br><br>'
-      + '<b>Ne comptent pas :</b> les installations d’avant la version 1.4.3, et celles qui '
-      + 'se sont opposées à la mesure. Une même personne qui réinstalle compte deux fois : '
-      + '<b>ce ne sont pas des personnes.</b> Les ' + nb(r.installations_de_test) + ' marquées '
-      + '« appareil de test » sont exclues — mais ce marquage ne repère que les versions de '
-      + 'développement : <b>vos propres téléphones installés depuis le magasin sont comptés '
-      + 'comme de vraies installations.</b><br><br>'
-      + '<b>Téléchargements et utilisateurs réguliers : pas ici, et c’est voulu.</b> La mesure '
-      + 'ne porte aucun identifiant et aucune heure, donc rien ne permet de reconnaître le même '
-      + 'téléphone deux jours de suite. <b>Ces deux chiffres, plus les désinstallations et la '
-      + 'rétention, se lisent dans la Play Console et App Store Connect</b>, qui les mesurent au '
-      + 'niveau du système.<br><br>'
-      + '<b>L’argent est « ce qui nous est parvenu ».</b> Il dépend des annonces de RevenueCat, '
-      + 'dont on sait qu’une au moins n’est jamais arrivée. Pour un état des ventes qui fait '
-      + 'foi, la référence reste le tableau de bord RevenueCat.'
-      + '</div></details>';
+    $('resume-note').innerHTML = '';
   }
 
   function envEtiq(v){

@@ -13,7 +13,7 @@
   Cette page NE CONTIENT AUCUN SECRET. La cle ci-dessous est la cle PUBLIQUE
   du projet : elle est deja publiee dans l'application Android installee chez
   les utilisateurs. Elle n'ouvre RIEN toute seule — l'epreuve du 09/09 l'a
-  montre : les onze vues repondent « permission denied » a un visiteur non
+  montre : les douze vues repondent « permission denied » a un visiteur non
   connecte, et rendent ZERO LIGNE a un compte connecte qui n'est pas celui de
   Gaetan.
 
@@ -276,7 +276,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 <div id="connexion">
   <form class="boite" id="form-connexion" autocomplete="on">
     <div class="marque"><b>Pilou</b><span>Console</span></div>
-    <p class="intro">Espace de pilotage. Lecture seule : aucune action de cette
+    <p class="intro">Espace de pilotage. Un seul bouton écrit dans la base — celui
+    qui génère la sauvegarde, et il n'écrit qu'une ligne de journal. Aucune autre action de cette
       page ne peut modifier quoi que ce soit.</p>
     <div id="erreur-connexion" role="alert"></div>
     <label for="email">Adresse e-mail</label>
@@ -367,11 +368,45 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       d'annonce, l'inverse n'arrive pas.</div></details>
   </section>
 
+  <section id="s-sauvegarde">
+    <h2>Sauvegarde de la base</h2>
+    <p class="note">Le plan gratuit de Supabase n'effectue <b>aucune sauvegarde
+    automatique</b>. Ce bouton produit un fichier <code>.sql</code> qui contient
+    l'intégralité des dix tables à conserver. Gardez-le ailleurs que sur cette
+    machine.</p>
+    <div class="cadre" id="cadre-sauvegarde"></div>
+    <p style="margin:14px 0 0">
+      <button type="button" id="btn-sauvegarde">Générer la sauvegarde</button>
+    </p>
+    <div id="sauvegarde-resultat" role="status"></div>
+    <details class="repli"><summary>Ce que contient le fichier, et ce qu'il ne contient pas</summary>
+      <div class="corps"><b>Dix tables sont dedans</b> : apporteurs, codes,
+      attributions, événements de facturation, commissions, commissions
+      archivées, mesures de scan, parcours d'entrée, quarantaine et journal
+      d'alerte.<br><br>
+      <b>Quatre en sont exclues, et chacune pour un motif :</b> la base des
+      médicaments (15&nbsp;846 lignes reconstructibles depuis un fichier du
+      dépôt — prouvé le 10/09, empreinte identique) ; le compteur anti-abus
+      (il contient des adresses IP, elles n'ont rien à faire sur un poste de
+      travail) ; le tampon de tentatives (vidé en permanence) ; et le journal
+      des sauvegardes lui-même.<br><br>
+      <b>Le fichier ne fusionne pas, il restaure.</b> Chaque table y forme une
+      section qui <b>refuse de s'exécuter</b> si la table n'est pas vide, vérifie
+      que la structure n'a pas changé, puis recompte et re-empreinte ce qu'elle a
+      inséré. Une section qui échoue n'écrit rien.<br><br>
+      <b>Il contient des données personnelles</b> : pseudonymes de facturation,
+      identifiants de transaction, corps bruts des annonces de paiement. Traitez
+      ce fichier comme un document sensible.</div></details>
+  </section>
+
   <footer>
-    Console en lecture seule — aucun bouton de cette page ne peut écrire dans la
-    base. Les onze vues interrogées ne contiennent que des agrégats : ni
-    pseudonyme, ni identifiant de transaction, ni adresse IP, ni commune, ni
-    modèle d'appareil. <span id="pied-version"></span>
+    Les douze vues interrogées ne contiennent que des agrégats : ni pseudonyme,
+    ni identifiant de transaction, ni adresse IP, ni commune, ni modèle
+    d'appareil. <b>Un seul bouton de cette page écrit dans la base</b> : « Générer
+    la sauvegarde », et il n'écrit qu'une ligne de journal — date, taille, nombre
+    de lignes, empreinte. Rien d'autre. Le fichier produit, lui, contient bien
+    des données personnelles : il ne passe jamais par la base.
+    <span id="pied-version"></span>
   </footer>
 </main>
 
@@ -382,7 +417,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   var URL_PROJET   = "https://kxjgzyhbefucxdgjraju.supabase.co";
   // Cle PUBLIQUE (role `anon`). Deja publiee dans l'application. N'ouvre rien
-  // seule : verifie le 09/09, les huit vues lui repondent « permission denied ».
+  // seule : verifie le 09/09, les vues lui repondent « permission denied ».
   var CLE_PUBLIQUE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4amd6eWhiZWZ1Y3hkZ2pyYWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NTMxMDUsImV4cCI6MjA5ODIyOTEwNX0.y7K3jYREwyVCg4UuSDy9-d3opHHtGfA4oeWvZ3UjwEU";
 
   var sb = window.supabase.createClient(URL_PROJET, CLE_PUBLIQUE, {
@@ -545,7 +580,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['resume','resume-note','s-alertes','s-argent','s-scans','s-parcours','s-officine'];
+    var ids = ['resume','resume-note','s-alertes','s-argent','s-scans','s-parcours','s-officine','s-sauvegarde'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
 
@@ -570,7 +605,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       }
       masquerBlocs(false);
       afficherEtat('ok','Console ouverte. ',
-        'Les huit vues répondent. Les chiffres ci-dessous sont ceux de la base.');
+        'Les douze vues répondent. Les chiffres ci-dessous sont ceux de la base.');
       return Promise.all([
         lire('v_admin_alertes'),
         lire('v_admin_abonnes'),
@@ -581,7 +616,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         lire('v_admin_scans_jour',     {col:'jour',    asc:false}),
         lire('v_admin_parcours_semaine',{col:'semaine',asc:false}),
         lire('v_admin_codes'),
-        lire('v_admin_attributions_semaine',{col:'semaine',asc:false})
+        lire('v_admin_attributions_semaine',{col:'semaine',asc:false}),
+        lire('v_admin_sauvegarde')
       ]);
     }).then(function(res){
       if(!res) return;
@@ -596,7 +632,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         scans:        res[6].data,
         parcours:     res[7].data,
         codes:        res[8].data,
-        attributions: res[9].data
+        attributions: res[9].data,
+        sauvegarde:   res[10].data[0] || null
       });
       $('horodatage').textContent = 'relevé le ' + fmtDate.format(new Date()) + ' (heure de Paris)';
       $('btn-recharger').disabled = false;
@@ -612,7 +649,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   // ── Rendu ─────────────────────────────────────────────────────────────────
   function rendre(d){
-    var compte = rendreAlertes(d.alertes);
+    var compte = rendreAlertes(d.alertes, d.sauvegarde);
+    rendreSauvegarde(d.sauvegarde);
     // ⚠️ LE BANDEAU RESUME LE PIRE DE CE QUI EST EN DESSOUS.
     // Defaut trouve au banc d'essai le 09/09 : le bandeau affichait « Console
     // ouverte » en vert alors que sept voyants etaient rouges. Un bandeau vert
@@ -628,9 +666,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         'Rien de rouge, mais quelque chose mérite un coup d’œil.');
     } else {
       afficherEtat('ok','Rien à signaler. ',
-        'Les onze vues répondent et aucun voyant n’est allumé.');
+        'Les douze vues répondent et aucun voyant n’est allumé.');
     }
-    rendreAbonnes(d.abonnes);
     rendreResume(d.resume, d.alertes);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent);
@@ -642,7 +679,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     rendreAttributions(d.attributions);
   }
 
-  function rendreAlertes(a){
+  function rendreAlertes(a, sv){
     if(!a){
       $('grille-alertes').innerHTML = '<div class="rien">Alertes illisibles.</div>';
       return { critique:1, attention:0 };
@@ -755,6 +792,22 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     h += ind('Codes à quota épuisé', nb(a.codes_epuises),
           a.codes_epuises > 0 ? 'attention' : 'ok',
           a.codes_epuises > 0 ? 'Ces codes ne donnent plus rien en pharmacie.' : 'Aucun code bloqué.');
+
+
+    // ⚠️ AJOUTE LE 10/09 — LE VOYANT DE SAUVEGARDE.
+    // Le plan gratuit n'a AUCUNE sauvegarde automatique (documentation
+    // Supabase, verifiee le 10/09). Une base sans copie est une base qu'un
+    // incident efface. Ce voyant ne dit pas « la sauvegarde existe » : il dit
+    // quand un fichier a ete GENERE. Le serveur ne sait pas ce qu'il est
+    // devenu.
+    var jSv = joursDepuis(sv && sv.derniere);
+    h += ind('Sauvegarde',
+          isFinite(jSv) ? (jSv < 1 ? "aujourd'hui" : Math.floor(jSv) + ' j') : 'jamais',
+          (!isFinite(jSv) || jSv > 14) ? 'critique' : (jSv > 8 ? 'attention' : 'ok'),
+          !isFinite(jSv)
+            ? "Aucun fichier n'a jamais été généré. La base n'a AUCUNE copie."
+            : 'Dernier export généré le ' + quandTexte(sv.derniere)
+              + ' — ' + nb(sv.lignes) + ' lignes, ' + octetsTexte(sv.octets) + '.');
 
     $('grille-alertes').innerHTML = h;
     return compte;
@@ -999,6 +1052,325 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   // ── Connexion / deconnexion ───────────────────────────────────────────────
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // SAUVEGARDE
+  // ══════════════════════════════════════════════════════════════════════════
+  // CINQ CONTROLES, ET LE TELECHARGEMENT EST REFUSE SI UN SEUL ECHOUE.
+  // Une sauvegarde incomplete EN SILENCE est pire que pas de sauvegarde : on
+  // croit avoir une copie, on ne l'ouvre que le jour ou tout est perdu.
+  var TABLES_ATTENDUES = 10;
+  // ⚠️ L'ORDRE EST IMPOSE PAR LES CLES ETRANGERES, il n'est PAS alphabetique.
+  // Sans ce controle, la page acceptait « dix lignes » sans regarder LESQUELLES :
+  // une table remplacee par une autre, ou un ordre change, produisait un fichier
+  // d'apparence complete et impossible a restaurer.
+  var TABLES_ORDRE = ['apporteurs','codes','attributions','evenements_facturation',
+    'commissions','commissions_archivees','scan_metrics','parcours_entree',
+    'evenements_quarantaine','journal_alerte_quarantaine'];
+
+  function octetsTexte(n){
+    if(n == null) return '—';
+    if(n < 1024) return n + ' o';
+    if(n < 1048576) return (Math.round(n/102.4)/10) + ' ko';
+    return (Math.round(n/104857.6)/10) + ' Mo';
+  }
+
+  function joursDepuis(v){
+    if(!v) return Infinity;
+    return (Date.now() - new Date(v).getTime()) / 86400000;
+  }
+
+  // SHA-256 et non MD5 : `crypto.subtle` ne propose pas MD5, et embarquer une
+  // implementation ecrite a la main serait du code cryptographique non eprouve
+  // dont un defaut subtil ferait echouer TOUS les controles.
+  function empreinte(octets){
+    return crypto.subtle.digest('SHA-256', octets).then(function(t){
+      var v = new Uint8Array(t), s = '';
+      for(var i=0;i<v.length;i++) s += ('0'+v[i].toString(16)).slice(-2);
+      return s;
+    });
+  }
+
+  function litt(s){ return String(s).replace(/'/g, "''"); }
+
+  function deuxChiffres(n){ return (n<10?'0':'') + n; }
+
+  function nomDuJour(){
+    var d = new Date();
+    // L'HEURE FAIT PARTIE DU NOM. Sans elle, une seconde sauvegarde le meme jour
+    // arrive sur le disque en « …(1).sql », et la commande de verification
+    // affichee condense l'ANCIEN fichier : ecart garanti, pour la mauvaise
+    // raison. Un controle qui echoue toujours finit debranche.
+    return 'pilou-sauvegarde-' + d.getFullYear() + '-'
+         + deuxChiffres(d.getMonth()+1) + '-' + deuxChiffres(d.getDate()) + '-'
+         + deuxChiffres(d.getHours()) + deuxChiffres(d.getMinutes()) + '.sql';
+  }
+
+  // Une section par table : garde de vacuite, assertion de structure, ordres,
+  // recomptage, empreinte de contenu. Le tout dans UNE transaction.
+  function section(r){
+    var t = r.nom_table, n = r.nb_lignes;
+    var L = [];
+    L.push('-- ==== DEBUT ' + t + ' : ' + n + ' ligne(s) ====');
+    L.push('-- structure attendue : ' + r.schema_colonnes);
+    L.push('-- empreinte contenu  : ' + r.empreinte);
+    L.push('begin;');
+    L.push("set local search_path to public;   -- <= LA SEULE LIGNE A CHANGER POUR EPROUVER");
+    L.push('do $pilou$ begin');
+    L.push('  if (select count(*) from ' + t + ') > 0 then');
+    L.push("    raise exception 'RESTAURATION REFUSEE : la table " + t + " n''est pas vide. "
+           + "Ce fichier remplit une base vide ; il ne fusionne pas.';");
+    L.push('  end if;');
+    L.push('end $pilou$;');
+    L.push('do $pilou$');
+    L.push("declare attendu text := '" + litt(r.schema_colonnes) + "'; trouve text;");
+    L.push('begin');
+    L.push("  select string_agg(a.attname || ' ' || format_type(a.atttypid, a.atttypmod)");
+    L.push("                    || case when a.attnotnull then ' not null' else '' end,");
+    L.push("                    ',' order by a.attnum)");
+    L.push('    into trouve');
+    L.push('    from pg_attribute a');
+    L.push('    join pg_class     r on r.oid = a.attrelid');
+    L.push('    join pg_namespace s on s.oid = r.relnamespace');
+    L.push("   where s.nspname = current_schema() and r.relname = '" + t + "'");
+    L.push('     and a.attnum > 0 and not a.attisdropped;');
+    L.push('  if trouve is distinct from attendu then');
+    L.push("    raise exception 'STRUCTURE DIFFERENTE pour " + t + "%  attendue : %  trouvee : %',");
+    L.push('                    chr(10), attendu, trouve;');
+    L.push('  end if;');
+    L.push('end $pilou$;');
+    if(r.ordres_sql) L.push(r.ordres_sql);
+    L.push('do $pilou$ declare c bigint; begin');
+    L.push('  select count(*) into c from ' + t + ';');
+    L.push('  if c <> ' + n + ' then');
+    L.push("    raise exception 'COMPTE DIFFERENT pour " + t + " : % attendues, % trouvees', " + n + ", c;");
+    L.push('  end if;');
+    L.push('end $pilou$;');
+    L.push('do $pilou$ declare e text; begin');
+    L.push("  select md5(coalesce(string_agg(to_jsonb(_l)::text, '' order by to_jsonb(_l)::text), ''))");
+    L.push('    into e from ' + t + ' as _l;');
+    L.push("  if e <> '" + r.empreinte + "' then");
+    L.push("    raise exception 'CONTENU DIFFERENT pour " + t + " : empreinte % attendue, % trouvee', "
+           + "'" + r.empreinte + "', e;");
+    L.push('  end if;');
+    L.push('end $pilou$;');
+    L.push('commit;');
+    L.push('-- ==== FIN ' + t + ' ====');
+    return L.join('\n');
+  }
+
+  // Onzieme section : elle rend visible « trois sections jamais jouees ».
+  function sectionControle(rows){
+    var L = [];
+    L.push('-- ==== DEBUT controle final ====');
+    L.push('begin;');
+    L.push('set local search_path to public;   -- <= LA SEULE LIGNE A CHANGER POUR EPROUVER');
+    L.push('do $pilou$ declare c bigint; begin');
+    for(var i=0;i<rows.length;i++){
+      L.push('  select count(*) into c from ' + rows[i].nom_table + ';');
+      L.push('  if c <> ' + rows[i].nb_lignes + ' then');
+      L.push("    raise exception 'RESTAURATION INCOMPLETE : " + rows[i].nom_table
+             + " porte % ligne(s), % attendue(s). Une section n''a pas ete jouee.', c, "
+             + rows[i].nb_lignes + ';');
+      L.push('  end if;');
+    }
+    L.push("  raise notice 'RESTAURATION COMPLETE : les 10 tables sont conformes.';");
+    L.push('end $pilou$;');
+    L.push('commit;');
+    L.push('-- ==== FIN controle final ====');
+    return L.join('\n');
+  }
+
+  function construire(rows, nom){
+    var total = 0, i;
+    var e = [];
+    e.push('-- ' + nom);
+    e.push('-- genere le ' + new Date().toISOString());
+    e.push('-- ' + rows.length + ' tables, une section chacune, PLUS une section de controle final.');
+    e.push('--');
+    e.push("-- A JOUER SECTION PAR SECTION, DANS L'ORDRE, UN ENVOI PAR SECTION.");
+    e.push("-- L'ordre est impose par les cles etrangeres : il n'est pas alphabetique.");
+    e.push('-- Si une section echoue, les precedentes sont acquises et les suivantes');
+    e.push("-- n'ont PAS ete jouees. Corriger, puis reprendre A LA SECTION EN ECHEC.");
+    e.push('-- NE JAMAIS REJOUER LE FICHIER ENTIER.');
+    e.push('--');
+    e.push("-- Ce fichier REMPLIT UNE BASE VIDE. Chaque section refuse de s'executer");
+    e.push('-- si sa table contient deja des lignes.');
+    e.push('--');
+    for(i=0;i<rows.length;i++){
+      total += rows[i].nb_lignes;
+      e.push('--   ' + (rows[i].nom_table + '                          ').slice(0,28)
+             + ' : ' + rows[i].nb_lignes + ' ligne(s)');
+    }
+    e.push('--   TOTAL                        : ' + total + ' ligne(s)');
+    e.push('');
+    var corps = [];
+    for(i=0;i<rows.length;i++) corps.push(section(rows[i]));
+    corps.push(sectionControle(rows));
+    return { texte: e.join('\n') + '\n' + corps.join('\n\n') + '\n', lignes: total };
+  }
+
+  function direSauvegarde(classe, texte){
+    $('sauvegarde-resultat').className = 'etat ' + classe;
+    $('sauvegarde-resultat').innerHTML = '<span class="pastille"></span><div>' + texte + '</div>';
+    $('sauvegarde-resultat').style.marginTop = '14px';
+  }
+
+  // ⚠️ SCINDE APRES LE BANC DU 10/09. La version d'avant rappelait
+  // rendreSauvegarde() apres un export reussi : elle ECRASAIT le message qui
+  // portait l'empreinte SHA-256 — celle que l'exploitant doit comparer avec
+  // certutil — et la remplacait par l'etat general. Le seul chiffre qui compte
+  // disparaissait deux secondes apres etre apparu.
+  function rendreSauvegarde(sv, garderMessage){
+    rendreTableauSauvegarde(sv);
+    if(!garderMessage) rendreEtatSauvegarde(sv);
+  }
+
+  function rendreTableauSauvegarde(sv){
+    var lignes = [
+      ['Dernier export généré', sv && sv.derniere ? quandTexte(sv.derniere) : 'jamais'],
+      ['Lignes dans ce fichier', sv && sv.lignes != null ? String(sv.lignes) : '—'],
+      ['Taille', sv ? octetsTexte(sv.octets) : '—'],
+      ['Exports enregistrés', sv && sv.nombre != null ? String(sv.nombre) : '—'],
+      ['Empreinte SHA-256', sv && sv.empreinte ? sv.empreinte : '—']
+    ];
+    var h = '<table><tbody>';
+    for(var i=0;i<lignes.length;i++){
+      h += '<tr><th style="text-align:left">' + ech(lignes[i][0]) + '</th><td>'
+         + ech(lignes[i][1]) + '</td></tr>';
+    }
+    h += '</tbody></table>';
+    $('cadre-sauvegarde').innerHTML = h;
+  }
+
+  function rendreEtatSauvegarde(sv){
+    var j = joursDepuis(sv && sv.derniere);
+    if(!sv || !sv.derniere){
+      direSauvegarde('critique',
+        "<b>Aucun export n'a jamais été généré depuis cette base.</b>"
+        + "Si c'est la première fois, la base n'a aucune copie : générez-en une. "
+        + "Si vous venez de RESTAURER la base, ce rouge est NORMAL — le journal des "
+        + "sauvegardes est volontairement hors du périmètre sauvegardé, il repart "
+        + "donc vide. Ce n'est pas une panne.");
+    } else if(j > 14){
+      direSauvegarde('critique', '<b>Dernier export généré il y a ' + Math.floor(j)
+        + ' jours.</b>C\'est trop. Générez-en un maintenant.');
+    } else if(j > 8){
+      direSauvegarde('attention', '<b>Dernier export généré il y a ' + Math.floor(j)
+        + ' jours.</b>La cadence prévue est hebdomadaire.');
+    } else {
+      // ⚠️ « export GENERE », jamais « sauvegarde a jour ». Le serveur sait qu'un
+      // fichier a ete PRODUIT ; il ne sait pas s'il a ete ecrit sur le disque, ni
+      // conserve. Dire « à jour » serait affirmer ce qu'on ignore.
+      direSauvegarde('ok', '<b>Dernier export généré il y a moins de 8 jours.</b>'
+        + 'Le serveur sait qu’un fichier a été produit — il ne sait pas où il est. '
+        + 'Vérification sur votre poste : '
+        + '<code>certutil -hashfile "&lt;fichier&gt;" SHA256</code>');
+    }
+  }
+
+  function sauvegarder(){
+    var b = $('btn-sauvegarde');
+    b.disabled = true;
+    direSauvegarde('ok', '<b>Lecture de la base…</b>');
+
+    sb.rpc('exporter_sauvegarde').then(function(r){
+      if(r.error) throw r.error;
+      var rows = r.data || [];
+
+      // CONTROLE 1 — dix tables, ni plus ni moins.
+      if(rows.length !== TABLES_ATTENDUES){
+        throw new Error('la base a rendu ' + rows.length + ' table(s) au lieu de '
+          + TABLES_ATTENDUES + '. Fichier NON écrit.');
+      }
+      for(var i=0;i<rows.length;i++){
+        var t = rows[i];
+        // CONTROLE 2 — autant d'ordres que de lignes.
+        if(Number(t.nb_lignes) !== Number(t.nb_ordres)){
+          throw new Error(t.nom_table + ' : ' + t.nb_lignes + ' ligne(s) mais '
+            + t.nb_ordres + ' ordre(s). Fichier NON écrit.');
+        }
+        // CONTROLE 3 — les noms ET l'ordre.
+        if(t.nom_table !== TABLES_ORDRE[i]){
+          throw new Error('table n°' + (i+1) + ' : « ' + t.nom_table + ' » au lieu de « '
+            + TABLES_ORDRE[i] + ' ». Fichier NON écrit.');
+        }
+        // CONTROLE 4 — controle de TRANSPORT : le texte recu porte-t-il autant de
+        // lignes que le serveur en annonce ? Il attrape une troncature, pas une
+        // erreur d'assemblage — le serveur a compte sur la meme chaine.
+        var vraies = t.ordres_sql ? t.ordres_sql.split('\n').length : 0;
+        if(vraies !== Number(t.nb_ordres)){
+          throw new Error(t.nom_table + ' : le texte reçu porte ' + vraies
+            + ' ordre(s) au lieu de ' + t.nb_ordres + '. Fichier NON écrit.');
+        }
+      }
+
+      var nom = nomDuJour();
+      var f = construire(rows, nom);
+
+      // CONTROLE 5 — les dix sections, plus celle de controle, sont bien la.
+      var marqueurs = (f.texte.match(/^-- ==== DEBUT /gm) || []).length;
+      if(marqueurs !== TABLES_ATTENDUES + 1){
+        throw new Error('le fichier porte ' + marqueurs + ' section(s) au lieu de '
+          + (TABLES_ATTENDUES + 1) + '. Fichier NON écrit.');
+      }
+
+      // ⚠️ CORRIGE APRES REVUE. La version d'avant calculait une empreinte puis
+      // telechargeait : elle ne COMPARAIT rien, donc elle ne pouvait rien
+      // refuser. Un controle qui ne peut pas echouer n'est pas un controle.
+      // Maintenant : on condense la chaine encodee ET les octets relus du Blob —
+      // ce que le disque recevra vraiment — et on refuse au moindre ecart.
+      var brut = new TextEncoder().encode(f.texte);
+      var blob = new Blob([f.texte], { type: 'application/sql' });
+      return blob.arrayBuffer().then(function(octets){
+        if(octets.byteLength !== brut.length){
+          throw new Error('le fichier fait ' + octets.byteLength + ' octets au lieu de '
+            + brut.length + ' à l’écriture. Fichier NON écrit.');
+        }
+        return Promise.all([empreinte(brut), empreinte(octets)]).then(function(deux){
+          if(deux[0] !== deux[1]){
+            throw new Error('l’empreinte du fichier écrit diffère de celle du texte '
+              + 'produit. Fichier NON écrit.');
+          }
+          var emp = deux[1];
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = nom;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          // 60 s et non 4 : sur un disque lent, un gros fichier peut encore etre
+          // en cours d'ecriture. Liberer trop tot ne coute rien a garder.
+          setTimeout(function(){ URL.revokeObjectURL(a.href); }, 60000);
+          return sb.rpc('journaliser_sauvegarde', {
+            p_octets: blob.size, p_lignes: f.lignes, p_empreinte: emp
+          }).then(function(j){
+            if(j.error){
+              direSauvegarde('attention',
+                '<b>Fichier téléchargé, mais le journal n’a pas été écrit.</b>'
+                + ech(j.error.message) + ' — le voyant restera rouge. '
+                + 'Empreinte du fichier, à conserver : <code>' + ech(emp) + '</code>');
+            } else {
+              direSauvegarde('ok',
+                '<b>' + ech(nom) + ' — ' + f.lignes + ' lignes, ' + octetsTexte(blob.size)
+                + '.</b>Vérifiez le fichier reçu : <code>certutil -hashfile "' + ech(nom)
+                + '" SHA256</code> doit rendre <code>' + ech(emp) + '</code>');
+            }
+            b.disabled = false;
+            // `true` : on garde a l'ecran le message qui porte l'empreinte.
+            return lire('v_admin_sauvegarde').then(function(s){
+              if(!s.error && s.data && s.data.length) rendreSauvegarde(s.data[0], true);
+            });
+          });
+        });
+      });
+    }).catch(function(e){
+      direSauvegarde('critique', '<b>Sauvegarde refusée.</b>'
+        + ech(e && e.message ? e.message : String(e)));
+      b.disabled = false;
+    });
+  }
+
   function montrerConsole(oui){
     $('connexion').style.display = oui ? 'none' : 'grid';
     $('console').style.display   = oui ? 'block' : 'none';
@@ -1033,6 +1405,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     sb.auth.signOut().then(function(){ montrerConsole(false); });
   });
   $('btn-recharger').addEventListener('click', charger);
+  $('btn-sauvegarde').addEventListener('click', sauvegarder);
 
   // Repliage : delegue, donc il survit a chaque rechargement des tableaux.
   document.addEventListener('click', function(ev){

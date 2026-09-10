@@ -13,7 +13,7 @@
   Cette page NE CONTIENT AUCUN SECRET. La cle ci-dessous est la cle PUBLIQUE
   du projet : elle est deja publiee dans l'application Android installee chez
   les utilisateurs. Elle n'ouvre RIEN toute seule — l'epreuve du 09/09 l'a
-  montre : les huit vues repondent « permission denied » a un visiteur non
+  montre : les dix vues repondent « permission denied » a un visiteur non
   connecte, et rendent ZERO LIGNE a un compte connecte qui n'est pas celui de
   Gaetan.
 
@@ -299,7 +299,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   <footer>
     Console en lecture seule — aucun bouton de cette page ne peut écrire dans la
-    base. Les onze vues interrogées ne contiennent que des agrégats : ni
+    base. Les dix vues interrogées ne contiennent que des agrégats : ni
     pseudonyme, ni identifiant de transaction, ni adresse IP, ni commune, ni
     modèle d'appareil. <span id="pied-version"></span>
   </footer>
@@ -556,7 +556,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         'Rien de rouge, mais quelque chose mérite un coup d’œil.');
     } else {
       afficherEtat('ok','Rien à signaler. ',
-        'Les onze vues répondent et aucun voyant n’est allumé.');
+        'Les dix vues répondent et aucun voyant n’est allumé.');
     }
     rendreAbonnes(d.abonnes);
     rendreResume(d.resume, d.alertes);

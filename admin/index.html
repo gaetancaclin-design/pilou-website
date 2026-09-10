@@ -144,6 +144,27 @@ section{margin:0 0 30px}
   margin:10px 0 0; font-size:12.5px; color:var(--encre-3); line-height:1.5;
   border-left:2px solid var(--trait-fort); padding-left:10px;
 }
+/* ── Replis ──────────────────────────────────────────────────────────────
+   ⚠️ UN REPLI, PAS UNE INFOBULLE. Une infobulle au survol n'existe pas sur
+   telephone — or c'est de son telephone que la console est consultee. Et une
+   reserve qui compte ne se cache pas derriere un survol : elle reste a un
+   clic, visible, et son TITRE porte deja l'avertissement. Le corps n'explique
+   que le pourquoi. */
+details.repli{
+  margin:10px 0 0; border-left:2px solid var(--trait-fort); padding-left:10px;
+}
+details.repli>summary{
+  cursor:pointer; list-style:none; font-size:12.5px; font-weight:650;
+  color:var(--encre-2); line-height:1.5; padding:1px 0;
+}
+details.repli>summary::-webkit-details-marker{display:none}
+details.repli>summary::before{content:"▸  "; color:var(--encre-3)}
+details.repli[open]>summary::before{content:"▾  "}
+details.repli>summary:hover{color:var(--accent-encre)}
+details.repli>summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+details.repli .corps{
+  font-size:12.5px; color:var(--encre-3); line-height:1.55; margin:6px 0 2px;
+}
 
 /* ── Bandeau de resume ─────────────────────────────────────────────────── */
 .resume{display:grid; gap:12px; margin:0 0 26px;
@@ -264,34 +285,42 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       <span class="sous">jamais additionné entre environnements ni entre devises</span></div>
     <div class="cadre" id="cadre-abonnes"></div>
     <div class="cadre" id="cadre-argent"></div>
-    <p class="note"><b>SANDBOX n'est pas une recette.</b> Ce sont les essais de
-      paiement, pas de l'argent encaissé. Les deux lignes ne se totalisent pas —
-      ni entre elles, ni entre euros et dollars.</p>
+    <details class="repli"><summary>SANDBOX n'est pas une recette — et rien ne se totalise ici</summary>
+      <div class="corps">Les lignes SANDBOX sont vos essais de paiement, pas de l'argent
+      encaissé. Elles ne s'additionnent ni entre elles, ni avec la production, ni entre
+      euros et dollars. Un montant en dollars sur un « accès offert » est normal :
+      RevenueCat n'a pas de devise de magasin à écrire quand il n'y a aucune transaction,
+      et met USD par défaut.</div></details>
   </section>
 
   <section id="s-scans">
     <div class="titre"><h2>Scan d'ordonnance</h2><span class="sous">60 derniers jours</span></div>
     <div class="cadre" id="cadre-scans"></div>
-    <p class="note"><b>Vos appareils de test sont comptés dedans, et on ne peut
-      pas les séparer</b> : la table de mesure ne porte aucune colonne
-      d'appareil. À dix utilisateurs, vos propres essais pèsent lourd dans ces
-      chiffres. La colonne <b>non classés</b> doit toujours valoir 0 : une autre
-      valeur signifie qu'un code de réponse échappe à tous les compteurs.</p>
+    <details class="repli"><summary>Vos appareils de test sont comptés dedans, et on ne peut pas les séparer</summary>
+      <div class="corps">La table de mesure ne porte aucune colonne d'appareil. À dix
+      utilisateurs, vos propres essais pèsent lourd dans ces chiffres.<br><br>
+      La colonne <b>non classés</b> doit toujours valoir 0 : une autre valeur signifie
+      qu'un code de réponse échappe à tous les compteurs, et elle s'affiche en rouge.<br><br>
+      Ces lignes n'existent que si la fonction a <b>répondu</b>. Un scan engagé qui n'a
+      jamais reçu de réponse ne figure nulle part ici — c'est le voyant « échecs
+      silencieux », en haut.</div></details>
   </section>
 
   <section id="s-parcours">
     <div class="titre"><h2>Parcours d'entrée</h2><span class="sous">par semaine</span></div>
     <div class="cadre" id="cadre-parcours"></div>
     <div class="cadre" id="cadre-inst-jour"></div>
-    <p class="note"><b>⚠️ Ces colonnes disent ce que la personne avait déjà fait au moment
-      où sa ligne est partie — pas ce qu'elle a fini par faire.</b> Le message part une à cinq
-      minutes après le premier lancement : quelqu'un qui saisit son traitement à la septième
-      minute est compté « aucun traitement ». <b>Ce biais gonfle l'abandon apparent</b>, et il
-      va toujours dans ce sens. Ne lisez jamais ces chiffres comme un bilan de parcours.</p>
-    <p class="note"><b>Par semaine, et c'est volontaire.</b> Au jour, plusieurs
-      cases ne contiennent qu'une seule personne — ce n'est plus une statistique,
-      c'est un individu. La semaine en cours est grisée : elle est incomplète et
-      ne se compare à aucune autre. Appareils de test exclus.</p>
+    <details class="repli"><summary>⚠️ Ces colonnes gonflent l'abandon apparent — à lire avant de les interpréter</summary>
+      <div class="corps"><b>Elles disent ce que la personne avait déjà fait au moment où sa
+      ligne est partie, pas ce qu'elle a fini par faire.</b> Le message part une à cinq minutes
+      après le premier lancement : quelqu'un qui saisit son traitement à la septième minute est
+      compté « aucun traitement ». Le biais va toujours dans ce sens. Ne lisez jamais ces
+      chiffres comme un bilan de parcours.<br><br>
+      <b>Par semaine, et c'est volontaire.</b> Au jour, plusieurs cases ne contiendraient qu'une
+      seule personne — ce n'est plus une statistique, c'est un individu. Le tableau du dessous ne
+      donne qu'un <b>compte</b> par jour, ce qui ne décrit le comportement de personne.<br><br>
+      La semaine en cours est grisée : incomplète, elle ne se compare à aucune autre. Appareils
+      de test exclus.</div></details>
   </section>
 
   <section id="s-officine">
@@ -299,8 +328,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     <div class="cadre" id="cadre-codes"></div>
     <div class="cadre" id="cadre-acces"></div>
     <div class="cadre" id="cadre-attributions"></div>
-    <p class="note">Aucun identifiant d'installation n'est affiché ici, et la
-      console est techniquement incapable d'en lire un.</p>
+    <details class="repli"><summary>Aucun identifiant d'installation n'est affiché ici</summary>
+      <div class="corps">Et ce n'est pas une promesse : la console est <b>techniquement
+      incapable</b> d'en lire un. Les vues qu'elle interroge ne contiennent que des agrégats —
+      le pseudonyme d'installation n'y figure dans aucune colonne.<br><br>
+      Les accès offerts sont lus dans <b>notre</b> table d'attributions, écrite au moment de
+      l'octroi, et non dans le journal de RevenueCat : un octroi peut ne jamais produire
+      d'annonce, l'inverse n'arrive pas.</div></details>
   </section>
 
   <footer>
@@ -710,14 +744,21 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // ⚠️ CE N'EST PAS UN COMPTEUR DE TELECHARGEMENTS, et le detail le dit.
     // « Signalement » et non « installation » : le mot compte. Une ligne = un
     // premier demarrage annonce au serveur, une a sept jours plus tard.
-    var parJour = ('installations_aujourd_hui' in r && r.installations_aujourd_hui != null)
-      ? 'Reçus aujourd’hui <b>' + nb(r.installations_aujourd_hui) + '</b> · '
-        + '7 jours <b>' + nb(r.installations_7j) + '</b> · '
-        + '30 jours <b>' + nb(r.installations_30j) + '</b>.'
-      : 'Depuis le ' + jourTexte(r.mesure_depuis) + '.';
-    h += res('Premiers démarrages signalés', nb(r.installations_mesurees),
-      parJour + ' Total depuis le ' + jourTexte(r.mesure_depuis)
-      + '. <b>Ni des téléchargements, ni des personnes</b> — voir la note.');
+    // ⚠️ LE GRAND CHIFFRE EST CELUI DES 30 DERNIERS JOURS, PAS LE CUMUL.
+    // Corrige le 10/09, et c'est Gaetan qui a raison : un cumul ne fait que
+    // monter, il compte des installations depuis longtemps supprimees, et il
+    // ne repond a aucune question de pilotage. « Combien de nouveaux ce
+    // mois-ci » se compare d'un mois sur l'autre ; « 32 depuis toujours », non.
+    // Le cumul reste, en petit, parce qu'il situe la profondeur de la mesure.
+    var aJour = ('installations_30j' in r && r.installations_30j != null);
+    h += res('Nouveaux démarrages · 30 jours',
+      aJour ? nb(r.installations_30j) : nb(r.installations_mesurees),
+      (aJour
+        ? '7 jours <b>' + nb(r.installations_7j) + '</b> · reçus aujourd’hui <b>'
+          + nb(r.installations_aujourd_hui) + '</b>.<br>'
+        : '')
+      + nb(r.installations_mesurees) + ' au total depuis le ' + jourTexte(r.mesure_depuis)
+      + '. <b>Des arrivées, pas un parc</b> : les désinstallations ne sont pas ici.');
 
     // ⚠️ SOURCE = NOTRE TABLE. Et l'ecart avec RevenueCat est AFFICHE, pas absorbe.
     // ⚠️ PLUS AUCUNE COULEUR ICI — corrige le 10/09.
@@ -748,32 +789,36 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + 'non séparables.');
 
     $('resume').innerHTML = h;
+    // ⚠️ REPLI, ET LE TITRE PORTE DEJA L'AVERTISSEMENT. Replie par defaut pour
+    // que le bandeau reste lisible ; jamais supprime, parce que ces reserves
+    // sont ce qui empeche de lire les chiffres de travers.
     $('resume-note').innerHTML =
-      '<b>Ce que compte « premiers démarrages signalés ».</b> Une ligne par '
-      + '<b>installation</b>, envoyée <b>une seule fois</b>, <b>une à cinq minutes</b> après '
-      + 'le premier lancement, pendant que l’application est ouverte. Si le téléphone est '
-      + 'hors ligne, elle réessaie pendant sept jours, puis renonce définitivement. Donc '
-      + '« reçus aujourd’hui » veut dire <b>signalements arrivés aujourd’hui</b> : le plus '
-      + 'souvent le jour même, jusqu’à une semaine plus tard pour un téléphone mal '
-      + 'connecté. Un zéro est banal. Ne comptent pas : '
-      + 'les installations d’avant la version 1.4.3, et celles qui se sont opposées à la '
-      + 'mesure. Une même personne qui réinstalle compte deux fois : ce ne sont pas des '
-      + 'personnes.<br><br>'
-      + '<b>Ce que ce bandeau ne peut pas vous dire, et pourquoi.</b> '
-      + 'Le nombre de <b>téléchargements</b> n’existe que chez Google Play et Apple : '
-      + 'il n’est pas dans cette base. Le nombre d’<b>utilisateurs réguliers</b> non '
-      + 'plus — la mesure du parcours porte une ligne par installation, sans aucun '
-      + 'identifiant et sans heure, donc rien ne permet de reconnaître le même '
-      + 'téléphone deux jours de suite. C’est voulu. <b>Ces deux chiffres se lisent '
-      + 'dans la Play Console et App Store Connect</b>, qui les mesurent au niveau du '
-      + 'système. Les ' + nb(r.installations_de_test) + ' installations marquées '
-      + '« appareil de test » sont exclues du compteur ci-dessus — mais ce marquage '
-      + 'ne repère que les versions de développement : <b>vos propres téléphones, s’ils '
-      + 'ont installé l’application depuis le magasin, sont comptés comme de vraies '
-      + 'installations.</b> Enfin, les chiffres d’argent sont <b>ce qui nous est '
-      + 'parvenu</b> : ils dépendent des annonces de RevenueCat, dont on sait qu’une '
-      + 'au moins ne nous est jamais arrivée. Pour un état des ventes qui fait foi, '
-      + 'la référence reste le tableau de bord RevenueCat.';
+      '<details class="repli"><summary>Ce que ces chiffres ne disent pas — '
+      + 'ni téléchargements, ni personnes, ni utilisateurs réguliers</summary>'
+      + '<div class="corps">'
+      + '<b>« Nouveaux démarrages ».</b> Une ligne par <b>installation</b>, envoyée '
+      + '<b>une seule fois</b>, une à cinq minutes après le premier lancement. Si le '
+      + 'téléphone est hors ligne, elle réessaie sept jours puis renonce. Donc « reçus '
+      + 'aujourd’hui » = signalements arrivés aujourd’hui : le plus souvent le jour même. '
+      + 'Un zéro est banal.<br><br>'
+      + '<b>Ce sont des arrivées, pas un parc.</b> Personne n’est retiré du compte quand '
+      + 'il désinstalle — cette information n’existe pas ici. C’est pourquoi le grand '
+      + 'chiffre est celui des 30 derniers jours : il se compare d’un mois sur l’autre.<br><br>'
+      + '<b>Ne comptent pas :</b> les installations d’avant la version 1.4.3, et celles qui '
+      + 'se sont opposées à la mesure. Une même personne qui réinstalle compte deux fois : '
+      + '<b>ce ne sont pas des personnes.</b> Les ' + nb(r.installations_de_test) + ' marquées '
+      + '« appareil de test » sont exclues — mais ce marquage ne repère que les versions de '
+      + 'développement : <b>vos propres téléphones installés depuis le magasin sont comptés '
+      + 'comme de vraies installations.</b><br><br>'
+      + '<b>Téléchargements et utilisateurs réguliers : pas ici, et c’est voulu.</b> La mesure '
+      + 'ne porte aucun identifiant et aucune heure, donc rien ne permet de reconnaître le même '
+      + 'téléphone deux jours de suite. <b>Ces deux chiffres, plus les désinstallations et la '
+      + 'rétention, se lisent dans la Play Console et App Store Connect</b>, qui les mesurent au '
+      + 'niveau du système.<br><br>'
+      + '<b>L’argent est « ce qui nous est parvenu ».</b> Il dépend des annonces de RevenueCat, '
+      + 'dont on sait qu’une au moins n’est jamais arrivée. Pour un état des ventes qui fait '
+      + 'foi, la référence reste le tableau de bord RevenueCat.'
+      + '</div></details>';
   }
 
   function envEtiq(v){

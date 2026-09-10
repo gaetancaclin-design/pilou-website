@@ -124,8 +124,8 @@ header.haut .droite{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
   border:1px solid transparent;
 }
 .etat b{display:block; margin-bottom:2px}
-.etat.ok{background:var(--ok-fond); color:var(--ok);
-  border-color:color-mix(in srgb, var(--ok) 26%, transparent)}
+.etat.ok{background:var(--carte); color:var(--encre-2); border-color:var(--trait)}
+.etat.ok .pastille{background:var(--ok)}
 .etat.attention{background:var(--attention-fond); color:var(--attention);
   border-color:color-mix(in srgb, var(--attention) 30%, transparent)}
 .etat.critique{background:var(--critique-fond); color:var(--critique);
@@ -145,6 +145,24 @@ section{margin:0 0 30px}
   border-left:2px solid var(--trait-fort); padding-left:10px;
 }
 
+/* ── Bandeau de resume ─────────────────────────────────────────────────── */
+.resume{display:grid; gap:12px; margin:0 0 26px;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.res{background:var(--carte); border:1px solid var(--trait); border-radius:var(--r);
+  padding:15px 16px; box-shadow:var(--ombre)}
+.res .quoi{font-size:11.5px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--encre-2); font-weight:650}
+.res .valeur{font-size:32px; font-weight:660; letter-spacing:-.025em; margin:2px 0 0;
+  line-height:1.1}
+.res .detail{font-size:12px; color:var(--encre-3); margin-top:4px; line-height:1.45}
+.res.alerte{border-color:color-mix(in srgb, var(--critique) 35%, transparent)}
+.res.alerte .valeur{color:var(--critique)}
+.plier{width:auto; display:block; margin:0; border-radius:0;
+  border:0; border-top:1px solid var(--trait);
+  background:var(--carte-2); color:var(--encre-2);
+  font-size:12.5px; font-weight:600; padding:10px; width:100%; cursor:pointer}
+.plier:hover{background:var(--accent-doux); color:var(--accent-encre)}
+tr.cachee{display:none}
 .grille{display:grid; gap:12px; margin-top:14px;
   grid-template-columns:repeat(auto-fill,minmax(228px,1fr))}
 .ind{
@@ -152,13 +170,17 @@ section{margin:0 0 30px}
   padding:14px 15px; box-shadow:var(--ombre);
   border-left:3px solid var(--trait-fort);
 }
-.ind.ok{border-left-color:var(--ok)}
+/* ⚠️ « TOUT VA BIEN » EST NEUTRE, PAS VERT — decide le 09/09.
+   Une console entierement verte apprend l'oeil a ignorer la couleur. Ici une
+   couleur veut dire UNE SEULE chose : regarde-moi. Le vert de la marque reste
+   dans l'en-tete et les accents ; il ne sert plus a dire « rien a signaler ». */
+.ind.ok{border-left-color:var(--trait-fort)}
 .ind.attention{border-left-color:var(--attention)}
 .ind.critique{border-left-color:var(--critique)}
 .ind .quoi{font-size:12px; text-transform:uppercase; letter-spacing:.05em;
   color:var(--encre-2); font-weight:600}
 .ind .valeur{font-size:27px; font-weight:660; letter-spacing:-.02em; margin:4px 0 0}
-.ind.ok .valeur{color:var(--ok)}
+.ind.ok .valeur{color:var(--encre)}
 .ind.attention .valeur{color:var(--attention)}
 .ind.critique .valeur{color:var(--critique)}
 .ind .detail{font-size:12.5px; color:var(--encre-3); margin-top:3px}
@@ -186,6 +208,8 @@ td.vide{color:var(--encre-3)}
 .etiq.bac{background:var(--attention-fond); color:var(--attention)}
 .etiq.ok{background:var(--ok-fond); color:var(--ok)}
 .etiq.non{background:var(--critique-fond); color:var(--critique)}
+.cap{padding:11px 13px 0; font-size:11.5px; font-weight:650;
+  text-transform:uppercase; letter-spacing:.06em; color:var(--encre-2)}
 .rien{padding:16px; color:var(--encre-3); font-size:13.5px}
 footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   font-size:12px; color:var(--encre-3); line-height:1.6}
@@ -227,6 +251,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   <div class="etat" id="etat-console"><span class="pastille"></span><div id="etat-texte"></div></div>
 
+  <div class="resume" id="resume"></div>
+  <p class="note" id="resume-note" style="margin:-14px 0 26px"></p>
+
   <section id="s-alertes">
     <div class="titre"><h2>Alertes</h2><span class="sous">ce qui doit réveiller la nuit</span></div>
     <div class="grille" id="grille-alertes"></div>
@@ -264,6 +291,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   <section id="s-officine">
     <div class="titre"><h2>Canal officine</h2><span class="sous">codes et attributions</span></div>
     <div class="cadre" id="cadre-codes"></div>
+    <div class="cadre" id="cadre-acces"></div>
     <div class="cadre" id="cadre-attributions"></div>
     <p class="note">Aucun identifiant d'installation n'est affiché ici, et la
       console est techniquement incapable d'en lire un.</p>
@@ -271,7 +299,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   <footer>
     Console en lecture seule — aucun bouton de cette page ne peut écrire dans la
-    base. Les huit vues interrogées ne contiennent que des agrégats : ni
+    base. Les onze vues interrogées ne contiennent que des agrégats : ni
     pseudonyme, ni identifiant de transaction, ni adresse IP, ni commune, ni
     modèle d'appareil. <span id="pied-version"></span>
   </footer>
@@ -369,6 +397,27 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // `garderBrut` : on ne montre le nom technique que la ou il sert vraiment —
   // les types d'evenement et les durees, qu'on retrouve tels quels dans
   // RevenueCat. Pour « accordé » ou « iOS », il n'apporte rien.
+  var MAGASINS = { PLAY_STORE:"Google Play", APP_STORE:"App Store",
+                   PROMOTIONAL:"Accès offert", STRIPE:"Stripe", AMAZON:"Amazon",
+                   MAC_APP_STORE:"Mac App Store", PLAY_STORE_DEFERRED:"Google Play (différé)" };
+  var PERIODES_PRODUIT = { monthly:"mensuel", annual:"annuel", yearly:"annuel",
+                           weekly:"hebdomadaire", lifetime:"à vie" };
+  // ⚠️ ON NE DEVINE PAS UN PRODUIT INCONNU : on rend l'identifiant tel quel.
+  // Deux formes existent dans la base, et elles ne veulent PAS dire la meme chose :
+  //   `plus:annual`           = un VRAI achat, formule Plus, engagement annuel ;
+  //   `rc_promo_plus_custom`  = un ACCES OFFERT, aucun argent, prefixe pose par
+  //                             RevenueCat. `custom` = la fin est une date, ce
+  //                             que fait justement notre canal officine.
+  function produitTexte(id){
+    if(id == null) return '<span class="vide">—</span>';
+    var m = /^rc_promo_(.+?)_([a-z_]+)$/.exec(id);
+    if(m) return 'Accès offert — ' + ech(m[1]) + ' <span class="brut">' + ech(id) + '</span>';
+    m = /^([A-Za-z0-9_]+):([A-Za-z0-9_]+)$/.exec(id);
+    if(m) return ech(m[1]) + ' — ' + ech(PERIODES_PRODUIT[m[2]] || m[2])
+              + ' <span class="brut">' + ech(id) + '</span>';
+    return ech(id);
+  }
+
   function traduit(table, v, garderBrut){
     if(v == null) return '<span class="vide">—</span>';
     var fr = table[v];
@@ -384,21 +433,32 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
          + '</div>';
   }
 
-  function tableau(titre, colonnes, lignes, vide){
+  // `limite` : nombre de lignes visibles d'emblee. Au-dela, les lignes sont
+  // masquees derriere un bouton. Elles sont DANS la page, pas absentes : un
+  // « tout afficher » qui rechargerait la base pourrait montrer autre chose.
+  function tableau(titre, colonnes, lignes, vide, limite){
     if(!lignes || !lignes.length)
       return '<div class="rien"><b>'+ech(titre)+'</b> — '+ech(vide||"aucune donnée")+'</div>';
-    var h = '<table><thead><tr>';
+    var h = '<div class="cap">'+ech(titre)+'</div><table><thead><tr>';
     for(var i=0;i<colonnes.length;i++) h += '<th>'+ech(colonnes[i])+'</th>';
     h += '</tr></thead><tbody>';
     for(var j=0;j<lignes.length;j++){
-      h += '<tr'+(lignes[j].grisee?' class="grisee"':'')+'>';
+      var classes = [];
+      if(lignes[j].grisee) classes.push('grisee');
+      if(limite && j >= limite) classes.push('cachee');
+      h += '<tr'+(classes.length?' class="'+classes.join(' ')+'"':'')+'>';
       for(var k=0;k<lignes[j].cases.length;k++){
         var c = lignes[j].cases[k];
         h += '<td class="num '+(c.classe||'')+'">'+(c.html || ech(c.texte))+'</td>';
       }
       h += '</tr>';
     }
-    return h + '</tbody></table>';
+    h += '</tbody></table>';
+    if(limite && lignes.length > limite){
+      h += '<button type="button" class="plier">Afficher les '
+         + (lignes.length - limite) + ' autres lignes</button>';
+    }
+    return h;
   }
 
   // ── Chargement ────────────────────────────────────────────────────────────
@@ -415,7 +475,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['s-alertes','s-argent','s-scans','s-parcours','s-officine'];
+    var ids = ['resume','resume-note','s-alertes','s-argent','s-scans','s-parcours','s-officine'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
 
@@ -444,6 +504,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       return Promise.all([
         lire('v_admin_alertes'),
         lire('v_admin_abonnes'),
+        lire('v_admin_resume'),
+        lire('v_admin_acces_offerts'),
         lire('v_admin_argent_mois',    {col:'mois',    asc:false}),
         lire('v_admin_scans_jour',     {col:'jour',    asc:false}),
         lire('v_admin_parcours_semaine',{col:'semaine',asc:false}),
@@ -456,11 +518,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       rendre({
         alertes:      res[0].data[0] || null,
         abonnes:      res[1].data,
-        argent:       res[2].data,
-        scans:        res[3].data,
-        parcours:     res[4].data,
-        codes:        res[5].data,
-        attributions: res[6].data
+        resume:       res[2].data[0] || null,
+        acces:        res[3].data,
+        argent:       res[4].data,
+        scans:        res[5].data,
+        parcours:     res[6].data,
+        codes:        res[7].data,
+        attributions: res[8].data
       });
       $('horodatage').textContent = 'relevé le ' + fmtDate.format(new Date()) + ' (heure de Paris)';
       $('btn-recharger').disabled = false;
@@ -491,14 +555,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         compte.attention + (compte.attention > 1 ? ' points à surveiller. ' : ' point à surveiller. '),
         'Rien de rouge, mais quelque chose mérite un coup d’œil.');
     } else {
-      afficherEtat('ok','Tout est au vert. ',
-        'Les huit vues répondent et aucun voyant n’est allumé.');
+      afficherEtat('ok','Rien à signaler. ',
+        'Les onze vues répondent et aucun voyant n’est allumé.');
     }
+    rendreAbonnes(d.abonnes);
+    rendreResume(d.resume, d.alertes);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent);
     rendreScans(d.scans);
     rendreParcours(d.parcours);
     rendreCodes(d.codes);
+    rendreAccesOfferts(d.acces);
     rendreAttributions(d.attributions);
   }
 
@@ -583,6 +650,56 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return compte;
   }
 
+  function res(quoi, valeur, detail, alerte){
+    return '<div class="res'+(alerte?' alerte':'')+'">'
+         + '<div class="quoi">'+ech(quoi)+'</div>'
+         + '<div class="valeur num">'+ech(valeur)+'</div>'
+         + '<div class="detail">'+detail+'</div></div>';
+  }
+
+  function rendreResume(r){
+    if(!r){ $('resume').innerHTML = ''; $('resume-note').textContent = ''; return; }
+    var h = '';
+
+    // ⚠️ CE N'EST PAS UN COMPTEUR DE TELECHARGEMENTS, et le detail le dit.
+    h += res('Installations mesurées', nb(r.installations_mesurees),
+      'Depuis le ' + jourTexte(r.mesure_depuis) + '. <b>Ce n’est pas le nombre de '
+      + 'téléchargements</b> — voir la note sous ce bandeau.');
+
+    // ⚠️ SOURCE = NOTRE TABLE. Et l'ecart avec RevenueCat est AFFICHE, pas absorbe.
+    var vus = r.acces_offerts_vus_par_revenuecat;
+    var ecart = r.acces_offerts_en_cours - vus;
+    h += res('Accès offerts en cours', nb(r.acces_offerts_en_cours),
+      ecart > 0
+        ? '<b>RevenueCat n’en connaît que ' + vus + '.</b> ' + ecart
+          + ' octroi(s) ne nous ont jamais été annoncés. Notre table fait foi.'
+        : 'Cohérent avec RevenueCat. ' + nb(r.acces_offerts_total) + ' accordé(s) en tout.',
+      ecart > 0);
+
+    // ⚠️ LE ZERO DOIT SE VOIR. C'est le chiffre qui compte vraiment.
+    h += res('Clients payants', nb(r.clients_payants),
+      r.clients_payants > 0
+        ? 'En production, hors essais.'
+        : 'Aucune vente à ce jour. Les ' + nb(r.achats_de_test)
+          + ' achat(s) SANDBOX sont vos essais.');
+
+    h += res('Scans sur 30 jours', nb(r.scans_30j),
+      nb(r.scans_30j_reussis) + ' réussis. <b>Vos appareils de test compris</b> — '
+      + 'non séparables.');
+
+    $('resume').innerHTML = h;
+    $('resume-note').innerHTML =
+      '<b>Ce que ce bandeau ne peut pas vous dire, et pourquoi.</b> '
+      + 'Le nombre de <b>téléchargements</b> n’existe que chez Google Play et Apple : '
+      + 'il n’est pas dans cette base. Le nombre d’<b>utilisateurs réguliers</b> non '
+      + 'plus — la mesure du parcours porte une ligne par installation, sans aucun '
+      + 'identifiant et sans heure, donc rien ne permet de reconnaître le même '
+      + 'téléphone deux jours de suite. C’est voulu. <b>Ces deux chiffres se lisent '
+      + 'dans la Play Console et App Store Connect</b>, qui les mesurent au niveau du '
+      + 'système. Les ' + nb(r.installations_de_test) + ' installations marquées '
+      + '« appareil de test » sont exclues du compteur ci-dessus.';
+  }
+
   function envEtiq(v){
     var c = (v === 'PRODUCTION') ? 'prod' : (v === 'SANDBOX' ? 'bac' : '');
     return '<span class="etiq '+c+'">'+ech(v || '—')+'</span>';
@@ -601,7 +718,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       ]};
     });
     var total = (rows && rows.length) ? rows[0].personnes_tous_env : null;
-    $('cadre-abonnes').innerHTML = tableau('Abonnés',
+    $('cadre-abonnes').innerHTML = tableau('Abonnements par environnement',
       ['Environnement','Actifs','Accès offerts','Ont payé','Annul. 30 j','Expir. 30 j','Personnes'],
       lignes, 'aucun événement de facturation')
       + (total != null
@@ -615,16 +732,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       return { cases:[
         {texte: jourTexte(r.mois)},
         {html: envEtiq(r.environnement)},
-        {texte: r.devise || '—'},
-        {html: traduit(TYPES, r.type, true)},
+        {html: traduit(MAGASINS, r.store)},
+        {html: produitTexte(r.product_id)},
+        {html: traduit(TYPES, r.type)},
         {texte: nb(r.evenements)},
         {texte: (r.montant_total == null) ? '—'
                 : (Number(r.montant_total).toFixed(2) + ' ' + (r.devise || ''))}
       ]};
     });
     $('cadre-argent').innerHTML = tableau('Événements de facturation',
-      ['Mois','Environnement','Devise','Type','Événements','Montant brut'],
-      lignes, 'aucun événement enregistré');
+      ['Mois','Environnement','Magasin','Produit','Type','Événements','Montant brut'],
+      lignes, 'aucun événement enregistré', 12);
   }
 
   function rendreScans(rows){
@@ -646,7 +764,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     $('cadre-scans').innerHTML = tableau('Scans par jour',
       ['Jour','Tentatives','Réussites','Refus 4xx','Délai dépassé','Autres 5xx',
        'Non classés','Latence médiane','Min','Max'],
-      lignes, 'aucun scan sur 60 jours');
+      lignes, 'aucun scan sur 60 jours', 12);
   }
 
   function rendreParcours(rows){
@@ -662,7 +780,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     });
     $('cadre-parcours').innerHTML = tableau('Parcours d’entrée',
       ['Semaine','Installations','Ont tenté un scan','1er par scan','1er à la main','Aucun traitement'],
-      lignes, 'aucun parcours enregistré');
+      lignes, 'aucun parcours enregistré', 12);
   }
 
   function rendreCodes(rows){
@@ -686,6 +804,28 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       lignes, 'aucun code');
   }
 
+  // ⚠️ SOURCE : `attributions`, notre table, et non le journal de RevenueCat.
+  // C'est la correction du 09/09 : un octroi peut ne jamais produire
+  // d'evenement chez RevenueCat, alors que notre fonction, elle, l'ecrit au
+  // moment ou elle l'accorde.
+  function rendreAccesOfferts(rows){
+    var lignes = (rows||[]).map(function(r){
+      return { grisee: !r.en_cours, cases:[
+        {texte: r.code},
+        {html: traduit(PLATEFORMES, r.plateforme)},
+        {html: traduit(ETATS, r.etat)},
+        {html: traduit(DUREES, r.duree_accordee, true)},
+        {texte: nb(r.nombre)},
+        {texte: r.en_cours ? 'en cours' : 'terminé',
+         classe: r.en_cours ? '' : 'vide'},
+        {texte: r.fin_la_plus_lointaine ? quandTexte(r.fin_la_plus_lointaine) : '—'}
+      ]};
+    });
+    $('cadre-acces').innerHTML = tableau('Accès offerts (source : nos attributions)',
+      ['Code','Plateforme','État','Durée','Nombre','En cours ?','Fin'],
+      lignes, 'aucun accès offert');
+  }
+
   function rendreAttributions(rows){
     var lignes = (rows||[]).map(function(r){
       return { cases:[
@@ -696,7 +836,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       ]};
     });
     $('cadre-attributions').innerHTML = tableau('Attributions',
-      ['Semaine','État','Plateforme','Nombre'], lignes, 'aucune attribution');
+      ['Semaine','État','Plateforme','Nombre'], lignes, 'aucune attribution', 12);
   }
 
   // ── Connexion / deconnexion ───────────────────────────────────────────────
@@ -734,6 +874,16 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     sb.auth.signOut().then(function(){ montrerConsole(false); });
   });
   $('btn-recharger').addEventListener('click', charger);
+
+  // Repliage : delegue, donc il survit a chaque rechargement des tableaux.
+  document.addEventListener('click', function(ev){
+    var b = ev.target.closest && ev.target.closest('.plier');
+    if(!b) return;
+    var cadre = b.parentNode;
+    var cachees = cadre.querySelectorAll('tr.cachee');
+    for(var i=0;i<cachees.length;i++) cachees[i].classList.remove('cachee');
+    b.parentNode.removeChild(b);
+  });
 
   // Session deja ouverte ?
   sb.auth.getSession().then(function(r){

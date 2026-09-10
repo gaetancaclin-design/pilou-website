@@ -283,6 +283,11 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     <div class="titre"><h2>Parcours d'entrée</h2><span class="sous">par semaine</span></div>
     <div class="cadre" id="cadre-parcours"></div>
     <div class="cadre" id="cadre-inst-jour"></div>
+    <p class="note"><b>⚠️ Ces colonnes disent ce que la personne avait déjà fait au moment
+      où sa ligne est partie — pas ce qu'elle a fini par faire.</b> Le message part une à cinq
+      minutes après le premier lancement : quelqu'un qui saisit son traitement à la septième
+      minute est compté « aucun traitement ». <b>Ce biais gonfle l'abandon apparent</b>, et il
+      va toujours dans ce sens. Ne lisez jamais ces chiffres comme un bilan de parcours.</p>
     <p class="note"><b>Par semaine, et c'est volontaire.</b> Au jour, plusieurs
       cases ne contiennent qu'une seule personne — ce n'est plus une statistique,
       c'est un individu. La semaine en cours est grisée : elle est incomplète et
@@ -745,10 +750,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     $('resume').innerHTML = h;
     $('resume-note').innerHTML =
       '<b>Ce que compte « premiers démarrages signalés ».</b> Une ligne par '
-      + '<b>installation</b>, envoyée <b>une seule fois</b>, entre le 1<sup>er</sup> et le '
-      + '7<sup>e</sup> jour après le tout premier lancement. Donc : « reçus aujourd’hui » '
-      + 'veut dire <b>signalements arrivés aujourd’hui</b>, pas installations du jour — '
-      + 'le décalage va jusqu’à une semaine, et un zéro est banal. Ne comptent pas : '
+      + '<b>installation</b>, envoyée <b>une seule fois</b>, <b>une à cinq minutes</b> après '
+      + 'le premier lancement, pendant que l’application est ouverte. Si le téléphone est '
+      + 'hors ligne, elle réessaie pendant sept jours, puis renonce définitivement. Donc '
+      + '« reçus aujourd’hui » veut dire <b>signalements arrivés aujourd’hui</b> : le plus '
+      + 'souvent le jour même, jusqu’à une semaine plus tard pour un téléphone mal '
+      + 'connecté. Un zéro est banal. Ne comptent pas : '
       + 'les installations d’avant la version 1.4.3, et celles qui se sont opposées à la '
       + 'mesure. Une même personne qui réinstalle compte deux fois : ce ne sont pas des '
       + 'personnes.<br><br>'

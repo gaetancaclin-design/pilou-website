@@ -13,7 +13,7 @@
   Cette page NE CONTIENT AUCUN SECRET. La cle ci-dessous est la cle PUBLIQUE
   du projet : elle est deja publiee dans l'application Android installee chez
   les utilisateurs. Elle n'ouvre RIEN toute seule — l'epreuve du 09/09 l'a
-  montre : les dix vues repondent « permission denied » a un visiteur non
+  montre : les onze vues repondent « permission denied » a un visiteur non
   connecte, et rendent ZERO LIGNE a un compte connecte qui n'est pas celui de
   Gaetan.
 
@@ -282,6 +282,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   <section id="s-parcours">
     <div class="titre"><h2>Parcours d'entrée</h2><span class="sous">par semaine</span></div>
     <div class="cadre" id="cadre-parcours"></div>
+    <div class="cadre" id="cadre-inst-jour"></div>
     <p class="note"><b>Par semaine, et c'est volontaire.</b> Au jour, plusieurs
       cases ne contiennent qu'une seule personne — ce n'est plus une statistique,
       c'est un individu. La semaine en cours est grisée : elle est incomplète et
@@ -299,7 +300,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   <footer>
     Console en lecture seule — aucun bouton de cette page ne peut écrire dans la
-    base. Les dix vues interrogées ne contiennent que des agrégats : ni
+    base. Les onze vues interrogées ne contiennent que des agrégats : ni
     pseudonyme, ni identifiant de transaction, ni adresse IP, ni commune, ni
     modèle d'appareil. <span id="pied-version"></span>
   </footer>
@@ -506,6 +507,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         lire('v_admin_abonnes'),
         lire('v_admin_resume'),
         lire('v_admin_acces_offerts'),
+        lire('v_admin_installations_jour', {col:'jour', asc:false}),
         lire('v_admin_argent_mois',    {col:'mois',    asc:false}),
         lire('v_admin_scans_jour',     {col:'jour',    asc:false}),
         lire('v_admin_parcours_semaine',{col:'semaine',asc:false}),
@@ -520,11 +522,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         abonnes:      res[1].data,
         resume:       res[2].data[0] || null,
         acces:        res[3].data,
-        argent:       res[4].data,
-        scans:        res[5].data,
-        parcours:     res[6].data,
-        codes:        res[7].data,
-        attributions: res[8].data
+        instJour:     res[4].data,
+        argent:       res[5].data,
+        scans:        res[6].data,
+        parcours:     res[7].data,
+        codes:        res[8].data,
+        attributions: res[9].data
       });
       $('horodatage').textContent = 'relevé le ' + fmtDate.format(new Date()) + ' (heure de Paris)';
       $('btn-recharger').disabled = false;
@@ -556,7 +559,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         'Rien de rouge, mais quelque chose mérite un coup d’œil.');
     } else {
       afficherEtat('ok','Rien à signaler. ',
-        'Les dix vues répondent et aucun voyant n’est allumé.');
+        'Les onze vues répondent et aucun voyant n’est allumé.');
     }
     rendreAbonnes(d.abonnes);
     rendreResume(d.resume, d.alertes);
@@ -564,6 +567,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     rendreArgent(d.argent);
     rendreScans(d.scans);
     rendreParcours(d.parcours);
+    rendreInstallationsJour(d.instJour);
     rendreCodes(d.codes);
     rendreAccesOfferts(d.acces);
     rendreAttributions(d.attributions);
@@ -661,6 +665,23 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
                 + quandTexte(a.dernier_compte_cree));
     }
 
+    // ⚠️ AJOUTE LE 10/09 — L'ALARME QUI MANQUAIT VRAIMENT.
+    // Ce qui doit reveiller la nuit, ce n'est pas un desaccord de comptage avec
+    // RevenueCat : c'est qu'une personne ait saisi son code en pharmacie et
+    // n'ait RIEN RECU. Cela se lit dans `attributions.etat`.
+    if('octrois_bloques' in a && a.octrois_bloques != null){
+      var bloques = a.octrois_bloques, rates = a.octrois_echoues_7j;
+      h += ind('Octrois de code',
+            (bloques + rates) > 0 ? (bloques + rates) + ' à voir' : 'aucun incident',
+            bloques > 0 ? 'critique' : (rates > 0 ? 'attention' : 'ok'),
+            bloques > 0
+              ? bloques + ' code(s) saisi(s) il y a plus d’une heure sans accès accordé. '
+                + 'Quelqu’un attend son mois offert.'
+              : (rates > 0
+                  ? rates + ' octroi(s) en échec sur 7 jours. La personne le sait, pas nous.'
+                  : 'Tout code saisi a donné son accès.'));
+    }
+
     // 7. Information, pas alerte.
     h += ind('Codes à quota épuisé', nb(a.codes_epuises),
           a.codes_epuises > 0 ? 'attention' : 'ok',
@@ -682,19 +703,33 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     var h = '';
 
     // ⚠️ CE N'EST PAS UN COMPTEUR DE TELECHARGEMENTS, et le detail le dit.
-    h += res('Installations mesurées', nb(r.installations_mesurees),
-      'Depuis le ' + jourTexte(r.mesure_depuis) + '. <b>Ce n’est pas le nombre de '
-      + 'téléchargements</b> — voir la note sous ce bandeau.');
+    // « Signalement » et non « installation » : le mot compte. Une ligne = un
+    // premier demarrage annonce au serveur, une a sept jours plus tard.
+    var parJour = ('installations_aujourd_hui' in r && r.installations_aujourd_hui != null)
+      ? 'Reçus aujourd’hui <b>' + nb(r.installations_aujourd_hui) + '</b> · '
+        + '7 jours <b>' + nb(r.installations_7j) + '</b> · '
+        + '30 jours <b>' + nb(r.installations_30j) + '</b>.'
+      : 'Depuis le ' + jourTexte(r.mesure_depuis) + '.';
+    h += res('Premiers démarrages signalés', nb(r.installations_mesurees),
+      parJour + ' Total depuis le ' + jourTexte(r.mesure_depuis)
+      + '. <b>Ni des téléchargements, ni des personnes</b> — voir la note.');
 
     // ⚠️ SOURCE = NOTRE TABLE. Et l'ecart avec RevenueCat est AFFICHE, pas absorbe.
+    // ⚠️ PLUS AUCUNE COULEUR ICI — corrige le 10/09.
+    // Ce voyant restait ROUGE en permanence jusqu'au 05/10, pour un ecart
+    // CONNU, EXPLIQUE et a ZERO EURO : un octroi du 05/09 n'a jamais produit
+    // d'evenement chez RevenueCat. Un rouge qu'on ne peut pas eteindre cesse
+    // d'etre lu, et finit par masquer les vrais. C'est un RENSEIGNEMENT.
+    // L'alarme qui compte est ailleurs : « octrois bloques », dans les alertes.
     var vus = r.acces_offerts_vus_par_revenuecat;
     var ecart = r.acces_offerts_en_cours - vus;
     h += res('Accès offerts en cours', nb(r.acces_offerts_en_cours),
-      ecart > 0
-        ? '<b>RevenueCat n’en connaît que ' + vus + '.</b> ' + ecart
-          + ' octroi(s) ne nous ont jamais été annoncés. Notre table fait foi.'
-        : 'Cohérent avec RevenueCat. ' + nb(r.acces_offerts_total) + ' accordé(s) en tout.',
-      ecart > 0);
+      nb(r.acces_offerts_total) + ' accordé(s) en tout. '
+      + (ecart > 0
+          ? 'RevenueCat n’en annonce que ' + vus + ' : ' + ecart + ' octroi(s) ne nous '
+            + 'ont jamais été signalés. Sans conséquence — ces accès valent zéro euro, '
+            + 'et notre propre table fait foi.'
+          : 'Cohérent avec ce que RevenueCat annonce.'));
 
     // ⚠️ LE ZERO DOIT SE VOIR. C'est le chiffre qui compte vraiment.
     h += res('Clients payants', nb(r.clients_payants),
@@ -709,7 +744,15 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
     $('resume').innerHTML = h;
     $('resume-note').innerHTML =
-      '<b>Ce que ce bandeau ne peut pas vous dire, et pourquoi.</b> '
+      '<b>Ce que compte « premiers démarrages signalés ».</b> Une ligne par '
+      + '<b>installation</b>, envoyée <b>une seule fois</b>, entre le 1<sup>er</sup> et le '
+      + '7<sup>e</sup> jour après le tout premier lancement. Donc : « reçus aujourd’hui » '
+      + 'veut dire <b>signalements arrivés aujourd’hui</b>, pas installations du jour — '
+      + 'le décalage va jusqu’à une semaine, et un zéro est banal. Ne comptent pas : '
+      + 'les installations d’avant la version 1.4.3, et celles qui se sont opposées à la '
+      + 'mesure. Une même personne qui réinstalle compte deux fois : ce ne sont pas des '
+      + 'personnes.<br><br>'
+      + '<b>Ce que ce bandeau ne peut pas vous dire, et pourquoi.</b> '
       + 'Le nombre de <b>téléchargements</b> n’existe que chez Google Play et Apple : '
       + 'il n’est pas dans cette base. Le nombre d’<b>utilisateurs réguliers</b> non '
       + 'plus — la mesure du parcours porte une ligne par installation, sans aucun '
@@ -807,6 +850,24 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     $('cadre-parcours').innerHTML = tableau('Parcours d’entrée',
       ['Semaine','Installations','Ont tenté un scan','1er par scan','1er à la main','Aucun traitement'],
       lignes, 'aucun parcours enregistré', 12);
+  }
+
+  // ⚠️ UN COMPTE PAR JOUR, ET RIEN DE PLUS.
+  // Le detail du parcours reste HEBDOMADAIRE parce qu'il croise le
+  // comportement : une case a 1 y decrirait ce qu'UNE personne a fait. Ici on
+  // ne publie qu'un compte — un « 1 » ne decrit le comportement de personne.
+  function rendreInstallationsJour(rows){
+    var lignes = (rows||[]).map(function(r){
+      return { cases:[
+        {texte: jourTexte(r.jour)},
+        {texte: nb(r.signalements)},
+        {texte: nb(r.ont_tente_un_scan)},
+        {texte: r.versions || '—'}
+      ]};
+    });
+    $('cadre-inst-jour').innerHTML = tableau('Premiers démarrages signalés, par jour',
+      ['Jour','Signalements','Ont tenté un scan','Versions vues'],
+      lignes, 'aucun signalement', 14);
   }
 
   function rendreCodes(rows){

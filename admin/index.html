@@ -251,6 +251,11 @@ tbody tr.grisee td{color:var(--encre-3); font-style:italic}
 td.rouge{color:var(--critique); font-weight:650}
 td.vide{color:var(--encre-3)}
 .brut{font-size:11px; color:var(--encre-3); letter-spacing:.02em}
+/* ⚠️ EXCEPTION MESUREE AU BANC LE 11/09. `td{white-space:nowrap}` convient a
+   toutes les tables de cette page sauf une : les libelles RevenueCat vont
+   jusqu'a « Active Subscriptions Set to Renew Percentage », et en 390 px les
+   chiffres sortaient de l'ecran. Ici, et ici seulement, le libelle s'enroule. */
+#cadre-audience-mesures td:first-child{white-space:normal; overflow-wrap:anywhere; min-width:5em}
 .etiq{
   display:inline-block; padding:1px 8px; border-radius:999px; font-size:11.5px;
   font-weight:650; background:var(--neutre-fond); color:var(--encre-2);
@@ -366,6 +371,32 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       Les accès offerts sont lus dans <b>notre</b> table d'attributions, écrite au moment de
       l'octroi, et non dans le journal de RevenueCat : un octroi peut ne jamais produire
       d'annonce, l'inverse n'arrive pas.</div></details>
+  </section>
+
+  <section id="s-audience">
+    <div class="titre"><h2>Audience</h2><span class="sous">archive RevenueCat</span></div>
+    <div class="cadre" id="cadre-audience-etat"></div>
+    <div class="cadre" id="cadre-audience-jours"></div>
+    <div class="cadre" id="cadre-audience-mesures"></div>
+    <details class="repli"><summary>⚠️ Trois choses à savoir avant de lire ces chiffres</summary>
+      <div class="corps"><b>La colonne « Actifs » ne remontera jamais au-delà de 28 jours.</b>
+      Ce n'est pas un choix de confort : au-delà de <b>32 jours</b>, l'API de RevenueCat rend
+      <b>0</b> au lieu d'une absence — mesuré le 11/09 sur 70 jours consécutifs à zéro alors que
+      703 clients étaient arrivés. Archiver ces zéros aurait inscrit un effondrement qui n'a
+      jamais eu lieu, dans une table qu'on ne peut plus corriger. La fenêtre est donc plafonnée
+      à 28 jours, avec trois jours de marge mesurés. Les jours antérieurs affichent
+      « <b>—</b> » : jamais lus, et non « zéro ».<br><br>
+      <b>La collecte est manuelle.</b> Rien ne se déclenche tout seul : l'extension nécessaire à
+      une tâche de nuit n'est pas installée. Si vous laissez passer plus de <b>28 jours</b>, les
+      jours de clients actifs non collectés sont perdus <b>définitivement</b>. Le voyant
+      « Collecte d'audience » passe à l'orange à 8 jours et au rouge à 28.<br><br>
+      <b>« — » n'est pas « vide », et « vide » n'est pas « zéro ».</b> « — » veut dire que ce jour
+      n'a jamais été lu pour cette série. « vide » veut dire qu'il a été lu et que RevenueCat n'a
+      rien rendu. Un zéro affiché est un vrai zéro mesuré. La ligne du jour est grisée et marquée
+      « en cours » : elle est provisoire et changera.<br><br>
+      Les totaux ne sont affichés que pour les <b>flux</b> (des arrivées, qui s'additionnent).
+      Additionner des <b>effectifs</b> — clients actifs, essais en cours — ne veut rien dire, et
+      la console ne le fait donc jamais.</div></details>
   </section>
 
   <section id="s-sauvegarde">
@@ -581,7 +612,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['resume','resume-note','s-alertes','s-argent','s-scans','s-parcours','s-officine','s-sauvegarde'];
+    var ids = ['resume','resume-note','s-alertes','s-argent','s-scans','s-parcours','s-officine','s-audience','s-sauvegarde'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
 
@@ -606,7 +637,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       }
       masquerBlocs(false);
       afficherEtat('ok','Console ouverte. ',
-        'Les douze vues répondent. Les chiffres ci-dessous sont ceux de la base.');
+        'Les quinze vues répondent. Les chiffres ci-dessous sont ceux de la base.');
       return Promise.all([
         lire('v_admin_alertes'),
         lire('v_admin_abonnes'),
@@ -618,7 +649,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         lire('v_admin_parcours_semaine',{col:'semaine',asc:false}),
         lire('v_admin_codes'),
         lire('v_admin_attributions_semaine',{col:'semaine',asc:false}),
-        lire('v_admin_sauvegarde')
+        lire('v_admin_sauvegarde'),
+        // ⚠️ ON NE LIT PAS `v_admin_audience` : elle rend deja 1073 lignes et
+        // PostgREST plafonne a 1000. Elle serait TRONQUEE EN SILENCE. Les trois
+        // vues ci-dessous sont bornees par construction : 1, 56 et 27 lignes.
+        lire('v_admin_audience_etat'),
+        lire('v_admin_audience_jours',   {col:'jour', asc:false}),
+        lire('v_admin_audience_mesures', {col:'graphique', asc:true})
       ]);
     }).then(function(res){
       if(!res) return;
@@ -634,7 +671,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         parcours:     res[7].data,
         codes:        res[8].data,
         attributions: res[9].data,
-        sauvegarde:   res[10].data[0] || null
+        sauvegarde:   res[10].data[0] || null,
+        audEtat:      res[11].data[0] || null,
+        audJours:     res[12].data,
+        audMesures:   res[13].data
       });
       $('horodatage').textContent = 'relevé le ' + fmtDate.format(new Date()) + ' (heure de Paris)';
       $('btn-recharger').disabled = false;
@@ -650,8 +690,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   // ── Rendu ─────────────────────────────────────────────────────────────────
   function rendre(d){
-    var compte = rendreAlertes(d.alertes, d.sauvegarde);
+    var compte = rendreAlertes(d.alertes, d.sauvegarde,
+                               { etat: d.audEtat, mesures: d.audMesures });
     rendreSauvegarde(d.sauvegarde);
+    rendreAudience(d.audEtat, d.audJours, d.audMesures);
     // ⚠️ LE BANDEAU RESUME LE PIRE DE CE QUI EST EN DESSOUS.
     // Defaut trouve au banc d'essai le 09/09 : le bandeau affichait « Console
     // ouverte » en vert alors que sept voyants etaient rouges. Un bandeau vert
@@ -667,7 +709,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         'Rien de rouge, mais quelque chose mérite un coup d’œil.');
     } else {
       afficherEtat('ok','Rien à signaler. ',
-        'Les douze vues répondent et aucun voyant n’est allumé.');
+        'Les quinze vues répondent et aucun voyant n’est allumé.');
     }
     rendreResume(d.resume, d.alertes);
     rendreAbonnes(d.abonnes);
@@ -680,7 +722,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     rendreAttributions(d.attributions);
   }
 
-  function rendreAlertes(a, sv){
+  function rendreAlertes(a, sv, au){
     if(!a){
       $('grille-alertes').innerHTML = '<div class="rien">Alertes illisibles.</div>';
       return { critique:1, attention:0 };
@@ -809,6 +851,77 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             ? "Aucun fichier n'a jamais été généré. La base n'a AUCUNE copie."
             : 'Dernier export généré le ' + quandTexte(sv.derniere)
               + ' — ' + nb(sv.lignes) + ' lignes, ' + octetsTexte(sv.octets) + '.');
+
+    // ⚠️ AJOUTE LE 11/09 — LE VOYANT QUI VOIT VENIR UNE PERTE DEFINITIVE.
+    // L'archivage est MANUEL. Au-dela de 32 jours d'age, l'API rend 0 au lieu
+    // d'une absence : un jour non collecte a temps n'est pas « en retard », il
+    // est PERDU. Sans ce voyant, un dispositif abandonne depuis six semaines
+    // afficherait « dernier etat : ok » — vert, sur une perte en cours.
+    // 🔴 DEFAUT TROUVE AU BANC LE 11/09 : quand la vue d'etat rend ZERO ligne,
+    // les voyants d'audience DISPARAISSAIENT de la grille et le bandeau affichait
+    // « Rien a signaler ». Le meme mode de panne que celui du 09/09, deplace d'un
+    // cran : l'absence de donnees n'est pas une absence de probleme.
+    if(!(au && au.etat)){
+      h += ind('Collecte d\u2019audience', 'illisible', 'critique',
+            'La vue d\u2019\u00e9tat n\u2019a rien rendu. Impossible de dire si l\u2019archive est '
+            + '\u00e0 jour, ni si la derni\u00e8re collecte a r\u00e9ussi. '
+            + 'L\u2019absence de donn\u00e9es n\u2019est pas une absence de probl\u00e8me.');
+    }
+    if(au && au.etat){
+      var eAu = au.etat;
+      var jAu = joursDepuis(eAu.dernier_passage);
+      var etAu = (!isFinite(jAu) || jAu >= 28) ? 'critique' : (jAu >= 8 ? 'attention' : 'ok');
+      if(eAu.dernier_etat === 'erreur') etAu = 'critique';
+      else if(eAu.dernier_etat === 'partiel' && etAu === 'ok') etAu = 'attention';
+      if(eAu.passages_bloques > 0) etAu = 'critique';
+      h += ind('Collecte d\u2019audience',
+            isFinite(jAu) ? (jAu < 1 ? "aujourd\u2019hui" : Math.floor(jAu) + ' j') : 'jamais',
+            etAu,
+            (!isFinite(jAu)
+              ? 'Aucune collecte n\u2019a jamais eu lieu. '
+              : 'Derni\u00e8re collecte ' + quandTexte(eAu.dernier_passage)
+                + ', \u00e9tat \u00ab ' + nb(eAu.dernier_etat) + ' \u00bb, '
+                + nb(eAu.lignes_dernier_passage) + ' ligne(s). ')
+            + (eAu.passages_bloques > 0
+                ? nb(eAu.passages_bloques) + ' passage(s) rest\u00e9(s) ouverts. ' : '')
+            + 'Elle est manuelle : au-del\u00e0 de 28 jours, les jours de clients actifs sont perdus.');
+
+      // Le retard ne suffit pas : une serie peut cesser d'etre rendue par l'API
+      // alors que le passage se termine en « ok ». Le trou, lui, se voit.
+      var trous = 0, retard = 0, incoh = 0, iM;
+      if(au.mesures){
+        for(iM = 0; iM < au.mesures.length; iM++){
+          var mM = au.mesures[iM];
+          if(mM.jours_manquants != null && Number(mM.jours_manquants) > trous)
+            trous = Number(mM.jours_manquants);
+          if(mM.jours_de_retard != null && Number(mM.jours_de_retard) > retard)
+            retard = Number(mM.jours_de_retard);
+          if(mM.forme === 'INCOHERENT') incoh++;
+        }
+      }
+      h += ind('Continuit\u00e9 de l\u2019archive',
+            trous > 0 ? trous + ' j manquant(s)' : 'sans trou',
+            (trous > 0 || incoh > 0) ? 'attention' : 'ok',
+            (trous > 0
+              ? 'Une s\u00e9rie au moins a ' + trous + ' jour(s) jamais collect\u00e9(s). '
+                + 'Au-del\u00e0 de 32 jours ils ne se rattrapent plus. '
+              : 'Chaque s\u00e9rie quotidienne couvre tous ses jours. ')
+            + (incoh > 0 ? incoh + ' mesure(s) ont chang\u00e9 de forme. ' : '')
+            + 'S\u00e9rie la plus en retard : ' + retard + ' jour(s).');
+    }
+
+    // 🔴 SECOND DEFAUT DU BANC : le tableau jour par jour se refusait a
+    // s'afficher — comportement voulu — mais le bandeau restait VERT. Un refus
+    // d'affichage est un incident : il doit s'allumer.
+    // Orange et non rouge : un simple renommage cosmetique par RevenueCat ne
+    // doit pas laisser un voyant rouge allume pendant des semaines. Un voyant
+    // rouge permanent est un voyant eteint.
+    if(au && au.mesures && au.mesures.length && !audienceLibellesConformes(au.mesures)){
+      h += ind('Libell\u00e9s d\u2019audience', 'chang\u00e9s', 'attention',
+            'Une des trois s\u00e9ries suivies ne porte plus le libell\u00e9 attendu. Le tableau '
+            + 'jour par jour n\u2019est PAS affich\u00e9 : ses colonnes pourraient d\u00e9signer '
+            + 'autre chose. \u00c0 v\u00e9rifier avant de le r\u00e9tablir.');
+    }
 
     $('grille-alertes').innerHTML = h;
     return compte;
@@ -1223,6 +1336,157 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // portait l'empreinte SHA-256 — celle que l'exploitant doit comparer avec
   // certutil — et la remplacait par l'etat general. Le seul chiffre qui compte
   // disparaissait deux secondes apres etre apparu.
+  // ── AUDIENCE ──────────────────────────────────────────────────────────────
+  // ⚠️ L'INDEX 0 EST CODE EN DUR DANS `v_admin_audience_jours`. Si RevenueCat
+  // reindexait ses mesures, les colonnes « Nouveaux », « Actifs » et « Essais »
+  // designeraient autre chose, et RIEN ne le signalerait. Le controle vit ici :
+  // on relit les libelles dans la vue des mesures et on REFUSE d'afficher le
+  // tableau si l'un d'eux a bouge. La table `audience_passages` compte d'ailleurs
+  // les renommages, donc le cas n'est pas theorique.
+  var AUDIENCE_LIBELLES = {
+    customers_new:    'New Customers',
+    customers_active: 'Active Customers',
+    trials:           'Active Trials'
+  };
+
+  function audienceLibellesConformes(mesures){
+    if(!mesures || !mesures.length) return false;
+    for(var g in AUDIENCE_LIBELLES){
+      if(!Object.prototype.hasOwnProperty.call(AUDIENCE_LIBELLES, g)) continue;
+      var trouve = null;
+      for(var i=0;i<mesures.length;i++){
+        if(mesures[i].graphique === g && Number(mesures[i].mesure_index) === 0){
+          trouve = mesures[i].libelle;
+        }
+      }
+      if(trouve !== AUDIENCE_LIBELLES[g]) return false;
+    }
+    return true;
+  }
+
+  // « — » : ce jour n'a jamais ete lu pour cette serie.
+  // « vide » : il a ete lu, et RevenueCat n'a rien rendu.
+  // Un zero affiche est un VRAI zero. L'archive etant en ajout seul, une valeur
+  // vide ecrite le reste pour toujours : confondre les trois serait definitif.
+  function caseAudience(lu, v){
+    if(!lu) return '—';
+    return (v == null) ? 'vide' : String(v);
+  }
+
+  function rendreAudience(e, jours, mesures){
+    rendreAudienceEtat(e);
+    rendreAudienceJours(jours, mesures);
+    rendreAudienceMesures(mesures);
+  }
+
+  function rendreAudienceEtat(e){
+    if(!e){
+      $('cadre-audience-etat').innerHTML =
+        '<div class="rien"><b>État de la collecte illisible.</b> Aucun chiffre n’est affiché.</div>';
+      return;
+    }
+    var j = joursDepuis(e.dernier_passage);
+    var h = '';
+    h += res('Dernière collecte',
+         isFinite(j) ? (j < 1 ? 'aujourd’hui' : Math.floor(j) + ' j') : 'jamais',
+         [['quand', quandTexte(e.dernier_passage)],
+          ['état', nb(e.dernier_etat)],
+          ['lignes ajoutées', nb(e.lignes_dernier_passage)],
+          ['passages mauvais', nb(e.mauvais_cinq_derniers) + ' sur ' + nb(e.passages_examines) + ' examiné(s)']],
+         'La collecte est <b>manuelle</b> : rien ne se déclenche tout seul. Au-delà de '
+         + '<b>28 jours</b> sans collecte, les jours de clients actifs deviennent '
+         + 'définitivement illisibles chez RevenueCat. « 0 mauvais » est affiché sur le '
+         + 'nombre de passages réellement examinés : sur un seul passage, un zéro ne prouve rien.',
+         (!isFinite(j) || j >= 28));
+    h += res('Archive', nb(e.lignes_archivees) + ' lignes',
+         [['du', jourTexte(e.premier_jour_archive)],
+          ['au', jourTexte(e.dernier_jour_archive)],
+          ['mesures suivies', nb(e.mesures_suivies)],
+          ['clients actifs, dernier jour', jourTexte(e.dernier_jour_actifs)
+             + (e.age_dernier_jour_actifs == null ? '' : ' (' + nb(e.age_dernier_jour_actifs) + ' j)')],
+          ['passages en tout', nb(e.passages_total), true]],
+         'L’archive est en <b>ajout seul</b> : rien n’y est jamais modifié ni supprimé. '
+         + 'Une valeur corrigée par RevenueCat ajoute une ligne, elle n’écrase pas l’ancienne — '
+         + 'et la console affiche toujours la <b>dernière</b> lecture de chaque jour.');
+    h += res('Révisions refusées', nb(e.revisions_refusees_cinq),
+         [['renommages écrits', nb(e.renommages_cinq)]],
+         'RevenueCat a corrigé un jour vieux de <b>plus de 14 jours</b> : la correction est '
+         + 'refusée et comptée ici. Ce n’est pas une perte — c’est ce qui empêche un '
+         + 'effacement rétroactif de réécrire l’histoire. Un chiffre qui monte chaque semaine '
+         + 'mérite qu’on regarde le détail du passage.');
+    $('cadre-audience-etat').innerHTML = h;
+  }
+
+  function rendreAudienceJours(rows, mesures){
+    var c = $('cadre-audience-jours');
+    if(!audienceLibellesConformes(mesures)){
+      c.innerHTML = '<div class="rien"><b>Jour par jour — NON AFFICHÉ.</b> Les libellés des '
+        + 'trois séries ne sont plus ceux attendus : les colonnes pourraient désigner autre '
+        + 'chose. Mieux vaut rien qu’un chiffre faux.</div>';
+      return;
+    }
+    if(!rows || !rows.length){
+      c.innerHTML = '<div class="rien"><b>Jour par jour</b> — aucune donnée.</div>';
+      return;
+    }
+    var lignes = [];
+    for(var i=0;i<rows.length;i++){
+      var r = rows[i];
+      var prov = !!(r.nouveaux_incomplet || r.actifs_incomplet || r.essais_incomplet);
+      lignes.push({
+        grisee: prov,
+        cases: [
+          { texte: jourTexte(r.jour) + (prov ? ' *' : '') },
+          { texte: caseAudience(r.nouveaux_lu, r.nouveaux) },
+          { texte: caseAudience(r.actifs_lu,   r.actifs) },
+          { texte: caseAudience(r.essais_lu,   r.essais) }
+        ]
+      });
+    }
+    // Legende dans le cap : elle s'enroule, elle ne deborde pas. Les COLONNES,
+    // elles, debordaient en 390 px — mesure au banc le 11/09.
+    c.innerHTML = tableau('Jour par jour — * jour en cours, « — » jamais lu, « vide » lu sans valeur',
+      ['Jour','Nouveaux','Actifs','Essais'], lignes, 'aucune donnée', 14);
+  }
+
+  function rendreAudienceMesures(rows){
+    var c = $('cadre-audience-mesures');
+    if(!rows || !rows.length){
+      c.innerHTML = '<div class="rien"><b>Mesures</b> — aucune donnée.</div>';
+      return;
+    }
+    // Les mesures vivantes d'abord. Celles qui sont a zero depuis toujours sont
+    // grisees : elles ne sont pas en panne, il n'y a simplement rien a compter.
+    var tri = rows.slice().sort(function(x, y){
+      var a = Number(x.jours_non_nuls) || 0, b = Number(y.jours_non_nuls) || 0;
+      if(a !== b) return b - a;
+      var cx = String(x.graphique) + ' ' + x.mesure_index;
+      var cy = String(y.graphique) + ' ' + y.mesure_index;
+      return cx < cy ? -1 : (cx > cy ? 1 : 0);
+    });
+    var lignes = [], muettes = 0;
+    for(var i=0;i<tri.length;i++){
+      var m = tri[i];
+      var mort = (Number(m.jours_non_nuls) === 0);
+      if(mort) muettes++;
+      var trou = (m.jours_manquants == null) ? 0 : Number(m.jours_manquants);
+      lignes.push({
+        grisee: mort,
+        cases: [
+          { html: ech(m.libelle) + '<br><span class="brut">' + ech(m.graphique)
+                  + ' · ' + ech(nb(m.jours_couverts)) + ' j'
+                  + (trou > 0 ? ' · ' + trou + ' manquant(s)' : '')
+                  + (m.forme === 'INCOHERENT' ? ' · FORME INCOHÉRENTE' : '') + '</span>' },
+          { texte: nb(m.jours_non_nuls) },
+          { texte: (m.derniere_valeur == null) ? 'vide' : String(m.derniere_valeur) }
+        ]
+      });
+    }
+    c.innerHTML = tableau(
+      'Les ' + tri.length + ' mesures archivées — ' + muettes + ' n’ont jamais rien compté',
+      ['Mesure','Jours non nuls','Dernière'], lignes, 'aucune mesure', 8);
+  }
+
   function rendreSauvegarde(sv, garderMessage){
     rendreTableauSauvegarde(sv);
     if(!garderMessage) rendreEtatSauvegarde(sv);

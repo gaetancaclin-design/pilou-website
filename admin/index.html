@@ -372,7 +372,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     <h2>Sauvegarde de la base</h2>
     <p class="note">Le plan gratuit de Supabase n'effectue <b>aucune sauvegarde
     automatique</b>. Ce bouton produit un fichier <code>.sql</code> qui contient
-    l'intégralité des dix tables à conserver. Gardez-le ailleurs que sur cette
+    l'intégralité des onze tables à conserver. Gardez-le ailleurs que sur cette
     machine.</p>
     <div class="cadre" id="cadre-sauvegarde"></div>
     <p style="margin:14px 0 0">
@@ -380,16 +380,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     </p>
     <div id="sauvegarde-resultat" role="status"></div>
     <details class="repli"><summary>Ce que contient le fichier, et ce qu'il ne contient pas</summary>
-      <div class="corps"><b>Dix tables sont dedans</b> : apporteurs, codes,
+      <div class="corps"><b>Onze tables sont dedans</b> : apporteurs, codes,
       attributions, événements de facturation, commissions, commissions
-      archivées, mesures de scan, parcours d'entrée, quarantaine et journal
-      d'alerte.<br><br>
-      <b>Quatre en sont exclues, et chacune pour un motif :</b> la base des
+      archivées, mesures de scan, parcours d'entrée, quarantaine, journal
+      d'alerte et <b>archive d'audience</b>.<br><br>
+      <b>Cinq en sont exclues, et chacune pour un motif :</b> la base des
       médicaments (15&nbsp;846 lignes reconstructibles depuis un fichier du
       dépôt — prouvé le 10/09, empreinte identique) ; le compteur anti-abus
       (il contient des adresses IP, elles n'ont rien à faire sur un poste de
-      travail) ; le tampon de tentatives (vidé en permanence) ; et le journal
-      des sauvegardes lui-même.<br><br>
+      travail) ; le tampon de tentatives (vidé en permanence) ; le journal
+      des sauvegardes lui-même ; et le journal des passages d'archivage, qui
+      est le carnet de bord du dispositif, pas une donnée.<br><br>
       <b>Le fichier ne fusionne pas, il restaure.</b> Chaque table y forme une
       section qui <b>refuse de s'exécuter</b> si la table n'est pas vide, vérifie
       que la structure n'a pas changé, puis recompte et re-empreinte ce qu'elle a
@@ -1059,14 +1060,14 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // CINQ CONTROLES, ET LE TELECHARGEMENT EST REFUSE SI UN SEUL ECHOUE.
   // Une sauvegarde incomplete EN SILENCE est pire que pas de sauvegarde : on
   // croit avoir une copie, on ne l'ouvre que le jour ou tout est perdu.
-  var TABLES_ATTENDUES = 10;
+  var TABLES_ATTENDUES = 11;
   // ⚠️ L'ORDRE EST IMPOSE PAR LES CLES ETRANGERES, il n'est PAS alphabetique.
-  // Sans ce controle, la page acceptait « dix lignes » sans regarder LESQUELLES :
+  // Sans ce controle, la page acceptait « onze lignes » sans regarder LESQUELLES :
   // une table remplacee par une autre, ou un ordre change, produisait un fichier
   // d'apparence complete et impossible a restaurer.
   var TABLES_ORDRE = ['apporteurs','codes','attributions','evenements_facturation',
     'commissions','commissions_archivees','scan_metrics','parcours_entree',
-    'evenements_quarantaine','journal_alerte_quarantaine'];
+    'evenements_quarantaine','journal_alerte_quarantaine','audience_lectures'];
 
   function octetsTexte(n){
     if(n == null) return '—';
@@ -1174,7 +1175,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
              + rows[i].nb_lignes + ';');
       L.push('  end if;');
     }
-    L.push("  raise notice 'RESTAURATION COMPLETE : les 10 tables sont conformes.';");
+    L.push("  raise notice 'RESTAURATION COMPLETE : les " + rows.length
+           + " tables sont conformes.';");
     L.push('end $pilou$;');
     L.push('commit;');
     L.push('-- ==== FIN controle final ====');
@@ -1278,7 +1280,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       if(r.error) throw r.error;
       var rows = r.data || [];
 
-      // CONTROLE 1 — dix tables, ni plus ni moins.
+      // CONTROLE 1 — onze tables, ni plus ni moins.
       if(rows.length !== TABLES_ATTENDUES){
         throw new Error('la base a rendu ' + rows.length + ' table(s) au lieu de '
           + TABLES_ATTENDUES + '. Fichier NON écrit.');
@@ -1308,7 +1310,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       var nom = nomDuJour();
       var f = construire(rows, nom);
 
-      // CONTROLE 5 — les dix sections, plus celle de controle, sont bien la.
+      // CONTROLE 5 — les onze sections, plus celle de controle, sont bien la.
       var marqueurs = (f.texte.match(/^-- ==== DEBUT /gm) || []).length;
       if(marqueurs !== TABLES_ATTENDUES + 1){
         throw new Error('le fichier porte ' + marqueurs + ' section(s) au lieu de '

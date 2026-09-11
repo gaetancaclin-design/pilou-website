@@ -375,6 +375,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   <section id="s-audience">
     <div class="titre"><h2>Audience</h2><span class="sous">archive RevenueCat</span></div>
+    <p class="note">La collecte est <b>manuelle</b> : rien ne se déclenche tout seul. Une fois
+    par semaine suffit. <b>Au-delà de 28 jours sans collecte</b>, les jours de clients actifs
+    deviennent définitivement illisibles chez RevenueCat.</p>
+    <p style="margin:14px 0 0">
+      <button type="button" id="btn-collecte">Collecter l'audience maintenant</button>
+    </p>
+    <div id="collecte-resultat" role="status"></div>
     <div class="cadre" id="cadre-audience-etat"></div>
     <div class="cadre" id="cadre-audience-jours"></div>
     <div class="cadre" id="cadre-audience-mesures"></div>
@@ -1373,6 +1380,86 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return (v == null) ? 'vide' : String(v);
   }
 
+  function direCollecte(classe, texte){
+    $('collecte-resultat').className = 'etat ' + classe;
+    $('collecte-resultat').innerHTML = '<span class="pastille"></span><div>' + texte + '</div>';
+    $('collecte-resultat').style.marginTop = '14px';
+  }
+
+  // ⚠️ ON N'EMPLOIE PAS `sb.functions.invoke` : il ajoute ses propres en-tetes
+  // et masque le code HTTP, or ici le code EST l'information (409 = deja
+  // collecte aujourd'hui, 401 = session non reconnue). On envoie donc
+  // exactement deux en-tetes, et rien d'autre.
+  // Aucun secret ne circule : c'est le jeton de VOTRE session, verifie cote
+  // serveur par la fonction, qui demande a Supabase qui en est le porteur.
+  function collecter(){
+    var b = $('btn-collecte');
+    if(b.disabled) return;
+    b.disabled = true;
+    direCollecte('ok', '<b>Collecte en cours…</b> Onze séries à lire chez RevenueCat, '
+      + 'puis l’écriture. Comptez une dizaine de secondes. Ne fermez pas la page.');
+
+    var debut = Date.now();
+    sb.auth.getSession().then(function(s){
+      var jeton = (s && s.data && s.data.session) ? s.data.session.access_token : null;
+      if(!jeton) throw new Error('SESSION');
+      return fetch(URL_PROJET + '/functions/v1/archiver-audience', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + jeton, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jours: 45 })
+      });
+    }).then(function(r){
+      return r.text().then(function(t){
+        var o = null;
+        try { o = t ? JSON.parse(t) : null; } catch(_) { o = null; }
+        return { code: r.status, corps: o, brut: t };
+      });
+    }).then(function(x){
+      var sec = Math.round((Date.now() - debut) / 100) / 10;
+      var o = x.corps || {};
+      if(x.code === 200){
+        var partiel = (o.etat === 'partiel');
+        direCollecte(partiel ? 'attention' : 'ok',
+          '<b>Collecte terminée' + (partiel ? ' — partielle' : '') + '.</b> '
+          + ech(nb(o.series_lues)) + ' série(s) lue(s), <b>' + ech(nb(o.lignes_ajoutees))
+          + '</b> ligne(s) ajoutée(s), ' + ech(nb(o.revisions_refusees))
+          + ' révision(s) refusée(s), en ' + sec + ' s.'
+          + (o.motif ? '<br>Détail : ' + ech(String(o.motif)) : '')
+          + (partiel ? '<br>Une série au moins n’a pas été lue. Sans gravité si cela ne se '
+                     + 'répète pas — la prochaine collecte rattrapera.' : ''));
+        // On recharge la console pour que les tableaux montrent les nouvelles
+        // lignes. Le message ci-dessus, lui, n'est PAS reecrit : c'est la
+        // lecon du banc du 10/09 sur l'empreinte de sauvegarde effacee.
+        charger();
+      } else if(x.code === 409){
+        direCollecte('attention',
+          '<b>Déjà collecté aujourd’hui.</b> Une seule collecte réussie par jour : '
+          + 'c’est un garde-fou, pas une panne. Revenez demain. '
+          + 'Si la collecte du jour avait échoué, elle serait rejouable — dites-le-moi.');
+        b.disabled = false;
+      } else if(x.code === 401){
+        direCollecte('critique',
+          '<b>Session non reconnue.</b> Déconnectez-vous et reconnectez-vous, puis '
+          + 'réessayez. Aucune ligne n’a été écrite.');
+        b.disabled = false;
+      } else {
+        direCollecte('critique',
+          '<b>Collecte en échec (code ' + ech(String(x.code)) + ').</b> '
+          + ech(o.motif ? String(o.motif) : (x.brut || 'pas de détail').slice(0, 300))
+          + '<br>Le passage est enregistré en erreur : vous pouvez réessayer.');
+        b.disabled = false;
+      }
+    }).catch(function(e){
+      var m = String(e && e.message ? e.message : e);
+      direCollecte('critique', m === 'SESSION'
+        ? '<b>Votre session a expiré.</b> Reconnectez-vous, puis réessayez.'
+        : '<b>La requête n’est pas partie.</b> ' + ech(m)
+          + '<br>Réseau, ou blocage du navigateur. <b>Aucune ligne n’a été écrite</b> — '
+          + 'un appel qui ne part pas ne peut rien archiver.');
+      b.disabled = false;
+    });
+  }
+
   function rendreAudience(e, jours, mesures){
     rendreAudienceEtat(e);
     rendreAudienceJours(jours, mesures);
@@ -1672,6 +1759,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   });
   $('btn-recharger').addEventListener('click', charger);
   $('btn-sauvegarde').addEventListener('click', sauvegarder);
+  $('btn-collecte').addEventListener('click', collecter);
 
   // Repliage : delegue, donc il survit a chaque rechargement des tableaux.
   document.addEventListener('click', function(ev){

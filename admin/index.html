@@ -403,7 +403,15 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       « en cours » : elle est provisoire et changera.<br><br>
       Les totaux ne sont affichés que pour les <b>flux</b> (des arrivées, qui s'additionnent).
       Additionner des <b>effectifs</b> — clients actifs, essais en cours — ne veut rien dire, et
-      la console ne le fait donc jamais.</div></details>
+      la console ne le fait donc jamais.<br><br>
+      <b>« Déjà vus » = actifs moins nouveaux.</b> C'est le nombre de personnes actives ce
+      jour-là qui étaient <b>déjà connues</b> — le plus proche substitut d'un usage régulier
+      sans rien mesurer dans l'application. <b>Mesure du 20 août : 92 actifs, dont 87
+      nouveaux, donc 5 déjà vus.</b> Le chiffre « 92 » ne désignait presque que du passage.
+      ⚠️ « Déjà vu » n'est pas « quotidien », et RevenueCat compte des <b>installations</b>,
+      pas des personnes. <b>Rien ici ne dit si quelqu'un saisit un traitement ou prend ses
+      médicaments</b> : cette mesure n'existe pas, et elle a été écartée le 20/08 parce
+      qu'elle porterait sur une donnée de santé.</div></details>
   </section>
 
   <section id="s-sauvegarde">
@@ -718,7 +726,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       afficherEtat('ok','Rien à signaler. ',
         'Les quinze vues répondent et aucun voyant n’est allumé.');
     }
-    rendreResume(d.resume, d.alertes);
+    rendreResume(d.resume, d.audJours);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent);
     rendreScans(d.scans);
@@ -956,9 +964,33 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return h + '</div>';
   }
 
-  function rendreResume(r){
+  // Somme d'une colonne d'audience sur les N derniers jours REVOLUS (le jour en
+  // cours est incomplet : l'inclure ferait baisser tous les totaux chaque matin).
+  // Rend null si aucun jour n'est exploitable — un total sur rien n'est pas zero.
+  function sommeAudience(jours, colonne, n){
+    if(!jours || !jours.length) return null;
+    var auj = new Date().toISOString().slice(0, 10), t = 0, vus = 0;
+    for(var i = 0; i < jours.length && vus < n; i++){
+      var g = jours[i];
+      if(g.jour >= auj) continue;              // jour en cours : ecarte
+      if(g[colonne] == null) { vus++; continue; }
+      t += Number(g[colonne]); vus++;
+    }
+    return vus ? t : null;
+  }
+
+  function ligneAudience(jours, quand){
+    if(!jours) return null;
+    for(var i = 0; i < jours.length; i++) if(jours[i].jour === quand) return jours[i];
+    return null;
+  }
+
+  function rendreResume(r, audJours){
     if(!r){ $('resume').innerHTML = ''; $('resume-note').innerHTML = ''; return; }
     var h = '', aJour = ('installations_30j' in r && r.installations_30j != null);
+    var hier = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    var gHier = ligneAudience(audJours, hier);
+    var rcNouveaux30 = sommeAudience(audJours, 'nouveaux', 30);
 
     // ⚠️ LE GRAND CHIFFRE EST CELUI DES 30 DERNIERS JOURS, PAS LE CUMUL.
     // Un cumul ne fait que monter, il compte des installations depuis longtemps
@@ -976,8 +1008,42 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + 'un zéro est banal.<br><br>Ce sont des <b>arrivées, pas un parc</b> : personne n’est '
       + 'retiré quand il désinstalle. Ni des téléchargements, ni des personnes — une '
       + 'réinstallation compte deux fois. Les installations d’avant la 1.4.3 et celles '
-      + 'opposées à la mesure ne comptent pas.<br><br>Téléchargements, désinstallations et '
-      + 'utilisateurs réguliers : <b>Play Console et App Store Connect</b>.');
+      + 'opposées à la mesure ne comptent pas.'
+      + (rcNouveaux30 != null
+          ? '<br><br>🔴 <b>Notre compteur ne voit qu’une partie des arrivées.</b> Sur les '
+            + '30 derniers jours, RevenueCat en a vu <b>' + rcNouveaux30 + '</b>. L’écart '
+            + 'vient des versions antérieures à la 1.4.3, des oppositions à la mesure, et '
+            + 'des signalements qui ne sont jamais arrivés. <b>Notre mesure n’a rien vu '
+            + 'avant le ' + ech(jourTexte(r.mesure_depuis)) + '.</b>'
+          : '')
+      + '<br><br>Téléchargements et désinstallations : <b>Play Console</b>. '
+      + 'Les personnes qui <b>reviennent</b>, elles, sont mesurées ci-contre.');
+
+    // ⚠️ AJOUTE LE 11/09, SUR UNE OBJECTION DE GAETAN, ET ELLE ETAIT JUSTE.
+    // « Clients actifs » ne distingue pas quelqu'un qui decouvre l'application
+    // de quelqu'un qui s'en sert. MESURE : le 20/08, 92 actifs dont 87 nouveaux
+    // — le chiffre disait 92 et ne designait que du passage. Le grand chiffre
+    // est donc REVENANTS = actifs - nouveaux, et « actifs » passe en detail.
+    if(gHier && gHier.revenants != null){
+      var rev = Number(gHier.revenants);
+      var moy = sommeAudience(audJours, 'revenants', 7);
+      h += res('Personnes qui reviennent', nb(gHier.revenants),
+        [['Actifs hier', nb(gHier.actifs)],
+         ['dont nouveaux', nb(gHier.nouveaux)],
+         ['Moyenne 7 jours', moy == null ? '—' : (Math.round(moy / 7 * 10) / 10)],
+         ['Hier', ech(jourTexte(hier)), true]],
+        'Parmi les personnes actives hier, celles qui étaient <b>déjà connues</b>. '
+        + 'C’est le plus proche substitut d’un usage régulier que l’on puisse obtenir '
+        + '<b>sans rien mesurer dans l’application</b>.<br><br>'
+        + '⚠️ « Déjà connue » n’est pas « quotidienne » : quelqu’un vu il y a trois '
+        + 'semaines et revenu hier compte ici. RevenueCat compte des <b>installations</b>, '
+        + 'pas des personnes.<br><br>'
+        + '🔴 <b>Ce chiffre ne dit rien sur la saisie d’un traitement, ni sur le fait que '
+        + 'quelqu’un prenne ses médicaments.</b> Cette mesure-là n’existe pas, et sa '
+        + 'création a été écartée le 20/08 — c’est une donnée de santé.<br><br>'
+        + 'Le jour en cours n’est pas affiché : il est incomplet jusqu’à minuit UTC.',
+        rev < 0);
+    }
 
     var vus = r.acces_offerts_vus_par_revenuecat;
     var ecart = r.acces_offerts_en_cours - vus;
@@ -1526,14 +1592,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           { texte: jourTexte(r.jour) + (prov ? ' *' : '') },
           { texte: caseAudience(r.nouveaux_lu, r.nouveaux) },
           { texte: caseAudience(r.actifs_lu,   r.actifs) },
-          { texte: caseAudience(r.essais_lu,   r.essais) }
+          // « Reviennent » prend la place des essais : un essai unique depuis le
+          // 03/09 n'apprend rien de jour en jour, et il reste lisible dans le
+          // tableau des mesures juste en dessous.
+          { texte: (r.actifs_lu && r.nouveaux_lu) ? caseAudience(1, r.revenants) : '—' }
         ]
       });
     }
     // Legende dans le cap : elle s'enroule, elle ne deborde pas. Les COLONNES,
     // elles, debordaient en 390 px — mesure au banc le 11/09.
-    c.innerHTML = tableau('Jour par jour — * jour en cours, « — » jamais lu, « vide » lu sans valeur',
-      ['Jour','Nouveaux','Actifs','Essais'], lignes, 'aucune donnée', 14);
+    c.innerHTML = tableau('Jour par jour — « déjà vus » = actifs moins nouveaux · * jour en cours · « — » jamais lu',
+      ['Jour','Nouveaux','Actifs','Déjà vus'], lignes, 'aucune donnée', 14);
   }
 
   function rendreAudienceMesures(rows){

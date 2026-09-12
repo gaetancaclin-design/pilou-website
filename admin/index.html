@@ -505,6 +505,36 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     if(i < 0 || i > 11) return jourTexte(v);
     return NOMS_MOIS[i] + " " + m[1];
   }
+  /**
+   * La collecte des mesures de scan tourne-t-elle encore ?
+   *
+   * La tâche d'archivage a été ARRÊTÉE le 12/09/2026, en application de la
+   * décision du 09/09 : elle était exécutée par un service hors de l'Union et
+   * lisait les journaux de l'hébergeur, qui portent l'adresse IP.
+   * `collected_at` ne bouge donc plus.
+   *
+   * ⚠️ SANS CETTE FONCTION, DEUX VOYANTS MENTENT, ET DANS LES DEUX SENS.
+   *
+   *  • « Échecs silencieux de scan » compare les appels engagés aux réponses
+   *    archivées sur une fenêtre calée sur le dernier archivage. Figée, la
+   *    fenêtre se vide : les deux compteurs tombent à zéro, l'écart vaut zéro,
+   *    et le voyant annonce « tout appel engagé a sa réponse » — pour toujours,
+   *    sans rien mesurer. Un faux « rien à signaler » est pire qu'une alerte.
+   *  • « Archivage des mesures » compte comme « en retard » tout scan engagé
+   *    postérieur au dernier scan archivé. Cette date est figée : chaque
+   *    nouveau scan deviendra « en retard » et le restera.
+   *
+   * Seuil à 12 h : la tâche passait toutes les 6 h. Deux cycles manqués, c'est
+   * un arrêt, pas un retard. Fonction PURE -> vérifiable hors navigateur.
+   */
+  var HEURES_AVANT_ARRET_COLLECTE = 12;
+  function collecteScanArretee(dernierArchivage, maintenant){
+    if(!dernierArchivage) return true;
+    var t = new Date(dernierArchivage).getTime();
+    if(!isFinite(t)) return true;
+    var ref = (maintenant == null) ? Date.now() : maintenant;
+    return (ref - t) / 3600000 > HEURES_AVANT_ARRET_COLLECTE;
+  }
   function heuresDepuis(v){
     if(!v) return Infinity;
     return (Date.now() - new Date(v).getTime()) / 3600000;
@@ -743,7 +773,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     rendreResume(d.resume, d.audJours);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent);
-    rendreScans(d.scans);
+    rendreScans(d.scans, d.alertes);
     rendreParcours(d.parcours);
     rendreInstallationsJour(d.instJour);
     rendreCodes(d.codes);
@@ -795,13 +825,26 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
     // 4. Ecart de scan. Un ecart NEGATIF n'est pas un bon signe : c'est le
     //    signe que le calcul ne tient plus. Orange, jamais vert.
-    var e = a.ecart_scans;
-    var etatEcart = (e == null) ? 'attention' : (e < 0 ? 'attention' : (e > 0 ? 'critique' : 'ok'));
-    h += ind('Échecs silencieux de scan',
-          (e == null || e < 0) ? 'non calculable' : String(e), etatEcart,
-          (e < 0 ? 'Écart négatif : bord de purge ou collecteur en avance. '
-                 : (e > 0 ? 'Des scans engagés sans réponse enregistrée. ' : 'Tout appel engagé a sa réponse. '))
-          + a.appels_engages_comparables + ' engagés / ' + a.reponses_comparables + ' réponses.');
+    // ⚠️ LA COLLECTE EST-ELLE ARRÊTÉE ? Voir `collecteScanArretee` plus haut :
+    // sans ce test, les deux voyants qui suivent deviennent faux le lendemain
+    // de l'arrêt, et rien ne le signale.
+    var scanArrete = collecteScanArretee(a.dernier_archivage);
+
+    if(scanArrete){
+      h += ind('Échecs silencieux de scan', 'mesure arrêtée', 'ok',
+            'La collecte des mesures de scan est arrêtée depuis le '
+            + quandTexte(a.dernier_archivage)
+            + '. Ce voyant ne mesure plus rien : il ne dit ni « tout va bien », '
+            + 'ni le contraire.');
+    } else {
+      var e = a.ecart_scans;
+      var etatEcart = (e == null) ? 'attention' : (e < 0 ? 'attention' : (e > 0 ? 'critique' : 'ok'));
+      h += ind('Échecs silencieux de scan',
+            (e == null || e < 0) ? 'non calculable' : String(e), etatEcart,
+            (e < 0 ? 'Écart négatif : bord de purge ou collecteur en avance. '
+                   : (e > 0 ? 'Des scans engagés sans réponse enregistrée. ' : 'Tout appel engagé a sa réponse. '))
+            + a.appels_engages_comparables + ' engagés / ' + a.reponses_comparables + ' réponses.');
+    }
 
     // 5. ⚠️ CORRIGE LE 10/09 — ON MESURE UN MANQUE, PLUS UN AGE.
     // L'ancienne version lisait l'age de la derniere INSERTION. Or
@@ -813,7 +856,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // Maintenant : en retard SEULEMENT s'il existe un scan ENGAGE posterieur
     // au dernier evenement archive et deja vieux de plus de huit heures — soit
     // plus d'un cycle complet de la tache, qui passe toutes les six heures.
-    if('engagees_non_archivees' in a && a.engagees_non_archivees != null){
+    if(scanArrete){
+      h += ind('Archivage des mesures', 'arrêté', 'ok',
+            'Tâche arrêtée le 12/09/2026, décision du 09/09 : elle lisait les '
+            + 'journaux de l’hébergeur depuis un service hors de l’Union. '
+            + 'Dernier archivage le ' + quandTexte(a.dernier_archivage)
+            + '. Le tableau des scans reste un historique, plus une mesure.');
+    } else if('engagees_non_archivees' in a && a.engagees_non_archivees != null){
       var manque = a.engagees_non_archivees;
       h += ind('Archivage des mesures',
             manque > 0 ? (manque + ' en retard') : 'à jour',
@@ -1141,7 +1190,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + '<div class="rien">Une ligne par <b>mois</b> et par type d\u2019\u00e9v\u00e9nement \u2014 ce n\u2019est pas un \u00e9v\u00e9nement par ligne. Le webhook RevenueCat est branch\u00e9 depuis le <b>8 septembre 2026</b> : rien d\u2019ant\u00e9rieur ne figure ici.</div>';
   }
 
-  function rendreScans(rows){
+  function rendreScans(rows, alertes){
     var lignes = (rows||[]).map(function(r){
       var nc = r.non_classes;
       return { cases:[
@@ -1157,10 +1206,21 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         {texte: (r.latence_max_s == null) ? '—' : r.latence_max_s + ' s'}
       ]};
     });
+    // ⚠️ La collecte est arrêtée depuis le 12/09/2026 : ce tableau est un
+    // HISTORIQUE, plus une mesure en cours. Sans cette mention, il se viderait
+    // tout seul au fil des 60 jours de la fenêtre, et se lirait comme
+    // « plus aucun scan » — c'est-à-dire comme une panne du produit.
+    var arret = collecteScanArretee(alertes ? alertes.dernier_archivage : null);
     $('cadre-scans').innerHTML = tableau('Scans par jour',
       ['Jour','Tentatives','Réussites','Refus 4xx','Délai dépassé','Autres 5xx',
        'Non classés','Latence médiane','Min','Max'],
-      lignes, 'aucun scan sur 60 jours', 12);
+      lignes, arret ? 'collecte arrêtée — plus aucune mesure enregistrée' : 'aucun scan sur 60 jours', 12)
+      + (arret
+          ? '<div class="rien">⚠️ <b>Collecte arrêtée le 12/09/2026</b> (décision du 09/09 : '
+            + 'la tâche lisait les journaux de l’hébergeur depuis un service hors de l’Union). '
+            + 'Ce tableau montre ce qui a été mesuré JUSQUE-LÀ, sur une fenêtre de 60 jours : '
+            + 'il se videra de lui-même, et cela ne voudra pas dire qu’il n’y a plus de scans.</div>'
+          : '');
   }
 
   function rendreParcours(rows){

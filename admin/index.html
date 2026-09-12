@@ -491,6 +491,20 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     if(m) return m[3]+"/"+m[2]+"/"+m[1].slice(2);
     return fmtJour.format(new Date(v));
   }
+  // La colonne `mois` de v_admin_argent_mois est le PREMIER JOUR du mois
+  // (date_trunc). L'afficher en jj/mm/aa la fait lire comme une date
+  // d'evenement -- c'est arrive le 12/09/2026. On ecrit le mois en toutes
+  // lettres, jamais un jour.
+  var NOMS_MOIS = ["janvier","f\u00e9vrier","mars","avril","mai","juin",
+    "juillet","ao\u00fbt","septembre","octobre","novembre","d\u00e9cembre"];
+  function moisTexte(v){
+    if(!v) return "\u2014";
+    var m = /^(\d{4})-(\d{2})-\d{2}/.exec(String(v));
+    if(!m) return jourTexte(v);
+    var i = parseInt(m[2], 10) - 1;
+    if(i < 0 || i > 11) return jourTexte(v);
+    return NOMS_MOIS[i] + " " + m[1];
+  }
   function heuresDepuis(v){
     if(!v) return Infinity;
     return (Date.now() - new Date(v).getTime()) / 3600000;
@@ -1111,7 +1125,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   function rendreArgent(rows){
     var lignes = (rows||[]).map(function(r){
       return { cases:[
-        {texte: jourTexte(r.mois)},
+        {texte: moisTexte(r.mois)},
         {html: envEtiq(r.environnement)},
         {html: traduit(MAGASINS, r.store)},
         {html: produitTexte(r.product_id)},
@@ -1123,7 +1137,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     });
     $('cadre-argent').innerHTML = tableau('Événements de facturation',
       ['Mois','Environnement','Magasin','Produit','Type','Événements','Montant brut'],
-      lignes, 'aucun événement enregistré', 12);
+      lignes, 'aucun événement enregistré', 12)
+      + '<div class="rien">Une ligne par <b>mois</b> et par type d\u2019\u00e9v\u00e9nement \u2014 ce n\u2019est pas un \u00e9v\u00e9nement par ligne. Le webhook RevenueCat est branch\u00e9 depuis le <b>8 septembre 2026</b> : rien d\u2019ant\u00e9rieur ne figure ici.</div>';
   }
 
   function rendreScans(rows){

@@ -770,7 +770,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       afficherEtat('ok','Rien à signaler. ',
         'Les quinze vues répondent et aucun voyant n’est allumé.');
     }
-    rendreResume(d.resume, d.audJours);
+    rendreResume(d.resume, d.audJours, d.alertes);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent);
     rendreScans(d.scans, d.alertes);
@@ -1048,7 +1048,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return null;
   }
 
-  function rendreResume(r, audJours){
+  function rendreResume(r, audJours, alertes){
     if(!r){ $('resume').innerHTML = ''; $('resume-note').innerHTML = ''; return; }
     var h = '', aJour = ('installations_30j' in r && r.installations_30j != null);
     var hier = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
@@ -1133,9 +1133,25 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + 'qu’une au moins n’est jamais arrivée. Pour un état des ventes qui fait foi, la '
       + 'référence reste le tableau de bord RevenueCat.');
 
-    h += res('Scans sur 30 jours', nb(r.scans_30j),
+    // ⚠️ CE CHIFFRE DESCEND TOUT SEUL DEPUIS L'ARRÊT DE LA COLLECTE.
+    // Il compte les scans des 30 derniers jours. La collecte étant arrêtée le
+    // 12/09/2026, plus aucune ligne ne s'ajoute : dans 30 jours il vaudra
+    // ZÉRO, et se lira comme « plus personne ne scanne » — c'est-à-dire comme
+    // une panne du produit. Le libellé doit donc le dire, sinon le tableau de
+    // bord ment par omission.
+    var scanArreteResume = collecteScanArretee(alertes ? alertes.dernier_archivage : null);
+    h += res(scanArreteResume ? 'Scans sur 30 jours — mesure arrêtée' : 'Scans sur 30 jours',
+      nb(r.scans_30j),
       [['Réussis', nb(r.scans_30j_reussis)]],
-      '<b>Vos appareils de test sont comptés dedans</b>, et on ne peut pas les séparer : la '
+      (scanArreteResume
+        ? '🔴 <b>La collecte des mesures de scan est arrêtée depuis le 12/09/2026</b> '
+          + '(décision du 09/09 : la tâche lisait les journaux de l’hébergeur depuis un '
+          + 'service hors de l’Union). Ce chiffre ne compte plus que ce qui a été mesuré '
+          + '<b>avant</b> l’arrêt, sur une fenêtre glissante de 30 jours : <b>il descendra '
+          + 'jusqu’à zéro de lui-même</b>. Zéro ne voudra pas dire « plus personne ne '
+          + 'scanne ».<br><br>'
+        : '')
+      + '<b>Vos appareils de test sont comptés dedans</b>, et on ne peut pas les séparer : la '
       + 'table de mesure ne porte aucune colonne d’appareil.<br><br>Ne comptent que les scans '
       + 'ayant <b>reçu une réponse</b>. Un scan engagé resté sans réponse ne figure pas ici — '
       + 'c’est le voyant « échecs silencieux ».');

@@ -689,8 +689,23 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     { cle:'audMesures',   vue:'v_admin_audience_mesures',      ordre:{col:'graphique', asc:true} }
   ];
 
+  // ── UN ETAT QUE PLUSIEURS BLOCS PARTAGENT (13/09/2026, lot 2) ─────────────
+  //
+  // `donneesCourantes` : le dernier jeu de donnees rendu. Un clic sur une puce
+  // de filtre doit redessiner le grand chiffre du haut, pas seulement le tableau
+  // du bas — sinon la page afficherait deux totaux contradictoires.
+  //
+  // ⚠️ IL N'Y A PLUS D'HORLOGE ICI, ET C'EST VOULU. Une premiere version du lot 2
+  // retenait l'heure rendue par le temoin pour calculer les fenetres. La revue
+  // adverse a montre deux defauts : le temoin est lu dans un ALLER-RETOUR
+  // SEPARE des vues, donc un minuit UTC tombant entre les deux allumait le bloc
+  // rouge pour rien ; et le repli sur l'horloge du POSTE, en cas de temoin
+  // illisible, ramenait exactement le risque que le commentaire disait ecarter.
+  // La date de reference vient desormais de `v_admin_resume` lui-meme.
+  var donneesCourantes = null;
+
   function charger(){
-    $('btn-recharger').disabled = true;
+        $('btn-recharger').disabled = true;
     $('horodatage').textContent = 'chargement…';
 
     // ⚠️ LE TEMOIN D'ABORD. Si la garde se refermait, toutes les autres vues
@@ -709,6 +724,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         return null;
       }
       masquerBlocs(false);
+
       afficherEtat('ok','Console ouverte. ',
         'Les quatorze vues répondent. Les chiffres ci-dessous sont ceux de la base.');
       return Promise.all(VUES.map(function(v){ return lire(v.vue, v.ordre); }));
@@ -735,6 +751,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   // ── Rendu ─────────────────────────────────────────────────────────────────
   function rendre(d){
+    // ⚠️ L'ORDRE COMPTE. Le resume calcule desormais ses trois chiffres de
+    // demarrages a partir des lignes du parcours ET du filtre en cours. Les deux
+    // doivent donc etre prets AVANT le premier rendu, et pas seulement avant le
+    // tableau du bas, qui est dessine plus loin.
+    donneesCourantes = d;
+    preparerParcours(d.parcoursJour);
+
     var compte = rendreAlertes(d.alertes, d.sauvegarde,
                                { etat: d.audEtat, mesures: d.audMesures });
     rendreSauvegarde(d.sauvegarde);
@@ -760,7 +783,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent);
     rendreParcours(d.parcours);
-    rendreParcoursJour(d.parcoursJour);
+    rendreParcoursJour();
     rendreCodes(d.codes);
     rendreAccesOfferts(d.acces);
     rendreAttributions(d.attributions);
@@ -1017,7 +1040,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   function rendreResume(r, audJours, alertes){
     if(!r){ $('resume').innerHTML = ''; $('resume-note').innerHTML = ''; return; }
-    var h = '', aJour = ('installations_30j' in r && r.installations_30j != null);
+    var h = '';
     var hier = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
     var gHier = ligneAudience(audJours, hier);
     var rcNouveaux30 = sommeAudience(audJours, 'nouveaux', 30);
@@ -1026,19 +1049,91 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // Un cumul ne fait que monter, il compte des installations depuis longtemps
     // supprimees, et il ne se compare a rien. « Combien de nouveaux ce mois-ci »
     // se compare au mois d'avant. Le cumul reste, en bas, en petit.
-    h += res('Nouveaux démarrages · 30 jours',
-      aJour ? nb(r.installations_30j) : nb(r.installations_mesurees),
-      aJour
-        ? [['7 jours', nb(r.installations_7j)],
-           ['Aujourd’hui', nb(r.installations_aujourd_hui)],
-           ['Total', nb(r.installations_mesurees), true]]
-        : [['Total', nb(r.installations_mesurees), true]],
-      'Une ligne par <b>installation</b>, envoyée une seule fois, une à cinq minutes après '
+    // ⚠️ CE CHIFFRE OBEIT AUX PUCES DE VERSION (13/09/2026, lot 2).
+    // Il etait calcule par la base, qui ne sait pas quelle version est publiee :
+    // le 13/09 « aujourd'hui » valait 2, et ces deux-la etaient le telephone de
+    // test. Il est maintenant calcule ICI, a partir des memes lignes et du meme
+    // filtre que le tableau du bas. Les deux ne peuvent plus se contredire.
+    //
+    // ⚠️ ET LA PAGE VERIFIE SON PROPRE CALCUL — MAIS SEULEMENT QUAND ELLE LE PEUT.
+    // Trois refus de revue adverse tiennent dans les lignes qui suivent :
+    //   • le ✅ « verifie identique » ne peut PLUS s'afficher sans qu'une
+    //     comparaison ait reellement eu lieu ;
+    //   • les trois compteurs de la base doivent etre presents ET entiers finis.
+    //     Avant, `Number(undefined)` donnait NaN, NaN n'est egal a rien, et le
+    //     bloc rouge s'allumait a tort en affichant « 41 / NaN / 2 » ;
+    //   • la comparaison n'est desactivee que si le filtre change VRAIMENT
+    //     quelque chose — une version decochee sans aucune ligne dans la fenetre
+    //     ne doit pas faire renoncer la page a se verifier.
+    function entierOuNul(v){
+      if(v === null || v === undefined || v === '') return null;
+      var x = Number(v);
+      return isFinite(x) ? x : null;
+    }
+    var parc    = demarragesFiltres(r.jour_serveur);
+    var calcule = !parc.cause;
+    var b30 = entierOuNul(r.installations_30j),
+        b7  = entierOuNul(r.installations_7j),
+        bAu = entierOuNul(r.installations_aujourd_hui);
+    var base = (b30 !== null && b7 !== null && bAu !== null) ? { j30:b30, j7:b7, auj:bAu } : null;
+
+    var memeRegle  = calcule && parc.ecartes === 0 && parc.reintegres === 0;
+    var comparable = calcule && base !== null && memeRegle;
+    var desaccord  = comparable &&
+      (parc.j30 !== base.j30 || parc.j7 !== base.j7 || parc.auj !== base.auj);
+
+    // ⚠️ CHAQUE REFUS DE CALCULER DIT SA PROPRE CAUSE. « la vue n'a rien rendu
+    // d'exploitable » couvrait trois situations opposees, dont une (tronquee au
+    // plafond de l'API) ou la vue avait justement rendu beaucoup trop.
+    var provenance;
+    if(!calcule){
+      provenance = '<br><br>⚠️ <b>Ce chiffre vient de la base et n’obéit PAS aux puces</b> : '
+        + (parc.cause === 'date'
+            ? 'la base n’a pas fourni sa date du jour. La migration du 13/09 n’est '
+              + 'probablement pas terminée — voir le voyant « Migration du 13/09 » plus haut.'
+            : parc.cause === 'vide'
+              ? 'la vue du parcours n’a rendu aucune ligne sur 90 jours.'
+              : 'la vue du parcours a rendu 1000 lignes, soit exactement le plafond de '
+                + 'l’API : elle est probablement <b>tronquée</b>, et tout total calculé ici '
+                + 'serait faux.')
+        + ' Il compte donc nos appareils de test signés pour le test interne, comme avant '
+        + 'le 13/09/2026.';
+    } else if(base === null){
+      provenance = '<br><br>⚠️ <b>Aucune comparaison n’a pu être faite</b> : la base n’a pas '
+        + 'fourni ses trois compteurs. Le chiffre affiché est celui calculé sur cette page, '
+        + 'et rien ne l’a confronté à autre chose.';
+    } else if(desaccord){
+      provenance = '';
+    } else if(!memeRegle){
+      // ⚠️ « ECARTER » ET « REINTEGRER » NE SONT PAS LA MEME CHOSE, et l'un fait
+      // MONTER le chiffre. Un texte unique laissait croire dans les deux cas que
+      // le vrai total etait plus haut.
+      provenance = '<br><br>🔶 <b>Vos puces changent ce chiffre : ce n’est pas celui de la base.</b>'
+        + (parc.ecartes
+            ? '<br>• <b>' + parc.ecartes + '</b> démarrage(s) <b>écarté(s)</b> par une version '
+              + 'décochée — le chiffre est donc plus BAS que celui de la base.'
+            : '')
+        + (parc.reintegres
+            ? '<br>• <b>' + parc.reintegres + '</b> démarrage(s) de <b>nos appareils de test</b>, '
+              + 'que vous avez réintégrés — le chiffre est donc plus HAUT que celui de la base.'
+            : '')
+        + '<br>Tant qu’une puce change quelque chose, la page ne se compare plus à la base.';
+    } else {
+      provenance = '<br><br>✅ <b>Aucune de vos puces ne change ce chiffre.</b> Il a été recalculé '
+        + 'sur cette page et <b>vérifié identique</b> à celui de la base. Les appareils marqués '
+        + '« test » en sont écartés, comme ils l’ont toujours été.';
+    }
+
+    var aide = 'Une ligne par <b>installation</b>, envoyée une seule fois, une à cinq minutes après '
       + 'le premier lancement. « Aujourd’hui » = signalements <b>arrivés</b> aujourd’hui ; '
       + 'un zéro est banal.<br><br>Ce sont des <b>arrivées, pas un parc</b> : personne n’est '
       + 'retiré quand il désinstalle. Ni des téléchargements, ni des personnes — une '
       + 'réinstallation compte deux fois. Les installations d’avant la 1.4.3 et celles '
       + 'opposées à la mesure ne comptent pas.'
+      + provenance
+      + '<br><br>⚠️ <b>« Total depuis le début » ne se filtre pas</b> : il vient de la base, '
+      + 'qui garde treize mois, alors que les puces ne portent que sur les <b>90 derniers '
+      + 'jours</b> chargés par cette page.'
       + (rcNouveaux30 != null
           ? '<br><br>🔴 <b>Notre compteur ne voit qu’une partie des arrivées.</b> Sur les '
             + '30 derniers jours, RevenueCat en a vu <b>' + rcNouveaux30 + '</b>. L’écart '
@@ -1046,16 +1141,41 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             + 'des signalements qui ne sont jamais arrivés. <b>Notre mesure n’a rien vu '
             + 'avant le ' + ech(jourTexte(r.mesure_depuis)) + '.</b>'
           : '')
-      + '<br><br>🔴 <b>CE CHIFFRE N’EST PAS FILTRÉ, et il compte nos propres essais.</b> '
-      + 'Le marquage « appareil de test » ne reconnaît pas une version signée pour le '
-      + 'test interne : c’est le fichier qui ira en production, il ne porte donc aucune '
-      + 'marque. Le 13/09/2026, les <b>deux</b> démarrages du jour étaient le téléphone '
-      + 'de test. <b>Le tableau du bas, lui, se filtre par version</b> — c’est le seul '
-      + 'endroit où vous pouvez écarter la vôtre. Si les deux se contredisent, c’est '
-      + 'celui du bas qui dit la vérité.'
       + '<br><br>Téléchargements et désinstallations : <b>Play Console</b>. '
-      + 'Les personnes qui <b>reviennent</b>, elles, sont mesurées ci-contre.');
+      + 'Les personnes qui <b>reviennent</b>, elles, sont mesurées ci-contre.';
 
+    if(desaccord){
+      h += res('Nouveaux démarrages — DEUX CHIFFRES EN DÉSACCORD', '?',
+        [['Calculé sur cette page', parc.j30 + ' / ' + parc.j7 + ' / ' + parc.auj],
+         ['Calculé par la base',    base.j30 + ' / ' + base.j7 + ' / ' + base.auj]],
+        'Lecture des deux lignes : <b>30 jours / 7 jours / aujourd’hui</b>.<br><br>'
+        + 'Aucune de vos puces ne change ce chiffre : les deux calculs devraient donner le '
+        + 'même résultat. Ils divergent — donc <b>cette page ne choisit pas</b>, et n’affiche '
+        + 'aucun des deux comme vrai.<br><br>Causes possibles : la fenêtre de la vue '
+        + '<code>v_admin_parcours_jour_version</code> a changé, ou l’une des deux sources a '
+        + 'été modifiée sans l’autre.<br><br><b>Ne décidez rien sur ces nombres tant que ce '
+        + 'bloc est affiché.</b><br><br>——<br><br>' + aide, true);
+    } else {
+      // ⚠️ UN CHIFFRE FILTRE LE DIT DANS SON TITRE. Le reglage est memorise dans
+      // le navigateur et survit a tous les rechargements : trois semaines plus
+      // tard, rien ne rappellerait qu'une version est decochee. La bulle « ? »
+      // ne suffit pas — il faut survoler pour la lire.
+      var lignesDetail = [];
+      if(calcule){
+        lignesDetail.push(['7 jours', String(parc.j7)]);
+        lignesDetail.push(['Aujourd’hui', String(parc.auj)]);
+        if(parc.ecartes)    lignesDetail.push(['Écartés par vos puces', String(parc.ecartes)]);
+        if(parc.reintegres) lignesDetail.push(['Appareils de test réintégrés', String(parc.reintegres)]);
+      } else if(base !== null){
+        lignesDetail.push(['7 jours', String(base.j7)]);
+        lignesDetail.push(['Aujourd’hui', String(base.auj)]);
+      }
+      lignesDetail.push(['Total depuis le début', nb(r.installations_mesurees), true]);
+
+      h += res('Nouveaux démarrages · 30 jours' + ((calcule && !memeRegle) ? ' — FILTRÉ' : ''),
+        calcule ? String(parc.j30) : (base !== null ? String(base.j30) : nb(r.installations_mesurees)),
+        lignesDetail, aide);
+    }
     // ⚠️ AJOUTE LE 11/09, SUR UNE OBJECTION DE GAETAN, ET ELLE ETAIT JUSTE.
     // « Clients actifs » ne distingue pas quelqu'un qui decouvre l'application
     // de quelqu'un qui s'en sert. MESURE : le 20/08, 92 actifs dont 87 nouveaux
@@ -1258,9 +1378,67 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return filtreParcours.versionsExclues[versionDe(r)] !== true;
   }
 
-  function rendreParcoursJour(rows){
+  /** Charge le filtre memorise et retient les lignes. Appele AVANT tout rendu. */
+  function preparerParcours(rows){
     if(!filtreCharge){ lireFiltreParcours(); filtreCharge = true; }
     lignesParcours = rows || [];
+  }
+
+  /**
+   * Les demarrages retenus par le filtre, sur les MEMES FENETRES que la base.
+   *
+   * ⚠️ LA DATE DE REFERENCE VIENT DE LA BASE, PAS D'UNE HORLOGE.
+   * `v_admin_resume` rend `current_date` sous le nom `jour_serveur`, evalue
+   * DANS LA MEME INSTRUCTION que les trois compteurs. Il ne peut donc pas y
+   * avoir de decalage entre le jour qui a servi a la base et celui qui sert ici,
+   * meme si minuit UTC tombe pendant le chargement. Si cette date manque, on ne
+   * calcule RIEN et on retombe honnetement sur les chiffres de la base — jamais
+   * sur l'horloge du poste, qui peut etre fausse d'un jour.
+   *
+   * ⚠️ LES BORNES SONT CELLES DE LA VUE, AU CARACTERE PRES :
+   *     30 jours    -> jour > jour_serveur - 30   (strict)
+   *      7 jours    -> jour > jour_serveur - 7    (strict)
+   *     aujourd'hui -> jour = jour_serveur
+   *
+   * `ecartes` et `reintegres` mesurent, SUR LA FENETRE DE 30 JOURS, ce que la
+   * regle locale traite autrement que la base : ce qu'elle ecarte et que la base
+   * aurait compte, ce qu'elle compte et que la base aurait ecarte. Quand les
+   * deux valent zero, les deux calculs DOIVENT tomber sur le meme resultat —
+   * c'est cela, et rien d'autre, qui autorise la comparaison. Une version
+   * decochee qui n'a plus aucune ligne dans la fenetre ne compte donc pas comme
+   * un filtre : elle ne change rien, et la page continue de se verifier.
+   *
+   * Rend soit `{ cause: … }` quand il n'y a rien a calculer, soit les comptes.
+   */
+  function demarragesFiltres(jourServeur){
+    if(typeof jourServeur !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(jourServeur))
+      return { cause:'date' };
+    var minuit = Date.parse(jourServeur + 'T00:00:00Z');
+    if(!isFinite(minuit))             return { cause:'date' };
+    if(lignesParcours.length === 0)   return { cause:'vide' };
+    if(lignesParcours.length >= 1000) return { cause:'tronquee' };
+
+    function jourUTC(n){ return new Date(minuit - n * 86400000).toISOString().slice(0, 10); }
+    var auj = jourServeur, b30 = jourUTC(30), b7 = jourUTC(7);
+
+    var t = { j30:0, j7:0, auj:0, ecartes:0, reintegres:0 };
+    for(var i=0;i<lignesParcours.length;i++){
+      var r = lignesParcours[i];
+      var n = Number(r.signalements) || 0;
+      var chezNous   = ligneRetenue(r);
+      var chezLaBase = (r.appareil_de_test === false);
+      var dans30     = (r.jour > b30);
+      if(dans30 && chezNous !== chezLaBase){
+        if(chezLaBase) t.ecartes += n; else t.reintegres += n;
+      }
+      if(!chezNous) continue;
+      if(dans30)         t.j30 += n;
+      if(r.jour > b7)    t.j7  += n;
+      if(r.jour === auj) t.auj += n;
+    }
+    return t;
+  }
+  function rendreParcoursJour(){
 
     // ⚠️ GARDE ANTI-TRONCATURE. PostgREST plafonne a 1000 lignes SANS LE DIRE.
     // Un tableau tronque en silence est pire qu'un tableau absent : on y lirait
@@ -1319,6 +1497,11 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         ecrireFiltreParcours();
         dessinerFiltresParcours();
         dessinerParcoursJour();
+        // ⚠️ LE GRAND CHIFFRE DU HAUT OBEIT AUX MEMES PUCES. Sans ce rappel, un
+        // clic laisserait en haut un total que le tableau du bas contredit.
+        if(donneesCourantes && donneesCourantes.resume){
+          rendreResume(donneesCourantes.resume, donneesCourantes.audJours, donneesCourantes.alertes);
+        }
       });
     }
   }

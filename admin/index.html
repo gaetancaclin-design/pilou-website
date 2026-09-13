@@ -250,6 +250,12 @@ tbody tr+tr td{border-top:1px solid var(--trait)}
 tbody tr.grisee td{color:var(--encre-3); font-style:italic}
 td.rouge{color:var(--critique); font-weight:650}
 td.vide{color:var(--encre-3)}
+/* ⚠️ ORANGE, PAS ROUGE (13/09/2026). « Sans net » signale un encaissement dont
+   un taux manque : il n'est pas perdu, il n'est pas chiffrable. Un rouge
+   permanent sur une situation connue et expliquee cesse d'etre un rouge. */
+td.attention{color:var(--attention); font-weight:650}
+/* Un cadre vide n'est qu'une boite grise qui clignote avant les donnees. */
+.cadre:empty{display:none}
 .brut{font-size:11px; color:var(--encre-3); letter-spacing:.02em}
 /* ⚠️ EXCEPTION MESUREE AU BANC LE 11/09. `td{white-space:nowrap}` convient a
    toutes les tables de cette page sauf une : les libelles RevenueCat vont
@@ -327,6 +333,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   <div class="etat" id="etat-console"><span class="pastille"></span><div id="etat-texte"></div></div>
 
+  <div class="cadre" id="bandeau-perimetre"></div>
   <div class="resume" id="resume"></div>
   <p class="note" id="resume-note" style="margin:-14px 0 26px"></p>
 
@@ -376,6 +383,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     <div class="cadre" id="cadre-codes"></div>
     <div class="cadre" id="cadre-acces"></div>
     <div class="cadre" id="cadre-attributions"></div>
+    <div class="cadre" id="cadre-officine"></div>
     <details class="repli"><summary>Aucun identifiant d'installation n'est affiché ici</summary>
       <div class="corps">Et ce n'est pas une promesse : la console est <b>techniquement
       incapable</b> d'en lire un. Les vues qu'elle interroge ne contiennent que des agrégats —
@@ -459,7 +467,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   </section>
 
   <footer>
-    Les quatorze vues interrogées ne contiennent que des agrégats : ni pseudonyme,
+    Les vues interrogées ne contiennent que des agrégats : ni pseudonyme,
     ni identifiant de transaction, ni adresse IP, ni commune, ni modèle
     d'appareil. <b>Un seul bouton de cette page écrit dans la base</b> : « Générer
     la sauvegarde », et il n'écrit qu'une ligne de journal — date, taille, nombre
@@ -533,6 +541,27 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       .replace(/"/g,"&quot;");
   }
   function nb(v){ return (v == null) ? "—" : String(v); }
+
+  // ⚠️ UN ENTIER, OU RIEN — ET SURTOUT PAS ZERO (remonte ici le 13/09/2026).
+  // C'est la SEULE definition de « nombre lisible » du fichier : le resume, le
+  // canal officine et les totaux d'unites passent tous par elle.
+  // `Number(null)`, `Number('')` et `Number(false)` valent ZERO en JavaScript.
+  // Une colonne devenue nulle passerait donc pour un vrai zero, et la page
+  // affirmerait « aucun client payant » en ayant lu... rien du tout. Cette
+  // fonction vivait a l'interieur du resume ; le canal officine en a besoin.
+  function entierOuNul(v){
+    if(typeof v === 'number') return (isFinite(v) && v % 1 === 0) ? v : null;
+    if(typeof v !== 'string') return null;
+    // ⚠️ `Number('   ')` vaut ZERO. Une colonne remplie d'espaces passait donc
+    // pour un vrai zero et la page annoncait « 0 client payant ».
+    var s = v.replace(/^\s+|\s+$/g, '');
+    if(s === '') return null;
+    var x = Number(s);
+    // ⚠️ ET UN ENTIER, PUISQUE C'EST SON NOM. Toutes les colonnes qui passent
+    // ici sont des comptes. Un decimal y produirait « (4.5 octrois) », et un
+    // ecart de 0,5 allumerait le bloc rouge « DEUX CHIFFRES EN DESACCORD ».
+    return (isFinite(x) && x % 1 === 0) ? x : null;
+  }
 
   // ── Traductions ───────────────────────────────────────────────────────────
   // ⚠️ LE NOM D'ORIGINE EST TOUJOURS AFFICHE EN GRIS A COTE. Le francais est
@@ -653,7 +682,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['resume','resume-note','s-alertes','s-argent','s-parcours','s-officine','s-audience','s-sauvegarde'];
+    var ids = ['bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-officine','s-audience','s-sauvegarde'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
 
@@ -678,6 +707,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     { cle:'abonnes',      vue:'v_admin_abonnes' },
     { cle:'resume',       vue:'v_admin_resume',                unique:true },
     { cle:'acces',        vue:'v_admin_acces_offerts' },
+    { cle:'officine',     vue:'v_admin_officine_mois',          ordre:{col:'mois',      asc:false} },
     { cle:'parcoursJour', vue:'v_admin_parcours_jour_version', ordre:{col:'jour',      asc:false} },
     { cle:'argent',       vue:'v_admin_argent_mois',           ordre:{col:'mois',      asc:false} },
     { cle:'parcours',     vue:'v_admin_parcours_semaine',      ordre:{col:'semaine',   asc:false} },
@@ -704,14 +734,41 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // La date de reference vient desormais de `v_admin_resume` lui-meme.
   var donneesCourantes = null;
 
+  // ⚠️ UN SEUL DRAPEAU POUR TOUTES LES PUCES (13/09/2026). Desactiver la seule
+  // puce de perimetre ne servait a rien : les puces de VERSION appellent le
+  // meme `rendre(donneesCourantes)`, qui redessine le bandeau et REACTIVE la
+  // puce de perimetre. Deux clics et le verrou etait contourne. Toute puce
+  // nait desormais desactivee tant que ce drapeau est leve, et tout clic est
+  // refuse a l'entree — y compris celui qui arrive entre deux redessins.
+  var chargementEnCours = false;
+
+  // ⚠️ UN JETON, PARCE QUE DEUX CHARGEMENTS PEUVENT SE CHEVAUCHER (13/09/2026).
+  // « Collecter l'audience » rappelle `charger()` a la fin, et rien n'empechait
+  // un deuxieme depart pendant qu'un premier etait en vol. Avec un simple
+  // booleen, la PREMIERE reponse arrivee baissait le verrou pour les deux, et
+  // l'ecran finissait par afficher la reponse LA PLUS ANCIENNE, horodatee
+  // comme si elle etait fraiche. Chaque depart prend un numero ; toute reponse
+  // qui ne porte pas le dernier numero est jetee sans rien toucher.
+  var jetonCharge = 0;
+
+  // Leve ou baisse le drapeau, et l'applique aux puces DEJA a l'ecran.
+  function verrouillerPuces(verrou){
+    chargementEnCours = !!verrou;
+    var p = document.querySelectorAll('button.puce');
+    for(var i=0;i<p.length;i++) p[i].disabled = chargementEnCours;
+  }
+
   function charger(){
-        $('btn-recharger').disabled = true;
+    var jeton = ++jetonCharge;
+    $('btn-recharger').disabled = true;
+    verrouillerPuces(true);
     $('horodatage').textContent = 'chargement…';
 
     // ⚠️ LE TEMOIN D'ABORD. Si la garde se refermait, toutes les autres vues
     // rendraient zero ligne et la page afficherait des zeros partout — une
     // panne qui ressemble a la bonne sante. On refuse ce mode de panne.
     lire('v_admin_ping').then(function(r){
+      if(jeton !== jetonCharge) return null;   // une lecture plus recente a pris la main
       if(r.error) throw r.error;
       if(!r.data || !r.data.length){
         masquerBlocs(true);
@@ -721,36 +778,95 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           + "l'absence de données n'est pas une absence de problème.");
         $('horodatage').textContent = '';
         $('btn-recharger').disabled = false;
+        verrouillerPuces(false);
         return null;
       }
       masquerBlocs(false);
 
       afficherEtat('ok','Console ouverte. ',
-        'Les quatorze vues répondent. Les chiffres ci-dessous sont ceux de la base.');
+        'Les ' + (VUES.length + 1) + ' vues répondent. Les chiffres ci-dessous sont ceux de la base.');
       return Promise.all(VUES.map(function(v){ return lire(v.vue, v.ordre); }));
     }).then(function(res){
-      if(!res) return;
+      if(jeton !== jetonCharge) return;        // reponse perimee : on ne rend rien,
+      if(!res) return;                         // et surtout on ne deverrouille pas.
       for(var i=0;i<res.length;i++) if(res[i].error) throw res[i].error;
       var d = {};
       for(var j=0;j<VUES.length;j++){
         var v = VUES[j], data = res[j].data || [];
         d[v.cle] = v.unique ? (data[0] || null) : data;
       }
-      rendre(d);
-      $('horodatage').textContent = 'relevé le ' + fmtDate.format(new Date()) + ' (heure de Paris)';
+      // ⚠️ LE DRAPEAU TOMBE AVANT LE RENDU. `rendre` recree les puces, et elles
+      // naissent desactivees tant qu'il est leve : le baisser apres laisserait
+      // la page entiere verrouillee jusqu'au prochain rechargement.
+      verrouillerPuces(false);
+      // ⚠️ `rendre` NE LEVE PLUS : elle rattrape elle-meme et rend false. Une
+      // premiere version mettait le try/catch ICI, et ne protegeait donc qu'UN
+      // des trois appelants — les deux puces de filtre appellent `rendre` aussi,
+      // et un plantage y laissait la page a moitie repeinte sous un bandeau vert.
+      if(rendre(d)){
+        $('horodatage').textContent = 'relevé le ' + fmtDate.format(new Date()) + ' (heure de Paris)';
+      }
       $('btn-recharger').disabled = false;
     }).catch(function(e){
+      if(jeton !== jetonCharge) return;
       masquerBlocs(true);
       afficherEtat('critique','LECTURE IMPOSSIBLE. ',
         'La base n’a pas répondu comme prévu : ' + (e && e.message ? e.message : e)
         + ". Aucun chiffre n'est affiché — mieux vaut rien qu'un chiffre faux.");
       $('horodatage').textContent = '';
       $('btn-recharger').disabled = false;
+      verrouillerPuces(false);
     });
   }
 
   // ── Rendu ─────────────────────────────────────────────────────────────────
+  /**
+   * ⚠️ UNE ERREUR DE LA PAGE N'EST PAS UNE ERREUR DE LA BASE (13/09/2026).
+   * Tout ce qui casse ici est de notre fait. Le dire autrement — « la base n'a
+   * pas repondu comme prevu » — c'est inventer une cause, et la servir en
+   * anglais a quelqu'un qui n'est pas developpeur.
+   *
+   * ⚠️ LE FILET EST ICI, PAS CHEZ L'APPELANT. `rendre` a TROIS appelants : le
+   * chargement et les deux puces de filtre. Proteger le seul chargement
+   * laissait un demi-repeint silencieux sous un bandeau vert des qu'on
+   * cliquait sur une puce.
+   *
+   * Rend `true` si la page a ete dessinee, `false` sinon — l'appelant ne doit
+   * pas horodater « releve le ... » un ecran qui n'a pas ete rendu.
+   */
   function rendre(d){
+    try { dessinerTout(d); return true; }
+    catch(err){
+      // ⚠️ ON DESARME LE REGLAGE AVANT TOUT LE RESTE. Voir `remettreFiltreParDefaut`.
+      //
+      // ⚠️ ET ON NE PROMET RIEN. `reglagePose` dit qu'un reglage EXISTAIT ; il ne
+      // dit pas qu'il est la CAUSE. Une premiere version ecrivait « rechargez,
+      // elle repartira propre » : sur une panne etrangere au reglage, Gaetan
+      // suivait la consigne, retombait sur le meme ecran noir, et avait perdu
+      // au passage un reglage qu'il avait pose expres. On enonce donc ce qu'on
+      // a FAIT, et l'on dit ce que chacune des deux suites voudra dire.
+      var reglagePose = !filtreParDefaut();
+      var ditReglage  = reglagePose ? nommerReglage() : '';
+      if(reglagePose) remettreFiltreParDefaut();
+      masquerBlocs(true);
+      afficherEtat('critique','AFFICHAGE IMPOSSIBLE. ',
+        'La base a répondu, mais la page n’a pas su afficher ces données. Ce n’est '
+        + 'pas une panne de la base : c’est un défaut de cette page, à signaler tel '
+        + 'quel. '
+        + (reglagePose
+            ? 'Un réglage était mémorisé (' + ditReglage + ') ; au cas où il serait en '
+              + 'cause, il vient d’être remis à sa valeur par défaut. Rechargez la '
+              + 'page : si l’écran ne revient pas, le réglage n’était pas en cause et '
+              + 'le défaut est ailleurs. '
+            : '')
+        + 'Détail technique : ' + (err && err.message ? err.message : err)
+        + ". Aucun chiffre n'est affiché — mieux vaut rien qu'un chiffre faux.");
+      $('horodatage').textContent = '';
+      return false;
+    }
+  }
+
+  function dessinerTout(d){
     // ⚠️ L'ORDRE COMPTE. Le resume calcule desormais ses trois chiffres de
     // demarrages a partir des lignes du parcours ET du filtre en cours. Les deux
     // doivent donc etre prets AVANT le premier rendu, et pas seulement avant le
@@ -777,7 +893,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         'Rien de rouge, mais quelque chose mérite un coup d’œil.');
     } else {
       afficherEtat('ok','Rien à signaler. ',
-        'Les quatorze vues répondent et aucun voyant n’est allumé.');
+        'Les ' + (VUES.length + 1) + ' vues répondent et aucun voyant n’est allumé.');
     }
     rendreResume(d.resume, d.audJours, d.alertes);
     rendreAbonnes(d.abonnes);
@@ -787,6 +903,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     rendreCodes(d.codes);
     rendreAccesOfferts(d.acces);
     rendreAttributions(d.attributions);
+    rendreOfficine(d.officine, d.resume);
+    dessinerPerimetre();
   }
 
   function rendreAlertes(a, sv, au){
@@ -1065,11 +1183,6 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     //   • la comparaison n'est desactivee que si le filtre change VRAIMENT
     //     quelque chose — une version decochee sans aucune ligne dans la fenetre
     //     ne doit pas faire renoncer la page a se verifier.
-    function entierOuNul(v){
-      if(v === null || v === undefined || v === '') return null;
-      var x = Number(v);
-      return isFinite(x) ? x : null;
-    }
     var parc    = demarragesFiltres(r.jour_serveur);
     var calcule = !parc.cause;
     var b30 = entierOuNul(r.installations_30j),
@@ -1202,26 +1315,125 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         rev < 0);
     }
 
-    var vus = r.acces_offerts_vus_par_revenuecat;
-    var ecart = r.acces_offerts_en_cours - vus;
-    // ⚠️ AUCUNE COULEUR ICI. Ce voyant serait reste rouge en permanence pour un
-    // ecart connu, explique et a zero euro. L'alarme qui compte est « octrois
-    // de code », dans les alertes.
-    h += res('Accès offerts en cours', nb(r.acces_offerts_en_cours),
-      [['Accordés en tout', nb(r.acces_offerts_total)],
-       ['Vus par RevenueCat', nb(vus)]],
+    // ⚠️ CETTE TUILE OBEIT A L'INTERRUPTEUR DE PERIMETRE (13/09/2026).
+    //
+    // ⚠️ PLUS AUCUN FAIT DU JOUR ECRIT EN DUR (correction du 13/09/2026). La
+    // version precedente affirmait, dans du texte fixe, « les deux acces en
+    // cours viennent d'apporteurs internes » et « le seul apporteur externe,
+    // Nico, n'a encore aucune attribution ». C'etaient deux faits VRAIS ce
+    // matin-la, lus dans la base et recopies dans une phrase : le jour ou Nico
+    // active son code, la page se met a mentir toute seule, sans que personne
+    // n'ait rien touche. Tout ce qui suit est desormais CALCULE.
+    //
+    // ⚠️ AUCUNE COULEUR. L'ecart avec RevenueCat est connu, explique, et vaut
+    // zero euro : un voyant rouge permanent ne serait plus un voyant. L'alarme
+    // qui compte est « octrois de code », dans les alertes.
+    //
+    // ⚠️ GARDE DE COLONNE. Si `acces_offerts_en_cours_internes` manque (vue non
+    // migree), on ne soustrait RIEN et on le dit. Soustraire zero en silence
+    // afficherait « nos octrois sont ecartes » alors que rien ne l'est.
+    // ⚠️ LES DEUX COLONNES, PAS UNE. Une migration appliquee en deux fois — ce
+    // qui est arrive le 13/09 sur `v_admin_alertes` — peut n'en apporter qu'une.
+    // Ne tester que la premiere affichait un « accordes en tout » NON filtre
+    // sous une coche verte « nos octrois sont ecartes ».
+    var marqueInterne  = !!r && ('acces_offerts_en_cours_internes' in r)
+                             && ('acces_offerts_total_internes' in r);
+    var aoInternes     = marqueInterne ? (Number(r.acces_offerts_en_cours_internes) || 0) : 0;
+    var aoTousInternes = marqueInterne ? (Number(r.acces_offerts_total_internes)    || 0) : 0;
+    var aoTous         = Number(r.acces_offerts_en_cours) || 0;
+    var aoTotal        = Number(r.acces_offerts_total)    || 0;
+    var aoEcarte       = marqueInterne && !compterNosTests();
+    var aoAffiche      = aoEcarte ? (aoTous  - aoInternes)     : aoTous;
+    var aoTotalAffiche = aoEcarte ? (aoTotal - aoTousInternes) : aoTotal;
+    var vus            = r.acces_offerts_vus_par_revenuecat;
+
+    // ⚠️ CHAQUE LIGNE PORTE SA FENETRE ET SON UNITE DANS SON LIBELLE.
+    //
+    // ⚠️ L'ORDRE FAIT LA LECTURE, ET LES LIBELLES RESTENT COURTS.
+    //
+    // Cette tuile fait 170 px de large : un libelle de quarante signes s'y
+    // replie sur trois lignes et le chiffre part tout seul a droite. Quatre
+    // lignes au maximum, et les reserves vont dans la bulle, pas dans les
+    // libelles — sinon on repare une mauvaise lecture en en creant une autre.
+    //
+    // L'oeil soustrait deux nombres VOISINS, quoi qu'en disent leurs libelles.
+    // Le seul couple comparable est : nos octrois EN COURS NON FILTRES, et les
+    // personnes EN COURS de RevenueCat. Trois regles en decoulent, et elles ont
+    // chacune coute une passe de revue :
+    //   1. ces deux lignes-la sont toujours l'une sous l'autre ;
+    //   2. RevenueCat est TOUJOURS LA DERNIERE : rien ne doit se trouver en
+    //      dessous. Une version precedente avait mis « accordes en tout » juste
+    //      apres, et 10 moins 3 se lisait « sept octrois manquants » ;
+    //   3. « nos octrois, non filtres » s'affiche MEME quand il repete le grand
+    //      chiffre. C'est le prix a payer pour que la regle 1 tienne dans les
+    //      DEUX modes, et une redite vaut mieux qu'une soustraction fausse.
+    //   4. « ACCORDES EN TOUT » N'EST PLUS DANS LA TUILE. Pose au-dessus de
+    //      « nos octrois, non filtres », il changeait DEUX dimensions a la fois
+    //      — la fenetre ET le perimetre — et « 5 des 10 » se lisait tout seul.
+    //      Avec trois lignes et deux dimensions, aucun ordre ne met cote a cote
+    //      que des comparables : on retire la ligne, pas on la deplace. Le
+    //      total vit dans la bulle, qui a la place de nommer sa fenetre.
+    //
+    // Il reste deux voisinages, et les deux se soustraient juste :
+    //   retires 2  /  non filtres 5   → 5 - 2 = 3, le grand chiffre ;
+    //   non filtres 5  /  RevenueCat 3 → le seul ecart qui veut dire quelque chose.
+    var detailAcces = [];
+    if(aoEcarte) detailAcces.push(['Nos octrois retirés', nb(aoInternes)]);
+    detailAcces.push(['Nos octrois, non filtrés', nb(aoTous)]);
+    detailAcces.push(['RevenueCat, personnes en cours', nb(vus)]);
+
+    h += res('Accès offerts en cours', nb(aoAffiche), detailAcces,
       'Source : <b>notre</b> table d’attributions, écrite au moment de l’octroi — pas le '
       + 'journal de RevenueCat.'
-      + (ecart > 0
-          ? '<br><br>' + ecart + ' octroi(s) ne nous ont jamais été annoncés par RevenueCat. '
-            + '<b>Sans conséquence</b> : ces accès valent zéro euro, et notre table fait foi.'
-          : '<br><br>Cohérent avec ce que RevenueCat annonce.'));
-
+      + (!marqueInterne
+          ? '<br><br>🔶 <b>La vue ne porte pas la marque « apporteur interne »</b> : '
+            + 'rien n’est écarté ici, quel que soit l’interrupteur.'
+          : (compterNosTests()
+              ? '<br><br>🔶 <b>Nos propres octrois sont comptés.</b> ' + aoInternes
+                + ' des ' + aoTous + ' accès en cours viennent d’apporteurs marqués '
+                + '« interne ».'
+              : '<br><br>✅ <b>Nos propres octrois sont écartés</b>, automatiquement : la '
+                + 'colonne <code>apporteurs.interne</code> les reconnaît, il n’y a aucune '
+                + 'liste à tenir. <b>' + aoInternes + '</b> des ' + aoTous + ' accès '
+                + '<b>en cours</b> sont écartés à ce titre, et <b>' + aoTousInternes
+                + '</b> des ' + aoTotal + ' accordés <b>en tout</b>.'))
+      // ⚠️ UN TIRET SANS EXPLICATION, ENTRE DEUX VRAIS NOMBRES, EST UN TROU.
+      + ((vus == null)
+          ? '<br><br>⚠️ <b>RevenueCat n’a annoncé aucun compte d’accès promotionnel</b> : '
+            + 'la ligne correspondante affiche « — », et <b>aucun écart ne peut être '
+            + 'calculé</b>. Ce n’est pas un zéro.'
+          : '')
+      // ⚠️ DEUX UNITES DIFFERENTES, ET IL FAUT LE DIRE. Notre table compte des
+      // OCTROIS (`count(*)` sur `attributions`) ; RevenueCat compte des PERSONNES
+      // (`count(distinct app_user_id)`). Un ecart positif peut donc venir d'un
+      // octroi jamais annonce AUSSI BIEN que de deux octrois pour une meme
+      // personne. L'ancienne phrase concluait a la premiere cause toute seule.
+      + ((vus != null && (aoTous - Number(vus)) > 0)
+          ? '<br><br>Notre table compte <b>' + aoTous + '</b> octroi(s) en cours ; '
+            + 'RevenueCat annonce <b>' + nb(vus) + '</b> personne(s) en accès '
+            + 'promotionnel. <b>Ce ne sont pas les mêmes unités</b> — des octrois d’un '
+            + 'côté, des personnes de l’autre : l’écart peut venir d’un octroi jamais '
+            + 'annoncé comme de deux octrois pour une même personne. <b>Sans '
+            + 'conséquence</b> : ces accès valent zéro euro, et notre table fait foi.'
+          : ''));
     // ⚠️ LE ZERO DOIT SE VOIR. C'est le chiffre qui compte vraiment.
-    h += res('Clients payants', nb(r.clients_payants),
+    //
+    // ⚠️ MAIS UN CHIFFRE ILLISIBLE N'EST PAS UN ZERO (13/09/2026). `null > 0`
+    // est FAUX en JavaScript : la tuile affichait « — » et la bulle affirmait
+    // « Aucune vente a ce jour » dans la meme respiration, sur la colonne qui
+    // decide si quelqu'un est paye.
+    // ⚠️ LE GRAND CHIFFRE OBEIT AU MEME JUGEMENT QUE LA BULLE (13/09/2026).
+    // `nb()` recopie ce qu'on lui donne : `false` s'affichait « false » et une
+    // chaine d'espaces laissait la tuile VIDE, en 32 px, pendant que la bulle
+    // — qu'il faut survoler — disait « pas pu etre lu ». La franchise ne peut
+    // pas etre dans l'info-bulle et le mensonge dans le chiffre.
+    var payantsLus = entierOuNul(r.clients_payants);
+    h += res('Clients payants', (payantsLus === null) ? '—' : nb(payantsLus),
       [['Achats de test', nb(r.achats_de_test)]],
       'En production, hors essais. '
-      + (r.clients_payants > 0 ? '' : '<b>Aucune vente à ce jour.</b> ')
+      + (payantsLus === null
+          ? '<b>Ce chiffre n’a pas pu être lu</b> — n’en concluez rien. '
+          : (payantsLus > 0 ? '' : '<b>Aucune vente à ce jour.</b> '))
       + 'Les achats SANDBOX sont vos propres essais de paiement.<br><br>Ce chiffre est '
       + '<b>ce qui nous est parvenu</b> : il dépend des annonces de RevenueCat, dont on sait '
       + 'qu’une au moins n’est jamais arrivée. Pour un état des ventes qui fait foi, la '
@@ -1260,7 +1472,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function rendreAbonnes(rows){
-    var lignes = (rows||[]).map(function(r){
+    var toutes = rows || [];
+    var lignes = sansNosTests(toutes).map(function(r){
       return { cases:[
         {html: envEtiq(r.environnement)},
         {texte: nb(r.actifs)},
@@ -1275,6 +1488,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     $('cadre-abonnes').innerHTML = tableau('Abonnements par environnement',
       ['Environnement','Actifs','Accès offerts','Ont payé','Annul. 30 j','Expir. 30 j','Personnes'],
       lignes, 'aucun événement de facturation')
+      // Ici la LIGNE est bien l'unite : une ligne = un environnement. Pas de
+      // troisieme argument, il n'y a rien de regroupe a chiffrer.
+      + mentionPerimetre(toutes, MOT_BAC)
       + (total != null
           ? '<div class="rien">Personnes distinctes, tous environnements confondus : <b class="num">'
             + ech(total) + '</b> — une même personne peut apparaître dans les deux lignes.</div>'
@@ -1282,7 +1498,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function rendreArgent(rows){
-    var lignes = (rows||[]).map(function(r){
+    var toutes = rows || [];
+    var lignes = sansNosTests(toutes).map(function(r){
       return { cases:[
         {texte: moisTexte(r.mois)},
         {html: envEtiq(r.environnement)},
@@ -1297,6 +1514,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     $('cadre-argent').innerHTML = tableau('Événements de facturation',
       ['Mois','Environnement','Magasin','Produit','Type','Événements','Montant brut'],
       lignes, 'aucun événement enregistré', 12)
+      + mentionPerimetre(toutes, MOT_BAC, U_EVENEMENTS)
       + '<div class="rien">Une ligne par <b>mois</b> et par type d\u2019\u00e9v\u00e9nement \u2014 ce n\u2019est pas un \u00e9v\u00e9nement par ligne. Le webhook RevenueCat est branch\u00e9 depuis le <b>8 septembre 2026</b> : rien d\u2019ant\u00e9rieur ne figure ici.</div>';
   }
 
@@ -1311,9 +1529,23 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         {texte: nb(r.aucun_traitement)}
       ]};
     });
+    // ⚠️ CE TABLEAU N'OBEIT PAS A L'INTERRUPTEUR, ET IL DOIT LE DIRE (13/09).
+    // `v_admin_parcours_semaine` ecarte `appareil_de_test = true` DANS LA BASE :
+    // la page ne recoit meme pas ces lignes, elle ne peut donc pas les rendre.
+    //
+    // ⚠️ CECI EST UNE AFFIRMATION SUR LA VUE, ET LA PAGE NE PEUT PAS LA
+    // VERIFIER : les lignes recues ne portent aucune colonne d'appareil. Elle a
+    // ete lue dans la definition de la vue le 13/09/2026. Si cette vue change,
+    // cette phrase devra changer avec elle — contrairement a celle des codes
+    // pharmacie, qui, elle, se verifie toute seule a chaque rendu.
     $('cadre-parcours').innerHTML = tableau('Parcours d’entrée',
       ['Semaine','Installations','Ont tenté un scan','1er par scan','1er à la main','Aucun traitement'],
-      lignes, 'aucun parcours enregistré', 12);
+      lignes, 'aucun parcours enregistré', 12)
+      + '<div class="rien"><b>Ce tableau n’obéit pas à l’interrupteur de périmètre.</b> '
+      + 'L’exclusion des appareils de test y est faite dans la base, avant l’envoi. '
+      + 'Et ce marquage ne reconnaît pas une version signée pour le test interne : '
+      + 'nos propres essais sur cette version-là comptent ici comme de vrais nouveaux '
+      + 'venus. Le tableau jour par jour, lui, se filtre par version.</div>';
   }
 
   // ── PARCOURS JOUR PAR JOUR, AVEC FILTRES (13/09/2026) ─────────────────────
@@ -1372,6 +1604,221 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     catch(e){ /* sans effet : le filtre ne vaut alors que pour cet onglet */ }
   }
 
+  /** Ce qui est pose, en toutes lettres — pour le dire avant de l'effacer. */
+  function nommerReglage(){
+    var bouts = [], n = 0, k;
+    if(filtreParcours.avecTest === true) bouts.push('l’interrupteur de périmètre');
+    for(k in filtreParcours.versionsExclues){
+      if(Object.prototype.hasOwnProperty.call(filtreParcours.versionsExclues, k)) n++;
+    }
+    if(n) bouts.push(n + (n > 1 ? ' versions décochées' : ' version décochée'));
+    return bouts.join(' et ');
+  }
+
+  /**
+   * Vrai si aucun reglage n'est pose : ni interrupteur, ni version decochee.
+   *
+   * ⚠️ IL LIT LA MEMOIRE, PAS LE STOCKAGE, ET C'EST VOULU. Il existe un cas ou
+   * il rend `true` alors que le stockage porte encore un reglage : une puce
+   * vient de ramener la memoire AU DEFAUT, et le rendu echoue. On ne desarme
+   * alors rien — et c'est sain, parce que le stockage ne contient jamais qu'un
+   * reglage qui a DEJA rendu avec succes (les puces n'enregistrent qu'apres un
+   * `rendre` vrai). Le rechargement repart donc d'un etat qui marchait. Ne pas
+   * « corriger » ceci en lui faisant lire le stockage : ce serait effacer un
+   * reglage sain a cause d'une panne qui ne le concerne pas.
+   */
+  function filtreParDefaut(){
+    if(filtreParcours.avecTest === true) return false;
+    for(var k in filtreParcours.versionsExclues){
+      if(Object.prototype.hasOwnProperty.call(filtreParcours.versionsExclues, k)) return false;
+    }
+    return true;
+  }
+
+  /**
+   * ⚠️ UN REGLAGE MEMORISE NE DOIT JAMAIS POUVOIR CONDAMNER LA CONSOLE.
+   *
+   * Ce reglage vit dans le stockage du navigateur : il SURVIT au rechargement
+   * et a la fermeture de l'onglet. Si un rendu casse sous ce reglage-la, et
+   * qu'on cache les blocs, on cache aussi la seule puce capable de l'annuler :
+   * la page se re-casse toute seule a chaque ouverture, indefiniment, et le
+   * seul remede serait d'effacer les donnees de site. Releve en revue adverse
+   * le 13/09/2026. On repart donc du reglage par defaut, ET on l'enregistre.
+   */
+  function remettreFiltreParDefaut(){
+    filtreParcours.avecTest = false;
+    filtreParcours.versionsExclues = {};
+    ecrireFiltreParcours();
+  }
+
+  /**
+   * ⚠️ UN SEUL ETAT POUR TOUT CE QUI EST « A NOUS », ET IL EST DEJA LA.
+   *
+   * `filtreParcours.avecTest` pilotait le seul parcours d'entree. Depuis le
+   * lot 3, il pilote aussi les acces offerts internes, les achats en bac a
+   * sable et les octrois de nos propres apporteurs — trois choses que la base
+   * sait reconnaitre TOUTE SEULE (`apporteurs.interne`, `environnement`).
+   * On ne cree donc pas un deuxieme reglage : on elargit la portee du premier,
+   * et on lui donne un nom qui dit ce qu'il fait.
+   *
+   * ⚠️ CE QUI N'OBEIT PAS DOIT LE DIRE. L'audience RevenueCat et les appels
+   * d'analyse n'ont AUCUNE notion d'appareil de test : leurs bulles l'ecrivent
+   * deja. Un interrupteur qui pretendrait les filtrer serait le « bouton global
+   * menteur » qu'on a refuse ce matin meme.
+   */
+  function compterNosTests(){ return filtreParcours.avecTest === true; }
+
+  /** Vrai si cette ligne vient de chez nous (et doit donc etre ecartee par defaut). */
+  function estANous(r){
+    return (r && (r.interne === true || r.environnement === 'SANDBOX'));
+  }
+
+  /** Les lignes a afficher, selon l'interrupteur. Ne modifie jamais l'entree. */
+  function sansNosTests(rows){
+    if(compterNosTests()) return rows || [];
+    return (rows || []).filter(function(r){ return !estANous(r); });
+  }
+
+
+  /**
+   * La mention grise sous un tableau. Vide quand rien n'est ecarte.
+   * ⚠️ GRIS, JAMAIS ORANGE : ecarter nos tests est le CADRAGE PAR DEFAUT, pas un
+   * filtre que quelqu'un a pose. Un avertissement permanent cesse d'avertir.
+   *
+   * ⚠️ UNE LIGNE N'EST PAS UNE UNITE. Les tableaux d'octrois et
+   * d'encaissements sont REGROUPES : une seule ligne ecartee peut porter cinq
+   * octrois. `compte` = { champ, sing, plur } ajoute l'unite reelle, lue dans
+   * les lignes elles-memes.
+   *
+   * ⚠️ LA GARDE PASSE PAR `entierOuNul`, ET ELLE DOIT. `Number('')`,
+   * `Number(false)` et `Number('   ')` valent ZERO, pas NaN : `isNaN` seul
+   * laissait passer une valeur vide et annoncait un total TROP PETIT en le
+   * presentant comme exact. Si UNE SEULE valeur est illisible, aucun total.
+   *
+   * ⚠️ LE GENRE EST PORTE PAR L'APPELANT. « 1 code ... est ecartee » se lit
+   * sur une page que Gaetan ouvre tous les jours : `mot.masculin` accorde.
+   */
+  function mentionPerimetre(rows, mot, compte){
+    if(compterNosTests()) return '';
+    var ecartees = (rows || []).filter(estANous);
+    var n = ecartees.length;
+    if(!n) return '';
+    var quoi = '<b>' + n + '</b> ' + (n > 1 ? mot.plur : mot.sing);
+    if(compte && compte.champ){
+      var s = 0, connu = true;
+      for(var i = 0; i < ecartees.length; i++){
+        // ⚠️ LA MEME DEFINITION QU'AILLEURS DANS LE FICHIER. Deux idees du mot
+        // « lisible » dans une meme page finissent toujours par diverger.
+        var v = entierOuNul(ecartees[i][compte.champ]);
+        if(v === null){ connu = false; break; }
+        s += v;
+      }
+      if(connu) quoi += ' (' + s + ' ' + (s > 1 ? compte.plur : compte.sing) + ')';
+    }
+    var accord = mot.masculin
+      ? (n > 1 ? ' sont écartés' : ' est écarté')
+      : (n > 1 ? ' sont écartées' : ' est écartée');
+    var pronom = (n > 1) ? 'les' : (mot.masculin ? 'le' : 'la');
+    return '<div class="rien">Cadrage par défaut : ' + quoi + accord
+         + '. L’interrupteur en haut de page ' + pronom + ' réintègre.</div>';
+  }
+
+  // ⚠️ LES NOMS SONT ECRITS UNE FOIS, ICI. Recopier « ligne de nos apporteurs
+  // internes » dans cinq appels, c'est se garantir cinq libelles divergents.
+  var MOT_BAC      = { sing:'ligne en bac à sable', plur:'lignes en bac à sable', masculin:false };
+  var MOT_INTERNES = { sing:'ligne de nos apporteurs internes',
+                       plur:'lignes de nos apporteurs internes', masculin:false };
+  var MOT_CODES    = { sing:'code de nos apporteurs internes',
+                       plur:'codes de nos apporteurs internes', masculin:true };
+  var U_OCTROIS    = { champ:'nombre',        sing:'octroi',       plur:'octrois' };
+  var U_EVENEMENTS = { champ:'evenements',    sing:'événement',   plur:'événements' };
+  var U_ENCAISSE   = { champ:'encaissements', sing:'encaissement', plur:'encaissements' };
+
+  /**
+   * ⚠️ CETTE LISTE EST CALCULEE, PAS ECRITE (correction du 13/09/2026).
+   * La premiere version la recopiait a la main. Or les codes pharmacie
+   * n'obéissent pas AUJOURD'HUI parce que `v_admin_codes` ne porte pas la
+   * colonne `interne` : le jour ou elle la portera, le tableau se filtrera et
+   * le bandeau continuerait d'annoncer le contraire. Exactement le defaut
+   * qu'on vient de corriger ailleurs sur cette page.
+   *
+   * On ne promet plus non plus que « chaque tableau le dit » : les trois cadres
+   * d'audience ne portent aucune mention, et c'etait faux.
+   */
+  /**
+   * TROIS etats, jamais deux. Sans aucune ligne, la page ne SAIT PAS si la vue
+   * porte la colonne `interne` : trancher « elle ne la porte pas » serait une
+   * supposition presentee comme un calcul, exactement ce qu'on corrige ici.
+   */
+  function etatCodes(){
+    var codes = (donneesCourantes && donneesCourantes.codes) || null;
+    if(!codes || !codes.length) return 'inconnu';
+    return ('interne' in codes[0]) ? 'filtrable' : 'sourd';
+  }
+
+  function blocsSourds(){
+    var liste = [];
+    // ⚠️ LES VOYANTS D'ABORD : c'est le bloc que cette page annonce comme
+    // « ce qui doit reveiller la nuit », et il compte nos codes et nos essais.
+    liste.push('les voyants d’alertes et la sauvegarde');
+    if(etatCodes() === 'sourd') liste.push('les codes pharmacie');
+    liste.push('le parcours d’entrée par semaine');
+    liste.push('les tuiles « Clients payants » et « Appels d’analyse »');
+    liste.push('l’audience RevenueCat');
+    return liste;
+  }
+
+  // ⚠️ LE DOUTE NE SE MET PAS DANS UNE ENUMERATION. Glisse au milieu d'une
+  // liste separee par des virgules, « peut-etre les codes pharmacie — aucun
+  // code enregistre, impossible de le dire » se lisait comme trois elements :
+  // on ne voyait plus ou s'arretait l'incertitude. Il a sa propre phrase.
+  function phraseDouteCodes(){
+    if(etatCodes() !== 'inconnu') return '';
+    return ' Pour les codes pharmacie, la page <b>ne peut pas le dire</b> : aucun code '
+         + 'n’est enregistré.';
+  }
+
+  function dessinerPerimetre(){
+    var actif = compterNosTests();
+    // ⚠️ LE TITRE N'ENUMERE PLUS RIEN, ET C'EST VOULU (13/09/2026).
+    // Il a d'abord dit « ce que toute cette page compte » : faux. Puis il a
+    // enumere les blocs a la main : incomplet, et condamne a devenir faux le
+    // jour ou un bloc changera de camp — alors que la ligne grise du dessous,
+    // elle, se recalcule a chaque rendu. Deux traitements opposes du meme fait
+    // a deux lignes d'ecart. Le titre ne promet donc plus de liste ; la liste
+    // vit en dessous, calculee, a un seul endroit.
+    var h = '<div class="cap">Périmètre — ce que l’interrupteur ci-dessous change</div>'
+          + '<div class="puces">'
+          + '<button type="button" class="puce' + (actif ? ' active' : '')
+          + '" data-role="nos-tests" aria-pressed="' + (actif ? 'true' : 'false') + '">'
+          + (actif ? '✓ ' : '') + 'Compter nos tests</button>'
+          + '<span class="puces-sep">'
+          + (actif
+              ? 'nos appareils, nos apporteurs internes et le bac à sable sont COMPTÉS'
+              : 'nos appareils, nos apporteurs internes et le bac à sable sont écartés')
+          + '</span></div>'
+          + '<div class="rien" style="padding-top:0">N’obéissent <b>pas</b> à cet '
+          + 'interrupteur : ' + blocsSourds().join(', ') + '.'
+          + phraseDouteCodes() + '</div>';
+    $('bandeau-perimetre').innerHTML = h;
+    var b = $('bandeau-perimetre').querySelector('button.puce');
+    if(b) b.disabled = chargementEnCours;
+    if(b) b.addEventListener('click', function(){
+      if(chargementEnCours) return;
+      filtreParcours.avecTest = !filtreParcours.avecTest;
+      // ⚠️ ON DESSINE D'ABORD, ON ENREGISTRE ENSUITE. Enregistrer avant, c'etait
+      // graver dans le navigateur un reglage dont on ignore encore s'il tient.
+      // ⚠️ ON REDESSINE TOUT, A PARTIR DES MEMES DONNEES. Redessiner bloc par
+      // bloc laisserait forcement un endroit en retard le jour ou on en ajoute
+      // un — et deux chiffres qui se contredisent sur la meme page, c'est le
+      // defaut qu'on passe la journee a corriger.
+      // ⚠️ `donneesCourantes` est forcement la : c'est `dessinerTout` qui cree
+      // cette puce, et il le pose des sa premiere ligne. On l'ecrit quand meme
+      // en ET, pour qu'aucun jour ce test ne serve de porte a un enregistrement
+      // qui n'aurait rien dessine.
+      if(donneesCourantes && rendre(donneesCourantes)) ecrireFiltreParcours();
+    });
+  }
   function versionDe(r){ return r.version_app || '(inconnue)'; }
   function ligneRetenue(r){
     if(!filtreParcours.avecTest && r.appareil_de_test === true) return false;
@@ -1467,12 +1914,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   function dessinerFiltresParcours(){
     var versions = versionsVues(), i;
-    var h = '<div class="cap">Filtres — ce que le tableau ci-dessous affiche</div>'
+    // La puce « nos appareils de test » a demenage en haut de page le 13/09 :
+    // elle ne pilotait plus seulement ce tableau, mais aussi les acces offerts,
+    // le bac a sable et les octrois internes. Un reglage qui agit partout ne
+    // peut pas vivre dans le coin d'un tableau.
+    var h = '<div class="cap">Versions — ce que le tableau ci-dessous affiche</div>'
           + '<div class="puces">'
-          + '<button type="button" class="puce' + (filtreParcours.avecTest ? ' active' : '')
-          + '" data-role="test" aria-pressed="' + (filtreParcours.avecTest ? 'true' : 'false')
-          + '">' + (filtreParcours.avecTest ? '✓ ' : '') + 'Nos appareils de test</button>'
-          + (versions.length ? '<span class="puces-sep">versions</span>' : '');
+          + (versions.length ? '' : '<span class="puces-sep">aucune version à filtrer</span>');
     for(i=0;i<versions.length;i++){
       var v = versions[i], actif = (filtreParcours.versionsExclues[v] !== true);
       h += '<button type="button" class="puce' + (actif ? ' active' : '')
@@ -1486,22 +1934,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // survit, donc aucune fuite. On rebranche les nouveaux.
     var boutons = $('filtres-parcours').querySelectorAll('button.puce');
     for(i=0;i<boutons.length;i++){
+      boutons[i].disabled = chargementEnCours;
       boutons[i].addEventListener('click', function(){
-        if(this.getAttribute('data-role') === 'test'){
-          filtreParcours.avecTest = !filtreParcours.avecTest;
-        } else {
-          var v = this.getAttribute('data-version');
-          if(filtreParcours.versionsExclues[v]) delete filtreParcours.versionsExclues[v];
-          else filtreParcours.versionsExclues[v] = true;
-        }
-        ecrireFiltreParcours();
-        dessinerFiltresParcours();
-        dessinerParcoursJour();
-        // ⚠️ LE GRAND CHIFFRE DU HAUT OBEIT AUX MEMES PUCES. Sans ce rappel, un
-        // clic laisserait en haut un total que le tableau du bas contredit.
-        if(donneesCourantes && donneesCourantes.resume){
-          rendreResume(donneesCourantes.resume, donneesCourantes.audJours, donneesCourantes.alertes);
-        }
+        if(chargementEnCours) return;
+        var v = this.getAttribute('data-version');
+        if(filtreParcours.versionsExclues[v]) delete filtreParcours.versionsExclues[v];
+        else filtreParcours.versionsExclues[v] = true;
+        // ⚠️ Meme regle que la puce de perimetre : dessiner, puis enregistrer.
+        // ⚠️ ON REDESSINE TOUT, comme l'interrupteur de perimetre. Redessiner
+        // seulement le tableau et le resume laissait une troisieme zone en
+        // retard des qu'on en ajoutait une.
+        if(donneesCourantes && rendre(donneesCourantes)) ecrireFiltreParcours();
       });
     }
   }
@@ -1576,8 +2019,16 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           lignes, 'aucun signalement avec ce filtre', 14);
   }
 
+  // ⚠️ CE TABLEAU N'OBEIT PAS A L'INTERRUPTEUR, ET IL LE VERIFIE (13/09/2026).
+  // `v_admin_codes` ne porte pas la colonne `interne` : la page ne peut pas
+  // distinguer nos codes de ceux d'un apporteur externe. Plutot que d'ecrire ca
+  // dans une phrase qui deviendrait fausse le jour ou la vue changera, on REGARDE
+  // les lignes recues : la mention s'effacera d'elle-meme ce jour-la.
   function rendreCodes(rows){
-    var lignes = (rows||[]).map(function(r){
+    var toutes = rows || [];
+    var etatC = (toutes.length === 0) ? 'inconnu'
+              : (('interne' in toutes[0]) ? 'filtrable' : 'sourd');
+    var lignes = (etatC === 'filtrable' ? sansNosTests(toutes) : toutes).map(function(r){
       var expire = r.expire_le ? new Date(r.expire_le).getTime() < Date.now() : false;
       return { cases:[
         {texte: r.code},
@@ -1594,7 +2045,29 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     });
     $('cadre-codes').innerHTML = tableau('Codes pharmacie',
       ['Code','Durée offerte','Quota max','Utilisé','Restant','Max / jour','Expiration','État'],
-      lignes, 'aucun code');
+      lignes, 'aucun code')
+      + mentionCodes(toutes, etatC);
+  }
+
+  // ⚠️ LA PHRASE SUR LE VOYANT NE SORT QUE SI QUELQUE CHOSE A VRAIMENT ETE
+  // ECARTE. Concatenee sans condition, elle parlait de « codes qui viennent
+  // d'etre ecartes » alors qu'aucun ne l'avait ete — et elle contredisait le
+  // bandeau quand l'interrupteur etait allume.
+  function mentionCodes(toutes, etatC){
+    if(etatC === 'inconnu'){
+      return '<div class="rien">Aucun code enregistré : la page <b>ne peut pas dire</b> '
+           + 'si l’interrupteur de périmètre atteindrait ce tableau.</div>';
+    }
+    if(etatC === 'sourd'){
+      return '<div class="rien"><b>Tous les codes sont affichés, les nôtres compris.</b> '
+           + 'La vue des codes ne porte pas la marque « apporteur interne » : '
+           + 'l’interrupteur de périmètre ne l’atteint pas.</div>';
+    }
+    var m = mentionPerimetre(toutes, MOT_CODES);
+    if(!m) return '';
+    return m + '<div class="rien">Le voyant « Codes à quota épuisé », plus haut, '
+         + 'compte <b>tous</b> les codes, y compris ceux qui viennent d’être '
+         + 'écartés de ce tableau.</div>';
   }
 
   // ⚠️ SOURCE : `attributions`, notre table, et non le journal de RevenueCat.
@@ -1602,7 +2075,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // d'evenement chez RevenueCat, alors que notre fonction, elle, l'ecrit au
   // moment ou elle l'accorde.
   function rendreAccesOfferts(rows){
-    var lignes = (rows||[]).map(function(r){
+    var toutes = rows || [];
+    var lignes = sansNosTests(toutes).map(function(r){
       return { grisee: !r.en_cours, cases:[
         {texte: r.code},
         {html: traduit(PLATEFORMES, r.plateforme)},
@@ -1616,11 +2090,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     });
     $('cadre-acces').innerHTML = tableau('Accès offerts (source : nos attributions)',
       ['Code','Plateforme','État','Durée','Nombre','En cours ?','Fin'],
-      lignes, 'aucun accès offert');
+      lignes, 'aucun accès offert')
+      + mentionPerimetre(toutes, MOT_INTERNES, U_OCTROIS);
   }
 
   function rendreAttributions(rows){
-    var lignes = (rows||[]).map(function(r){
+    var toutes = rows || [];
+    var lignes = sansNosTests(toutes).map(function(r){
       return { cases:[
         {texte: 'sem. du ' + jourTexte(r.semaine)},
         {html: traduit(ETATS, r.etat)},
@@ -1629,9 +2105,89 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       ]};
     });
     $('cadre-attributions').innerHTML = tableau('Attributions',
-      ['Semaine','État','Plateforme','Nombre'], lignes, 'aucune attribution', 12);
+      ['Semaine','État','Plateforme','Nombre'], lignes, 'aucune attribution', 12)
+      + mentionPerimetre(toutes, MOT_INTERNES, U_OCTROIS);
   }
 
+  // ── CE QUE LE CANAL OFFICINE A REELLEMENT RAPPORTE ────────────────────────
+  //
+  // ⚠️ CETTE VUE NE CALCULE AUCUNE COMMISSION, et ce tableau non plus. Ni taux
+  // ni plafond ne sont stockes a ce jour, et la regle de remuneration n'est pas
+  // arretee. On mesure l'ASSIETTE : l'argent reel entre par un code.
+  //
+  // ⚠️ LE NET, PAS LE BRUT. La colonne « net » vient de `net_encaisse()`, qui
+  // a remplace `net_estime()` le 13/09 : l'ancienne divisait par (1+taxe) au
+  // lieu de soustraire et surestimait de 5,9 % — 2,2415 € au lieu de 2,1163 €
+  // sur le paiement du 12/09. Gaetan l'a vue en comparant a Google Play, qui
+  // annonce « revenu estime 2,12 € » pour cette commande. Une ligne dont un
+  // taux manque n'a PAS de net : elle est comptee dans la derniere colonne.
+  //
+  // ⚠️ ON N'ADDITIONNE PAS LES DEVISES : une ligne par devise, comme la vue.
+  function rendreOfficine(rows, resume){
+    var toutes = rows || [];
+    var lignes = sansNosTests(toutes).map(function(r){
+      return { cases:[
+        {texte: moisTexte(r.mois)},
+        {texte: r.apporteur || '—'},
+        {texte: r.code || '—'},
+        {texte: nb(r.encaissements)},
+        {texte: nb(r.abonnes)},
+        {texte: (r.brut == null) ? '—' : Number(r.brut).toFixed(2) + ' ' + (r.devise || '')},
+        {texte: (r.net  == null) ? '—' : Number(r.net).toFixed(2)  + ' ' + (r.devise || '')},
+        {texte: nb(r.encaissements_sans_net),
+         classe: (Number(r.encaissements_sans_net) > 0) ? 'attention' : 'vide'}
+      ]};
+    });
+    // ⚠️ UN TABLEAU VIDE NE DIT PAS POURQUOI IL EST VIDE, et il y a deux
+    // « vides » tres differents ici : aucun client payant du tout, ou des
+    // clients payants dont AUCUN n'entre par un code. Le second est le seul
+    // qui compte pour remunerer un apporteur. Le chiffre est LU dans le
+    // resume ; il n'est jamais ecrit en dur (c'est le defaut du 13/09).
+    // On ne parle que si la base a rendu zero ligne : si c'est l'interrupteur
+    // qui a vide le tableau, c'est la mention de perimetre qui le dit.
+    // ⚠️ ON ENONCE DES MESURES, ON NE CONCLUT RIEN. « Il n'y a rien a
+    // commissionner », puis « aucun encaissement n'est rattache a un code »,
+    // etaient deux deductions tirees d'une ABSENCE de lignes : un code
+    // supprime, un apporteur efface ou une jointure changee donnent le meme
+    // vide. Cette page ecrit elle-meme, plus haut, que « l'absence de donnees
+    // n'est pas une absence de probleme ». Il ne reste donc que des faits :
+    // zero ligne rendue, N payants dans la MEME lecture (deux requetes d'un
+    // meme `Promise.all` : la meme lecture, pas le meme instant), et la regle
+    // d'appartenance a ce tableau.
+    //
+    // ⚠️ ET `entierOuNul`, JAMAIS `Number`. `Number(null)` vaut ZERO : la
+    // version precedente affirmait « aucun client payant a ce jour » au moment
+    // meme ou la tuile du haut affichait « — » faute d'avoir pu lire.
+    var faitVide = '';
+    if(toutes.length === 0){
+      var payants = resume ? entierOuNul(resume.clients_payants) : null;
+      faitVide = '<div class="rien">La vue n’a rendu <b>aucune ligne</b>. '
+        + (payants === null
+            ? '<b>Le nombre de clients payants n’a pas pu être lu</b> : ce tableau '
+              + 'vide ne permet alors aucune conclusion.'
+            : 'Dans la même lecture, le résumé compte <b>' + payants + '</b> '
+              + 'client(s) payant(s) en production, tous canaux confondus.')
+        + ' Un encaissement n’apparaît dans ce tableau que s’il est rattaché à un '
+        + 'code : <b>une absence de ligne ne prouve pas</b>, à elle seule, qu’aucun '
+        + 'paiement n’est passé par un code.</div>';
+    }
+    $('cadre-officine').innerHTML = tableau(
+      'Canal officine — argent réellement encaissé par code',
+      ['Mois','Apporteur','Code','Encaissements','Abonnés','Brut','Net encaissé','Sans net'],
+      lignes,
+      'aucun encaissement rattaché à un code', 12)
+      + mentionPerimetre(toutes, MOT_INTERNES, U_ENCAISSE)
+      + faitVide
+      + '<div class="rien"><b>Ce tableau ne calcule aucune commission</b> : ni taux ni '
+      + 'plafond ne sont enregistrés, et la règle n’est pas arrêtée. Il montre l’assiette — '
+      + 'l’argent réel entré par un code.<br><br>Le <b>net</b> est le brut moins la TVA et '
+      + 'moins la part du magasin, aux taux que RevenueCat envoie <b>avec chaque paiement</b> '
+      + '— rien n’est figé dans la page. La colonne « sans net » compte les encaissements '
+      + 'dont un taux manquait : ils ne sont pas perdus, ils ne sont simplement pas '
+      + 'chiffrables.<br><br>⚠️ Le « revenu estimé » de Google reste une <b>estimation</b> : '
+      + 'le versement réel arrive sur le relevé mensuel, après conversions et remboursements. '
+      + 'Avant de payer une commission, rapprochez ce total de ce relevé.</div>';
+  }
   // ── Connexion / deconnexion ───────────────────────────────────────────────
 
   // ══════════════════════════════════════════════════════════════════════════

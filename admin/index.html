@@ -13,7 +13,7 @@
   Cette page NE CONTIENT AUCUN SECRET. La cle ci-dessous est la cle PUBLIQUE
   du projet : elle est deja publiee dans l'application Android installee chez
   les utilisateurs. Elle n'ouvre RIEN toute seule — l'epreuve du 09/09 l'a
-  montre : les douze vues repondent « permission denied » a un visiteur non
+  montre : les vues `v_admin_*` repondent « permission denied » a un visiteur non
   connecte, et rendent ZERO LIGNE a un compte connecte qui n'est pas celui de
   Gaetan.
 
@@ -273,6 +273,25 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   .ind .valeur{font-size:24px}
   #console{padding:16px 13px 56px}
 }
+/* ── Puces de filtre (13/09/2026) ──────────────────────────────────────────
+   Meme doctrine que les voyants : une puce ACTIVE est en accent doux, une puce
+   eteinte est grise ET BARREE. Ce qui est ecarte doit se voir sans lire. */
+.puces{display:flex; flex-wrap:wrap; gap:7px; align-items:center; padding:8px 13px 13px}
+.puces-sep{font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--encre-3); font-weight:650; margin-left:6px}
+.puce{
+  width:auto; margin:0; padding:5px 11px; border-radius:999px;
+  font-size:12.5px; font-weight:600; cursor:pointer;
+  background:var(--carte); color:var(--encre-3); border:1px solid var(--trait-fort);
+}
+.puce.active{background:var(--accent-doux); color:var(--accent-encre);
+  border-color:color-mix(in srgb, var(--accent) 35%, transparent)}
+.puce:not(.active){text-decoration:line-through}
+.puce:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.rien.avert{background:var(--attention-fond); color:var(--attention);
+  border-bottom:1px solid color-mix(in srgb, var(--attention) 28%, transparent)}
+.rien.avert b{color:var(--attention)}
+#filtres-parcours:empty{display:none}
 </style>
 </head>
 <body>
@@ -329,22 +348,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       et met USD par défaut.</div></details>
   </section>
 
-  <section id="s-scans">
-    <div class="titre"><h2>Scan d'ordonnance</h2><span class="sous">60 derniers jours</span></div>
-    <div class="cadre" id="cadre-scans"></div>
-    <details class="repli"><summary>Vos appareils de test sont comptés dedans, et on ne peut pas les séparer</summary>
-      <div class="corps">La table de mesure ne porte aucune colonne d'appareil. À dix
-      utilisateurs, vos propres essais pèsent lourd dans ces chiffres.<br><br>
-      La colonne <b>non classés</b> doit toujours valoir 0 : une autre valeur signifie
-      qu'un code de réponse échappe à tous les compteurs, et elle s'affiche en rouge.<br><br>
-      Ces lignes n'existent que si la fonction a <b>répondu</b>. Un scan engagé qui n'a
-      jamais reçu de réponse ne figure nulle part ici — c'est le voyant « échecs
-      silencieux », en haut.</div></details>
-  </section>
-
   <section id="s-parcours">
-    <div class="titre"><h2>Parcours d'entrée</h2><span class="sous">par semaine</span></div>
+    <div class="titre"><h2>Parcours d'entrée</h2><span class="sous">par semaine, puis jour par jour</span></div>
     <div class="cadre" id="cadre-parcours"></div>
+    <div class="cadre" id="filtres-parcours"></div>
     <div class="cadre" id="cadre-inst-jour"></div>
     <details class="repli"><summary>⚠️ Ces colonnes gonflent l'abandon apparent — à lire avant de les interpréter</summary>
       <div class="corps"><b>Elles disent ce que la personne avait déjà fait au moment où sa
@@ -356,7 +363,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       seule personne — ce n'est plus une statistique, c'est un individu. Le tableau du dessous ne
       donne qu'un <b>compte</b> par jour, ce qui ne décrit le comportement de personne.<br><br>
       La semaine en cours est grisée : incomplète, elle ne se compare à aucune autre. Appareils
-      de test exclus.</div></details>
+      de test exclus de ce tableau hebdomadaire.<br><br>
+      <b>Le tableau du dessous, lui, se filtre</b> — et il le faut. Le marquage
+      « appareil de test » ne reconnaît PAS une version signée pour le test interne :
+      c'est exactement le fichier qui ira en production, il ne porte donc aucune
+      marque. Nos propres essais y comptent comme de vrais nouveaux venus tant que
+      leur numéro de version n'a pas été décoché.</div></details>
   </section>
 
   <section id="s-officine">
@@ -428,7 +440,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     <details class="repli"><summary>Ce que contient le fichier, et ce qu'il ne contient pas</summary>
       <div class="corps"><b>Onze tables sont dedans</b> : apporteurs, codes,
       attributions, événements de facturation, commissions, commissions
-      archivées, mesures de scan, parcours d'entrée, quarantaine, journal
+      archivées, mesures de scan (figées au 12/09/2026), parcours d'entrée, quarantaine, journal
       d'alerte et <b>archive d'audience</b>.<br><br>
       <b>Cinq en sont exclues, et chacune pour un motif :</b> la base des
       médicaments (15&nbsp;846 lignes reconstructibles depuis un fichier du
@@ -447,7 +459,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   </section>
 
   <footer>
-    Les douze vues interrogées ne contiennent que des agrégats : ni pseudonyme,
+    Les quatorze vues interrogées ne contiennent que des agrégats : ni pseudonyme,
     ni identifiant de transaction, ni adresse IP, ni commune, ni modèle
     d'appareil. <b>Un seul bouton de cette page écrit dans la base</b> : « Générer
     la sauvegarde », et il n'écrit qu'une ligne de journal — date, taille, nombre
@@ -504,36 +516,6 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     var i = parseInt(m[2], 10) - 1;
     if(i < 0 || i > 11) return jourTexte(v);
     return NOMS_MOIS[i] + " " + m[1];
-  }
-  /**
-   * La collecte des mesures de scan tourne-t-elle encore ?
-   *
-   * La tâche d'archivage a été ARRÊTÉE le 12/09/2026, en application de la
-   * décision du 09/09 : elle était exécutée par un service hors de l'Union et
-   * lisait les journaux de l'hébergeur, qui portent l'adresse IP.
-   * `collected_at` ne bouge donc plus.
-   *
-   * ⚠️ SANS CETTE FONCTION, DEUX VOYANTS MENTENT, ET DANS LES DEUX SENS.
-   *
-   *  • « Échecs silencieux de scan » compare les appels engagés aux réponses
-   *    archivées sur une fenêtre calée sur le dernier archivage. Figée, la
-   *    fenêtre se vide : les deux compteurs tombent à zéro, l'écart vaut zéro,
-   *    et le voyant annonce « tout appel engagé a sa réponse » — pour toujours,
-   *    sans rien mesurer. Un faux « rien à signaler » est pire qu'une alerte.
-   *  • « Archivage des mesures » compte comme « en retard » tout scan engagé
-   *    postérieur au dernier scan archivé. Cette date est figée : chaque
-   *    nouveau scan deviendra « en retard » et le restera.
-   *
-   * Seuil à 12 h : la tâche passait toutes les 6 h. Deux cycles manqués, c'est
-   * un arrêt, pas un retard. Fonction PURE -> vérifiable hors navigateur.
-   */
-  var HEURES_AVANT_ARRET_COLLECTE = 12;
-  function collecteScanArretee(dernierArchivage, maintenant){
-    if(!dernierArchivage) return true;
-    var t = new Date(dernierArchivage).getTime();
-    if(!isFinite(t)) return true;
-    var ref = (maintenant == null) ? Date.now() : maintenant;
-    return (ref - t) / 3600000 > HEURES_AVANT_ARRET_COLLECTE;
   }
   function heuresDepuis(v){
     if(!v) return Infinity;
@@ -671,9 +653,41 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['resume','resume-note','s-alertes','s-argent','s-scans','s-parcours','s-officine','s-audience','s-sauvegarde'];
+    var ids = ['resume','resume-note','s-alertes','s-argent','s-parcours','s-officine','s-audience','s-sauvegarde'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
+
+  // ── LES VUES LUES, ET LEUR NOM DANS `rendre` ──────────────────────────────
+  //
+  // ⚠️ ASSEMBLAGE PAR NOM, JAMAIS PAR POSITION — corrige le 13/09/2026.
+  // L'ancienne version lisait `res[0]` … `res[13]` a la main. Retirer une vue
+  // de la liste obligeait a renumeroter treize lignes, et un oubli PARTIEL ne
+  // levait AUCUNE erreur : le tableau des attributions recevait les donnees de
+  // la sauvegarde, et le voyant Sauvegarde passait au ROUGE « aucun fichier n'a
+  // jamais ete genere » alors que la derniere sauvegarde datait de l'avant-veille.
+  // Une fausse alerte rouge est aussi grave qu'une alerte cachee. Desormais,
+  // ajouter ou retirer une vue ne touche QUE cette liste.
+  //
+  // ⚠️ ON NE LIT PAS `v_admin_audience` : elle rend deja plus de mille lignes et
+  // PostgREST plafonne a 1000. Elle serait TRONQUEE EN SILENCE. Les trois vues
+  // d'audience ci-dessous sont bornees par construction : 1, 56 et 27 lignes.
+  //
+  // `unique` : la vue rend UNE ligne (ou zero) ; on garde la premiere.
+  var VUES = [
+    { cle:'alertes',      vue:'v_admin_alertes',               unique:true },
+    { cle:'abonnes',      vue:'v_admin_abonnes' },
+    { cle:'resume',       vue:'v_admin_resume',                unique:true },
+    { cle:'acces',        vue:'v_admin_acces_offerts' },
+    { cle:'parcoursJour', vue:'v_admin_parcours_jour_version', ordre:{col:'jour',      asc:false} },
+    { cle:'argent',       vue:'v_admin_argent_mois',           ordre:{col:'mois',      asc:false} },
+    { cle:'parcours',     vue:'v_admin_parcours_semaine',      ordre:{col:'semaine',   asc:false} },
+    { cle:'codes',        vue:'v_admin_codes' },
+    { cle:'attributions', vue:'v_admin_attributions_semaine',  ordre:{col:'semaine',   asc:false} },
+    { cle:'sauvegarde',   vue:'v_admin_sauvegarde',            unique:true },
+    { cle:'audEtat',      vue:'v_admin_audience_etat',         unique:true },
+    { cle:'audJours',     vue:'v_admin_audience_jours',        ordre:{col:'jour',      asc:false} },
+    { cle:'audMesures',   vue:'v_admin_audience_mesures',      ordre:{col:'graphique', asc:true} }
+  ];
 
   function charger(){
     $('btn-recharger').disabled = true;
@@ -696,45 +710,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       }
       masquerBlocs(false);
       afficherEtat('ok','Console ouverte. ',
-        'Les quinze vues répondent. Les chiffres ci-dessous sont ceux de la base.');
-      return Promise.all([
-        lire('v_admin_alertes'),
-        lire('v_admin_abonnes'),
-        lire('v_admin_resume'),
-        lire('v_admin_acces_offerts'),
-        lire('v_admin_installations_jour', {col:'jour', asc:false}),
-        lire('v_admin_argent_mois',    {col:'mois',    asc:false}),
-        lire('v_admin_scans_jour',     {col:'jour',    asc:false}),
-        lire('v_admin_parcours_semaine',{col:'semaine',asc:false}),
-        lire('v_admin_codes'),
-        lire('v_admin_attributions_semaine',{col:'semaine',asc:false}),
-        lire('v_admin_sauvegarde'),
-        // ⚠️ ON NE LIT PAS `v_admin_audience` : elle rend deja 1073 lignes et
-        // PostgREST plafonne a 1000. Elle serait TRONQUEE EN SILENCE. Les trois
-        // vues ci-dessous sont bornees par construction : 1, 56 et 27 lignes.
-        lire('v_admin_audience_etat'),
-        lire('v_admin_audience_jours',   {col:'jour', asc:false}),
-        lire('v_admin_audience_mesures', {col:'graphique', asc:true})
-      ]);
+        'Les quatorze vues répondent. Les chiffres ci-dessous sont ceux de la base.');
+      return Promise.all(VUES.map(function(v){ return lire(v.vue, v.ordre); }));
     }).then(function(res){
       if(!res) return;
       for(var i=0;i<res.length;i++) if(res[i].error) throw res[i].error;
-      rendre({
-        alertes:      res[0].data[0] || null,
-        abonnes:      res[1].data,
-        resume:       res[2].data[0] || null,
-        acces:        res[3].data,
-        instJour:     res[4].data,
-        argent:       res[5].data,
-        scans:        res[6].data,
-        parcours:     res[7].data,
-        codes:        res[8].data,
-        attributions: res[9].data,
-        sauvegarde:   res[10].data[0] || null,
-        audEtat:      res[11].data[0] || null,
-        audJours:     res[12].data,
-        audMesures:   res[13].data
-      });
+      var d = {};
+      for(var j=0;j<VUES.length;j++){
+        var v = VUES[j], data = res[j].data || [];
+        d[v.cle] = v.unique ? (data[0] || null) : data;
+      }
+      rendre(d);
       $('horodatage').textContent = 'relevé le ' + fmtDate.format(new Date()) + ' (heure de Paris)';
       $('btn-recharger').disabled = false;
     }).catch(function(e){
@@ -768,14 +754,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         'Rien de rouge, mais quelque chose mérite un coup d’œil.');
     } else {
       afficherEtat('ok','Rien à signaler. ',
-        'Les quinze vues répondent et aucun voyant n’est allumé.');
+        'Les quatorze vues répondent et aucun voyant n’est allumé.');
     }
     rendreResume(d.resume, d.audJours, d.alertes);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent);
-    rendreScans(d.scans, d.alertes);
     rendreParcours(d.parcours);
-    rendreInstallationsJour(d.instJour);
+    rendreParcoursJour(d.parcoursJour);
     rendreCodes(d.codes);
     rendreAccesOfferts(d.acces);
     rendreAttributions(d.attributions);
@@ -808,79 +793,61 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             ? 'L’alarme ne mesure plus. Le « 0 » ci-contre ne prouve rien.'
             : 'Dernière mesure : ' + quandTexte(a.alarme_derniere_mesure));
 
-    // 3. Webhook : rouge SEULEMENT si le dernier echec est postérieur au dernier
-    //    succes. Sinon on regarde un incident deja clos.
-    var ech_ = a.webhook_dernier_echec ? new Date(a.webhook_dernier_echec).getTime() : 0;
-    var suc_ = a.webhook_dernier_succes ? new Date(a.webhook_dernier_succes).getTime() : 0;
-    var enPanne = ech_ > suc_;
-    h += ind('Webhook de paiement',
-          enPanne ? 'en échec' : 'répond',
-          enPanne ? 'critique' : 'ok',
-          enPanne
-            ? 'Dernier échec ' + quandTexte(a.webhook_dernier_echec) + ', postérieur au dernier succès.'
-            : (a.webhook_non_2xx_7j > 0
-                ? a.webhook_non_2xx_7j + ' échec(s) sur 7 jours, tous antérieurs au dernier succès du '
-                  + quandTexte(a.webhook_dernier_succes)
-                : 'Dernier succès ' + quandTexte(a.webhook_dernier_succes)));
-
-    // 4. Ecart de scan. Un ecart NEGATIF n'est pas un bon signe : c'est le
-    //    signe que le calcul ne tient plus. Orange, jamais vert.
-    // ⚠️ LA COLLECTE EST-ELLE ARRÊTÉE ? Voir `collecteScanArretee` plus haut :
-    // sans ce test, les deux voyants qui suivent deviennent faux le lendemain
-    // de l'arrêt, et rien ne le signale.
-    var scanArrete = collecteScanArretee(a.dernier_archivage);
-
-    if(scanArrete){
-      h += ind('Échecs silencieux de scan', 'mesure arrêtée', 'ok',
-            'La collecte des mesures de scan est arrêtée depuis le '
-            + quandTexte(a.dernier_archivage)
-            + '. Ce voyant ne mesure plus rien : il ne dit ni « tout va bien », '
-            + 'ni le contraire.');
+    // 3. ⚠️ TROIS VOYANTS ONT ETE RETIRES ICI LE 13/09/2026. IL FAUT SAVOIR
+    //    POURQUOI, SINON QUELQU'UN LES REMETTRA.
+    //
+    //    « Webhook de paiement », « Echecs silencieux de scan » et « Archivage
+    //    des mesures » etaient tous les trois nourris par `scan_metrics`, dont
+    //    la collecte est ARRETEE depuis le 12/09 (decision du 09/09 : la tache
+    //    lisait les journaux de l'hebergeur depuis un service hors de l'Union).
+    //
+    //    Le pire des trois etait le webhook : le 13/09 il affichait encore
+    //    « repond » sur un dernier succes date du 09/09 — alors que le PREMIER
+    //    CLIENT PAYANT etait passe le 12/09 a 13h37. Faux dans les deux sens, et
+    //    il le serait reste pour toujours. Les deux autres annoncaient honnetement
+    //    « mesure arretee » : une brique qui annonce qu'elle ne mesure plus rien
+    //    n'est plus une brique, c'est une cicatrice.
+    //
+    //    ⚠️ CE RETRAIT LAISSE UN ANGLE MORT, ET ON L'ECRIT A L'ECRAN.
+    //    « Quarantaine non rejouee » NE LE COUVRE PAS : la quarantaine n'attrape
+    //    qu'un corps SIGNE et mal forme. Une signature invalide, un 500 de la
+    //    fonction, ou RevenueCat qui n'appelle plus, n'ecrivent RIEN, nulle part.
+    //    RevenueCat reessaie cinq fois puis abandonne. Aucune detection
+    //    automatique de cette panne n'existe aujourd'hui. Le seul fait verifiable
+    //    est la date du dernier evenement RECU, ci-dessous.
+    // ⚠️ « EVENEMENT », PAS « PAIEMENT » — corrige en revue adverse le 13/09.
+    //    La valeur est `max(recu_le)` sur TOUS les evenements de facturation.
+    //    Sur les cinq lignes presentes au 13/09, QUATRE ne sont pas des ventes :
+    //    une annulation, une expiration, un acces offert a 0 USD, et un achat de
+    //    test en bac a sable. Un voyant « dernier paiement » se serait donc
+    //    allume, tout frais, le jour ou un client ANNULE son abonnement —
+    //    l'exact inverse de la verite, sur le chiffre qui compte le plus.
+    if('dernier_evenement_facturation' in a){
+      h += ind('Dernier événement de facturation',
+            a.dernier_evenement_facturation
+              ? dureeTexte(heuresDepuis(a.dernier_evenement_facturation))
+              : 'jamais',
+            'ok',
+            (a.dernier_evenement_facturation
+              ? 'Reçu le ' + quandTexte(a.dernier_evenement_facturation) + '. '
+              : 'Aucun événement de facturation reçu à ce jour. ')
+            + 'CE N’EST PAS UNE VENTE : les annulations, les expirations, les accès '
+            + 'offerts à 0 € et les achats de test comptent aussi. FAIT, PAS VERDICT '
+            + '— ce voyant ne passe jamais au rouge : sans activité il vieillit sans '
+            + 'qu’il y ait la moindre panne. Aucune détection automatique d’une panne '
+            + 'du webhook n’existe : la référence reste le tableau de bord RevenueCat.');
     } else {
-      var e = a.ecart_scans;
-      var etatEcart = (e == null) ? 'attention' : (e < 0 ? 'attention' : (e > 0 ? 'critique' : 'ok'));
-      h += ind('Échecs silencieux de scan',
-            (e == null || e < 0) ? 'non calculable' : String(e), etatEcart,
-            (e < 0 ? 'Écart négatif : bord de purge ou collecteur en avance. '
-                   : (e > 0 ? 'Des scans engagés sans réponse enregistrée. ' : 'Tout appel engagé a sa réponse. '))
-            + a.appels_engages_comparables + ' engagés / ' + a.reponses_comparables + ' réponses.');
+      // ⚠️ UN DEMI-DEPLOIEMENT DOIT SE VOIR. Entre la publication de cette page et
+      // l'etape 2 du SQL, `v_admin_alertes` ne porte pas encore cette colonne :
+      // la grille perdait trois voyants et n'en gagnait aucun, EN SILENCE. Une
+      // migration interrompue serait restee invisible pour toujours.
+      h += ind('Migration du 13/09', 'incomplète', 'attention',
+            'L’étape 2 du SQL n’a pas été appliquée : la vue des alertes ne porte pas '
+            + 'encore la date du dernier événement de facturation, et les vues mortes '
+            + 'sont probablement encore en place. Exécutez « 2-APRES-le-push.sql ».');
     }
 
-    // 5. ⚠️ CORRIGE LE 10/09 — ON MESURE UN MANQUE, PLUS UN AGE.
-    // L'ancienne version lisait l'age de la derniere INSERTION. Or
-    // `collected_at` ne bouge que lorsqu'une ligne est inseree : sans scan,
-    // rien n'est insere, et le voyant passait a l'orange pour une machine en
-    // parfait etat. Mesure du 10/09 : archivage passe a 18:56 avec succes,
-    // zero insertion, parce qu'aucun scan depuis 07:26. Presque chaque matin
-    // aurait ete orange.
-    // Maintenant : en retard SEULEMENT s'il existe un scan ENGAGE posterieur
-    // au dernier evenement archive et deja vieux de plus de huit heures — soit
-    // plus d'un cycle complet de la tache, qui passe toutes les six heures.
-    if(scanArrete){
-      h += ind('Archivage des mesures', 'arrêté', 'ok',
-            'Tâche arrêtée le 12/09/2026, décision du 09/09 : elle lisait les '
-            + 'journaux de l’hébergeur depuis un service hors de l’Union. '
-            + 'Dernier archivage le ' + quandTexte(a.dernier_archivage)
-            + '. Le tableau des scans reste un historique, plus une mesure.');
-    } else if('engagees_non_archivees' in a && a.engagees_non_archivees != null){
-      var manque = a.engagees_non_archivees;
-      h += ind('Archivage des mesures',
-            manque > 0 ? (manque + ' en retard') : 'à jour',
-            manque > 0 ? 'attention' : 'ok',
-            manque > 0
-              ? manque + ' scan(s) engagé(s) il y a plus de 8 h ne sont toujours pas archivés.'
-              : (a.scans_engages_24h > 0
-                  ? a.scans_engages_24h + ' scan(s) sur 24 h, tous archivés. Dernier le '
-                    + quandTexte(a.dernier_scan_archive) + '.'
-                  : 'Aucun scan depuis le ' + quandTexte(a.dernier_scan_archive)
-                    + ' — rien à archiver. Ce n’est pas une panne.'));
-    } else {
-      // Vue d'avant la v5 : on affiche, on n'alarme pas.
-      h += ind('Dernière insertion', dureeTexte(heuresDepuis(a.dernier_archivage)), 'ok',
-            quandTexte(a.dernier_archivage) + ' — voyant d’archivage indisponible (migration v5 non appliquée).');
-    }
-
-    // 6. Comptes. Le reglage « inscription fermee » n'est PAS lisible en base :
+    // 4. Comptes. Le reglage « inscription fermee » n'est PAS lisible en base :
     //    on mesure son EFFET a la place.
     if('comptes_auth' in a && a.comptes_auth != null){
       var c = a.comptes_auth;
@@ -909,7 +876,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
                   : 'Tout code saisi a donné son accès.'));
     }
 
-    // 7. Information, pas alerte.
+    // 5. Information, pas alerte.
     h += ind('Codes à quota épuisé', nb(a.codes_epuises),
           a.codes_epuises > 0 ? 'attention' : 'ok',
           a.codes_epuises > 0 ? 'Ces codes ne donnent plus rien en pharmacie.' : 'Aucun code bloqué.');
@@ -1079,6 +1046,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             + 'des signalements qui ne sont jamais arrivés. <b>Notre mesure n’a rien vu '
             + 'avant le ' + ech(jourTexte(r.mesure_depuis)) + '.</b>'
           : '')
+      + '<br><br>🔴 <b>CE CHIFFRE N’EST PAS FILTRÉ, et il compte nos propres essais.</b> '
+      + 'Le marquage « appareil de test » ne reconnaît pas une version signée pour le '
+      + 'test interne : c’est le fichier qui ira en production, il ne porte donc aucune '
+      + 'marque. Le 13/09/2026, les <b>deux</b> démarrages du jour étaient le téléphone '
+      + 'de test. <b>Le tableau du bas, lui, se filtre par version</b> — c’est le seul '
+      + 'endroit où vous pouvez écarter la vôtre. Si les deux se contredisent, c’est '
+      + 'celui du bas qui dit la vérité.'
       + '<br><br>Téléchargements et désinstallations : <b>Play Console</b>. '
       + 'Les personnes qui <b>reviennent</b>, elles, sont mesurées ci-contre.');
 
@@ -1133,28 +1107,28 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + 'qu’une au moins n’est jamais arrivée. Pour un état des ventes qui fait foi, la '
       + 'référence reste le tableau de bord RevenueCat.');
 
-    // ⚠️ CE CHIFFRE DESCEND TOUT SEUL DEPUIS L'ARRÊT DE LA COLLECTE.
-    // Il compte les scans des 30 derniers jours. La collecte étant arrêtée le
-    // 12/09/2026, plus aucune ligne ne s'ajoute : dans 30 jours il vaudra
-    // ZÉRO, et se lira comme « plus personne ne scanne » — c'est-à-dire comme
-    // une panne du produit. Le libellé doit donc le dire, sinon le tableau de
-    // bord ment par omission.
-    var scanArreteResume = collecteScanArretee(alertes ? alertes.dernier_archivage : null);
-    h += res(scanArreteResume ? 'Scans sur 30 jours — mesure arrêtée' : 'Scans sur 30 jours',
-      nb(r.scans_30j),
-      [['Réussis', nb(r.scans_30j_reussis)]],
-      (scanArreteResume
-        ? '🔴 <b>La collecte des mesures de scan est arrêtée depuis le 12/09/2026</b> '
-          + '(décision du 09/09 : la tâche lisait les journaux de l’hébergeur depuis un '
-          + 'service hors de l’Union). Ce chiffre ne compte plus que ce qui a été mesuré '
-          + '<b>avant</b> l’arrêt, sur une fenêtre glissante de 30 jours : <b>il descendra '
-          + 'jusqu’à zéro de lui-même</b>. Zéro ne voudra pas dire « plus personne ne '
-          + 'scanne ».<br><br>'
-        : '')
-      + '<b>Vos appareils de test sont comptés dedans</b>, et on ne peut pas les séparer : la '
-      + 'table de mesure ne porte aucune colonne d’appareil.<br><br>Ne comptent que les scans '
-      + 'ayant <b>reçu une réponse</b>. Un scan engagé resté sans réponse ne figure pas ici — '
-      + 'c’est le voyant « échecs silencieux ».');
+    // ⚠️ UN FAIT, PAS UNE MESURE D'USAGE — et la bulle dit ses quatre trous.
+    // Remplace la tuile « Scans sur 30 jours », retiree le 13/09/2026 avec la
+    // collecte gelee : elle serait descendue jusqu'a zero toute seule, et ce
+    // zero se serait lu comme « plus personne ne scanne ».
+    if(alertes && 'scans_engages_24h' in alertes){
+      h += res('Appels d’analyse · 24 h', nb(alertes.scans_engages_24h), null,
+        '<b>Ce qu’il compte :</b> les appels d’analyse d’ordonnance <b>arrivés '
+        + 'jusqu’au serveur</b> sur les 24 dernières heures glissantes. Source : le '
+        + 'compteur anti-abus, seule mesure de scan encore vivante depuis l’arrêt de '
+        + 'la collecte le 12/09/2026.<br><br>'
+        + '<b>Ce qu’il ne compte pas</b>, et il faut le savoir avant de le lire :<br>'
+        + '• les demandes <b>refusées par le plafond anti-abus</b> — le chiffre '
+        + '<b>baisse</b> donc quand quelqu’un tape sur le service ;<br>'
+        + '• les images trop volumineuses, écartées avant le compteur ;<br>'
+        + '• la réussite, l’échec, la durée : <b>rien de tout cela n’est mesuré</b>.'
+        + '<br><br><b>Vos appareils de test sont comptés dedans</b> : cette table ne '
+        + 'porte aucune colonne d’appareil. L’écriture est « au mieux » — une panne '
+        + 'de la table laisse passer le scan sans le compter. Purge à <b>24 h</b> : '
+        + 'aucun historique, aucune comparaison avec hier, et <b>un zéro ne prouve '
+        + 'pas qu’il n’y a pas eu de scan</b>.<br><br>'
+        + 'La mesure d’usage qui fait foi reste « Ont tenté un scan », plus bas.');
+    }
 
     $('resume').innerHTML = h;
     $('resume-note').innerHTML = '';
@@ -1206,39 +1180,6 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + '<div class="rien">Une ligne par <b>mois</b> et par type d\u2019\u00e9v\u00e9nement \u2014 ce n\u2019est pas un \u00e9v\u00e9nement par ligne. Le webhook RevenueCat est branch\u00e9 depuis le <b>8 septembre 2026</b> : rien d\u2019ant\u00e9rieur ne figure ici.</div>';
   }
 
-  function rendreScans(rows, alertes){
-    var lignes = (rows||[]).map(function(r){
-      var nc = r.non_classes;
-      return { cases:[
-        {texte: jourTexte(r.jour)},
-        {texte: nb(r.tentatives)},
-        {texte: nb(r.reussites)},
-        {texte: nb(r.refus_4xx)},
-        {texte: nb(r.delais_depasses)},
-        {texte: nb(r.autres_echecs_5xx)},
-        {texte: nb(nc), classe: (nc && nc !== 0) ? 'rouge' : 'vide'},
-        {texte: (r.latence_mediane_s == null) ? '—' : r.latence_mediane_s + ' s'},
-        {texte: (r.latence_min_s == null) ? '—' : r.latence_min_s + ' s'},
-        {texte: (r.latence_max_s == null) ? '—' : r.latence_max_s + ' s'}
-      ]};
-    });
-    // ⚠️ La collecte est arrêtée depuis le 12/09/2026 : ce tableau est un
-    // HISTORIQUE, plus une mesure en cours. Sans cette mention, il se viderait
-    // tout seul au fil des 60 jours de la fenêtre, et se lirait comme
-    // « plus aucun scan » — c'est-à-dire comme une panne du produit.
-    var arret = collecteScanArretee(alertes ? alertes.dernier_archivage : null);
-    $('cadre-scans').innerHTML = tableau('Scans par jour',
-      ['Jour','Tentatives','Réussites','Refus 4xx','Délai dépassé','Autres 5xx',
-       'Non classés','Latence médiane','Min','Max'],
-      lignes, arret ? 'collecte arrêtée — plus aucune mesure enregistrée' : 'aucun scan sur 60 jours', 12)
-      + (arret
-          ? '<div class="rien">⚠️ <b>Collecte arrêtée le 12/09/2026</b> (décision du 09/09 : '
-            + 'la tâche lisait les journaux de l’hébergeur depuis un service hors de l’Union). '
-            + 'Ce tableau montre ce qui a été mesuré JUSQUE-LÀ, sur une fenêtre de 60 jours : '
-            + 'il se videra de lui-même, et cela ne voudra pas dire qu’il n’y a plus de scans.</div>'
-          : '');
-  }
-
   function rendreParcours(rows){
     var lignes = (rows||[]).map(function(r){
       return { grisee: !!r.semaine_en_cours, cases:[
@@ -1255,22 +1196,201 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       lignes, 'aucun parcours enregistré', 12);
   }
 
+  // ── PARCOURS JOUR PAR JOUR, AVEC FILTRES (13/09/2026) ─────────────────────
+  //
+  // POURQUOI CES FILTRES EXISTENT. Le marquage « appareil de test » repose sur
+  // DEUX signaux : un drapeau de compilation, et le suffixe « -debug » de la
+  // version native. Une build SIGNEE pour le test interne ne porte NI L'UN NI
+  // L'AUTRE — c'est exactement le fichier qui ira en production. Le 13/09, deux
+  // lignes en version 1.4.11, qui n'existait que sur le telephone de Gaetan, ont
+  // donc ete comptees comme deux VRAIS nouveaux utilisateurs. A dix installations
+  // par jour, chaque remise a zero de recette deplace le chiffre de dix pour cent.
+  //
+  // Aucune parade automatique n'existe : le serveur ne sait pas quelle version est
+  // publiee, et un drapeau pose a la signature suivrait l'artefact jusqu'en
+  // production. Le filtre est donc MANUEL — mais il ne demande AUCUNE liste a
+  // tenir a jour : les boutons sont fabriques a partir des donnees elles-memes.
+  //
+  // ⚠️ CE QUI EST ECARTE SE VOIT, TOUJOURS. Un tableau de bord dont on a oublie
+  // un filtre ment aussi surement qu'une brique morte. Deux niveaux, et la
+  // distinction compte : une version DECOCHEE par quelqu'un allume un bandeau
+  // ORANGE, au-dessus du tableau, avec le compte exact ; l'exclusion par defaut
+  // des appareils de test se dit en GRIS, comme un cadrage. Un bandeau orange
+  // permanent — ce qu'aurait produit la premiere version — cesse d'avertir.
+  var CLE_FILTRE_PARCOURS = 'pilou.console.parcours.filtre';
+  var filtreParcours = { avecTest:false, versionsExclues:{} };
+  var lignesParcours = [];
+  var filtreCharge   = false;
+
+  function lireFiltreParcours(){
+    // Le stockage du navigateur peut etre refuse (navigation privee, donnees de
+    // site effacees) : on n'en depend jamais, on retombe sur le reglage par defaut.
+    try{
+      var brut = window.localStorage.getItem(CLE_FILTRE_PARCOURS);
+      if(!brut) return;
+      var o = JSON.parse(brut);
+      if(o && typeof o === 'object'){
+        filtreParcours.avecTest = (o.avecTest === true);
+        // ⚠️ ON NE GARDE QUE LES CLES VALANT EXACTEMENT `true`. Une valeur
+        // heritee d'une version anterieure, ou bricolee a la main, ferait une
+        // puce qui s'affiche active mais dont le premier clic ne fait rien :
+        // il en faudrait deux. Releve en revue adverse le 13/09.
+        filtreParcours.versionsExclues = {};
+        if(o.versionsExclues && typeof o.versionsExclues === 'object'){
+          for(var k in o.versionsExclues){
+            if(Object.prototype.hasOwnProperty.call(o.versionsExclues, k)
+               && o.versionsExclues[k] === true){
+              filtreParcours.versionsExclues[k] = true;
+            }
+          }
+        }
+      }
+    }catch(e){ /* sans effet : le defaut s'applique */ }
+  }
+  function ecrireFiltreParcours(){
+    try{ window.localStorage.setItem(CLE_FILTRE_PARCOURS, JSON.stringify(filtreParcours)); }
+    catch(e){ /* sans effet : le filtre ne vaut alors que pour cet onglet */ }
+  }
+
+  function versionDe(r){ return r.version_app || '(inconnue)'; }
+  function ligneRetenue(r){
+    if(!filtreParcours.avecTest && r.appareil_de_test === true) return false;
+    return filtreParcours.versionsExclues[versionDe(r)] !== true;
+  }
+
+  function rendreParcoursJour(rows){
+    if(!filtreCharge){ lireFiltreParcours(); filtreCharge = true; }
+    lignesParcours = rows || [];
+
+    // ⚠️ GARDE ANTI-TRONCATURE. PostgREST plafonne a 1000 lignes SANS LE DIRE.
+    // Un tableau tronque en silence est pire qu'un tableau absent : on y lirait
+    // des totaux faux sans le savoir. La vue est bornee a 90 jours, ce cas ne
+    // doit donc jamais arriver ; s'il arrive, c'est la VUE qu'il faut retrecir.
+    if(lignesParcours.length >= 1000){
+      $('filtres-parcours').innerHTML = '';
+      $('cadre-inst-jour').innerHTML =
+        '<div class="rien"><b>Aucun chiffre affiché.</b> La vue a rendu 1000 lignes, '
+        + 'soit exactement le plafond de l’API : elle est probablement tronquée et '
+        + 'tout total serait faux. Réduisez la fenêtre de la vue avant de lire ceci.</div>';
+      return;
+    }
+    dessinerFiltresParcours();
+    dessinerParcoursJour();
+  }
+
+  function versionsVues(){
+    var vus = {}, liste = [], i;
+    for(i=0;i<lignesParcours.length;i++){
+      var v = versionDe(lignesParcours[i]);
+      if(!vus[v]){ vus[v] = true; liste.push(v); }
+    }
+    return liste.sort();
+  }
+
+  function dessinerFiltresParcours(){
+    var versions = versionsVues(), i;
+    var h = '<div class="cap">Filtres — ce que le tableau ci-dessous affiche</div>'
+          + '<div class="puces">'
+          + '<button type="button" class="puce' + (filtreParcours.avecTest ? ' active' : '')
+          + '" data-role="test" aria-pressed="' + (filtreParcours.avecTest ? 'true' : 'false')
+          + '">' + (filtreParcours.avecTest ? '✓ ' : '') + 'Nos appareils de test</button>'
+          + (versions.length ? '<span class="puces-sep">versions</span>' : '');
+    for(i=0;i<versions.length;i++){
+      var v = versions[i], actif = (filtreParcours.versionsExclues[v] !== true);
+      h += '<button type="button" class="puce' + (actif ? ' active' : '')
+         + '" data-role="version" data-version="' + ech(v) + '" aria-pressed="'
+         + (actif ? 'true' : 'false') + '">' + (actif ? '✓ ' : '') + ech(v) + '</button>';
+    }
+    h += '</div>';
+    $('filtres-parcours').innerHTML = h;
+
+    // Les anciens boutons sont detruits avec l'innerHTML : aucun ecouteur ne
+    // survit, donc aucune fuite. On rebranche les nouveaux.
+    var boutons = $('filtres-parcours').querySelectorAll('button.puce');
+    for(i=0;i<boutons.length;i++){
+      boutons[i].addEventListener('click', function(){
+        if(this.getAttribute('data-role') === 'test'){
+          filtreParcours.avecTest = !filtreParcours.avecTest;
+        } else {
+          var v = this.getAttribute('data-version');
+          if(filtreParcours.versionsExclues[v]) delete filtreParcours.versionsExclues[v];
+          else filtreParcours.versionsExclues[v] = true;
+        }
+        ecrireFiltreParcours();
+        dessinerFiltresParcours();
+        dessinerParcoursJour();
+      });
+    }
+  }
+
   // ⚠️ UN COMPTE PAR JOUR, ET RIEN DE PLUS.
-  // Le detail du parcours reste HEBDOMADAIRE parce qu'il croise le
-  // comportement : une case a 1 y decrirait ce qu'UNE personne a fait. Ici on
-  // ne publie qu'un compte — un « 1 » ne decrit le comportement de personne.
-  function rendreInstallationsJour(rows){
-    var lignes = (rows||[]).map(function(r){
-      return { cases:[
-        {texte: jourTexte(r.jour)},
-        {texte: nb(r.signalements)},
-        {texte: nb(r.ont_tente_un_scan)},
-        {texte: r.versions || '—'}
-      ]};
-    });
-    $('cadre-inst-jour').innerHTML = tableau('Premiers démarrages signalés, par jour',
-      ['Jour','Signalements','Ont tenté un scan','Versions vues'],
-      lignes, 'aucun signalement', 14);
+  // Le detail du parcours reste HEBDOMADAIRE parce qu'il croise le comportement :
+  // une case a 1 y decrirait ce qu'UNE personne a fait. Ici on ne publie qu'un
+  // compte — un « 1 » ne decrit le comportement de personne.
+  function dessinerParcoursJour(){
+    var parJour = {}, ordre = [], i, k;
+    var gardes = 0, masquesTest = 0, masquesVersion = 0, scansTest = 0, scansVersion = 0;
+
+    for(i=0;i<lignesParcours.length;i++){
+      var r = lignesParcours[i];
+      var n = Number(r.signalements) || 0;
+      var s = Number(r.ont_tente_un_scan) || 0;
+      if(!ligneRetenue(r)){
+        // Une ligne a la fois « test » et « version decochee » n'est comptee
+        // qu'UNE fois, du cote test : gardes + masques = total, toujours.
+        if(!filtreParcours.avecTest && r.appareil_de_test === true){ masquesTest += n; scansTest += s; }
+        else { masquesVersion += n; scansVersion += s; }
+        continue;
+      }
+      gardes += n;
+      if(!parJour[r.jour]){
+        parJour[r.jour] = { jour:r.jour, sig:0, scan:0, versions:{} };
+        ordre.push(r.jour);
+      }
+      var g = parJour[r.jour];
+      g.sig  += n;
+      g.scan += Number(r.ont_tente_un_scan) || 0;
+      g.versions[versionDe(r)] = true;
+    }
+
+    var lignes = [];
+    for(i=0;i<ordre.length;i++){
+      var jr = parJour[ordre[i]], vs = [];
+      for(k in jr.versions) if(Object.prototype.hasOwnProperty.call(jr.versions, k)) vs.push(k);
+      vs.sort();
+      lignes.push({ cases:[
+        {texte: jourTexte(jr.jour)},
+        {texte: String(jr.sig)},
+        {texte: String(jr.scan)},
+        {texte: vs.join(', ')}
+      ]});
+    }
+
+    // ⚠️ L'ORANGE EST RESERVE A CE QUE QUELQU'UN A CHOISI D'ECARTER.
+    // Corrige en revue adverse le 13/09 : la premiere version allumait le bandeau
+    // orange des l'ouverture, parce que des appareils de test il y en a presque
+    // tous les jours et qu'ils sont ecartes PAR DEFAUT. Un avertissement
+    // permanent cesse d'avertir — c'est exactement le mode de panne que tout ce
+    // lot combat. Le cadrage par defaut se dit donc en gris, comme un fait.
+    var masques = masquesTest + masquesVersion, bandeau = '';
+    if(masquesVersion > 0){
+      bandeau += '<div class="rien avert">⚠️ <b>Vous avez décoché une version.</b> '
+        + masquesVersion + ' démarrage(s) et ' + scansVersion + ' scan(s) tenté(s) '
+        + 'ne sont pas comptés ci-dessous.</div>';
+    }
+    if(masquesTest > 0){
+      bandeau += '<div class="rien">Cadrage par défaut : ' + masquesTest + ' démarrage(s) '
+        + 'et ' + scansTest + ' scan(s) tenté(s) marqués « appareil de test » sont '
+        + 'écartés. La puce du dessus les réintègre.</div>';
+    }
+    if(masques > 0){
+      bandeau += '<div class="rien"><b>Affiché : ' + gardes + '</b> démarrage(s) sur '
+        + (gardes + masques) + '.</div>';
+    }
+    $('cadre-inst-jour').innerHTML = bandeau
+      + tableau('Premiers démarrages signalés, par jour',
+          ['Jour','Signalements','Ont tenté un scan','Versions'],
+          lignes, 'aucun signalement avec ce filtre', 14);
   }
 
   function rendreCodes(rows){

@@ -1,2 +1,5 @@
-﻿*.bak
+*.bak
 *.bak-*
+# Les lots SQL portent l identifiant du compte administrateur.
+# Tout fichier commite ici devient une PAGE PUBLIQUE : ils vivent hors du depot.
+*.sql

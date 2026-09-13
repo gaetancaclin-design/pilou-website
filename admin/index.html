@@ -236,6 +236,49 @@ tr.cachee{display:none}
 .ind.critique .valeur{color:var(--critique)}
 .ind .detail{font-size:12.5px; color:var(--encre-3); margin-top:3px}
 
+/* ── La bande « À faire » ─────────────────────────────────────
+   Les deux seules actions de cette page qui ont une ECHEANCE. Elles etaient
+   en bas, sans date : l'archive d'audience se perd DEFINITIVEMENT au-dela de
+   28 jours, et la base n'a aucune sauvegarde automatique. Une action a delai
+   enterree sous huit blocs est une action qu'on oublie. */
+.afaire{display:grid; gap:12px; margin:0 0 22px;
+  grid-template-columns:repeat(auto-fit,minmax(288px,1fr))}
+.tache{
+  background:var(--carte); border:1px solid var(--trait); border-radius:var(--r);
+  padding:14px 15px; box-shadow:var(--ombre); border-left:3px solid var(--trait-fort);
+}
+.tache.attention{border-left-color:var(--attention)}
+.tache.critique{border-left-color:var(--critique)}
+.tache-tete{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap}
+.tache-quoi{font-size:12px; text-transform:uppercase; letter-spacing:.05em;
+  color:var(--encre-2); font-weight:600}
+.tache-delai{font-size:19px; font-weight:660; letter-spacing:-.01em}
+.tache.attention .tache-delai{color:var(--attention)}
+.tache.critique  .tache-delai{color:var(--critique)}
+.tache-dit{font-size:12.5px; color:var(--encre-3); margin-top:4px; line-height:1.5}
+.tache button{margin-top:11px}
+
+/* ── Sections repliees ─────────────────────────────────────────
+   ⚠️ UNE SEULE REGLE, ET ELLE NE S'APPLIQUE QUE FERMEE. Ouverte, chaque
+   element retrouve ses propres regles — en particulier `.cadre:empty` et la
+   grille. Une seconde regle pour l'etat ouvert ecraserait celles-la par
+   specificite et ferait reapparaitre les cadres vides. */
+section.repliable:not(.ouverte) > *:not(.titre){display:none}
+section.repliable > .titre{cursor:pointer; user-select:none}
+/* ⚠️ UN VRAI BOUTON, PAS UN `role` POSE SUR LE TITRE. Mettre role="button"
+   sur le `.titre` avalait le <h2> qu'il contient : la page perdait quatre de
+   ses six titres de niveau 2 dans le plan du document. Le <h2> garde donc sa
+   semantique, et le bouton est un element a part — tandis que le titre entier
+   reste cliquable, par confort. */
+.plier-titre{
+  all:unset; cursor:pointer; margin-left:auto; padding:2px 6px;
+  color:var(--encre-3); font-size:13px; line-height:1;
+  display:inline-block; transition:transform .12s;
+}
+.plier-titre:hover{color:var(--accent-encre)}
+.plier-titre:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:4px}
+section.repliable.ouverte > .titre > .plier-titre{transform:rotate(90deg)}
+
 .cadre{overflow-x:auto; margin-top:14px; border:1px solid var(--trait);
   border-radius:var(--r); background:var(--carte); box-shadow:var(--ombre)}
 table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:min-content}
@@ -333,6 +376,31 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   <div class="etat" id="etat-console"><span class="pastille"></span><div id="etat-texte"></div></div>
 
+  <!-- ⚠️ LES BOUTONS SONT ICI, EN DUR, ET NON RECREES PAR LE RENDU.
+       Les ecouteurs sont poses une fois au chargement : un bouton redessine a
+       chaque rendu perdrait le sien en silence. Le rendu ne remplit que le
+       delai et la phrase, jamais les boutons. -->
+  <div class="afaire" id="afaire">
+    <div class="tache" id="tache-collecte">
+      <div class="tache-tete">
+        <span class="tache-quoi">Collecter l’audience</span>
+        <span class="tache-delai" id="delai-collecte">—</span>
+      </div>
+      <div class="tache-dit" id="dit-collecte"></div>
+      <button type="button" id="btn-collecte">Collecter maintenant</button>
+      <div id="collecte-resultat" role="status"></div>
+    </div>
+    <div class="tache" id="tache-sauvegarde">
+      <div class="tache-tete">
+        <span class="tache-quoi">Sauvegarder la base</span>
+        <span class="tache-delai" id="delai-sauvegarde">—</span>
+      </div>
+      <div class="tache-dit" id="dit-sauvegarde"></div>
+      <button type="button" id="btn-sauvegarde">Générer la sauvegarde</button>
+      <div id="sauvegarde-resultat" role="status"></div>
+    </div>
+  </div>
+
   <div class="cadre" id="bandeau-perimetre"></div>
   <div class="resume" id="resume"></div>
   <p class="note" id="resume-note" style="margin:-14px 0 26px"></p>
@@ -342,7 +410,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     <div class="grille" id="grille-alertes"></div>
   </section>
 
-  <section id="s-argent">
+  <section id="s-argent" class="repliable">
     <div class="titre"><h2>Argent</h2>
       <span class="sous">jamais additionné entre environnements ni entre devises</span></div>
     <div class="cadre" id="cadre-abonnes"></div>
@@ -378,7 +446,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       leur numéro de version n'a pas été décoché.</div></details>
   </section>
 
-  <section id="s-officine">
+  <section id="s-officine" class="repliable">
     <div class="titre"><h2>Canal officine</h2><span class="sous">codes et attributions</span></div>
     <div class="cadre" id="cadre-codes"></div>
     <div class="cadre" id="cadre-acces"></div>
@@ -393,15 +461,11 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       d'annonce, l'inverse n'arrive pas.</div></details>
   </section>
 
-  <section id="s-audience">
+  <section id="s-audience" class="repliable">
     <div class="titre"><h2>Audience</h2><span class="sous">archive RevenueCat</span></div>
     <p class="note">La collecte est <b>manuelle</b> : rien ne se déclenche tout seul. Une fois
     par semaine suffit. <b>Au-delà de 28 jours sans collecte</b>, les jours de clients actifs
     deviennent définitivement illisibles chez RevenueCat.</p>
-    <p style="margin:14px 0 0">
-      <button type="button" id="btn-collecte">Collecter l'audience maintenant</button>
-    </p>
-    <div id="collecte-resultat" role="status"></div>
     <div class="cadre" id="cadre-audience-etat"></div>
     <div class="cadre" id="cadre-audience-jours"></div>
     <div class="cadre" id="cadre-audience-mesures"></div>
@@ -434,19 +498,23 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       qu'elle porterait sur une donnée de santé.</div></details>
   </section>
 
-  <section id="s-sauvegarde">
-    <h2>Sauvegarde de la base</h2>
+  <section id="s-sauvegarde" class="repliable">
+    <div class="titre"><h2>Sauvegarde de la base</h2><span class="sous">le plan gratuit n’en fait aucune</span></div>
     <p class="note">Le plan gratuit de Supabase n'effectue <b>aucune sauvegarde
     automatique</b>. Ce bouton produit un fichier <code>.sql</code> qui contient
     l'intégralité des onze tables à conserver. Gardez-le ailleurs que sur cette
     machine.</p>
     <div class="cadre" id="cadre-sauvegarde"></div>
-    <p style="margin:14px 0 0">
-      <button type="button" id="btn-sauvegarde">Générer la sauvegarde</button>
-    </p>
-    <div id="sauvegarde-resultat" role="status"></div>
     <details class="repli"><summary>Ce que contient le fichier, et ce qu'il ne contient pas</summary>
-      <div class="corps"><b>Onze tables sont dedans</b> : apporteurs, codes,
+      <div class="corps"><b>Le serveur sait qu’un fichier a été produit — il ne sait
+      pas où il est</b>, ni s’il a été conservé. Pour vérifier sur votre poste que
+      le fichier reçu est bien celui qui a été généré :
+      <code>certutil -hashfile "&lt;fichier&gt;" SHA256</code>, et comparez l’empreinte
+      avec celle du tableau ci-dessus.<br><br>
+      <b>Si vous venez de RESTAURER la base</b>, un voyant rouge « aucun fichier
+      généré » est NORMAL : le journal des sauvegardes est volontairement hors du
+      périmètre sauvegardé, il repart donc vide. Ce n’est pas une panne.<br><br>
+      <b>Onze tables sont dedans</b> : apporteurs, codes,
       attributions, événements de facturation, commissions, commissions
       archivées, mesures de scan (figées au 12/09/2026), parcours d'entrée, quarantaine, journal
       d'alerte et <b>archive d'audience</b>.<br><br>
@@ -632,11 +700,327 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return garderBrut ? ech(fr) + ' <span class="brut">' + ech(v) + '</span>' : ech(fr);
   }
 
+  /**
+   * ⚠️ L'EXPLICATION SE CACHE QUAND TOUT VA BIEN, JAMAIS QUAND ÇA VA MAL.
+   *
+   * Les paragraphes ecrits sous chaque voyant etiraient les cases et noyaient
+   * la grille — c'est la remarque de Gaetan, et elle etait deja la le 13/09
+   * au matin. Mais tout envoyer en infobulle serait pire : sur un voyant
+   * ORANGE ou ROUGE, l'explication est ce qu'il faut lire tout de suite, et
+   * un telephone n'a pas de survol. La regle est donc :
+   *   vert            → explication dans la bulle, case compacte ;
+   *   orange / rouge  → explication VISIBLE, sans un geste de plus.
+   * La bulle s'ouvre aussi a l'appui (`:focus-within`), pas qu'au survol.
+   */
+  // ═════════════════════════════════════════════════════════════════════════
+  // LES DEUX ECHEANCES DE LA PAGE — UN SEUL CALCUL, DEUX AFFICHAGES
+  // ═════════════════════════════════════════════════════════════════════════
+  //
+  // ⚠️ LE VOYANT DU BAS ET LA BANDE DU HAUT LISENT LA MEME FONCTION. Recopier
+  // un seuil, c'est se garantir le jour ou le haut annonce « il reste 3 jours »
+  // au-dessus d'un voyant deja rouge. Toute la journee du 13/09 a ete passee a
+  // corriger des chiffres qui se contredisaient sur une meme page.
+  //
+  // `limite` est le nombre de jours au-dela duquel c'est trop tard. `reste` est
+  // ce qu'il en demeure ; il peut etre NEGATIF, et c'est alors un retard.
+
+  /** Sauvegarde : orange a 8 jours, rouge a 14. Aucune copie automatique. */
+  function echeanceSauvegarde(sv){
+    var j = joursDepuis(sv && sv.derniere);
+    return {
+      jours: j,
+      limite: 14,
+      // ⚠️ `floor(limite - j)` — voir `echeanceCollecte`, meme piege.
+      reste: isFinite(j) ? joursRestants(14, j, j > 14) : null,
+      etat: (!isFinite(j) || j > 14) ? 'critique' : (j > 8 ? 'attention' : 'ok'),
+      perte: false
+    };
+  }
+
+  /**
+   * Collecte d'audience : orange a 8 jours, rouge a 28.
+   *
+   * ⚠️ CE DELAI N'EST PAS UN RETARD, C'EST UNE PERTE. Au-dela de 32 jours
+   * d'age, l'API de RevenueCat rend 0 au lieu d'une absence : un jour non
+   * collecte a temps n'est pas en retard, il est PERDU, et rien ne le rattrape.
+   * La fenetre est plafonnee a 28 jours, avec trois jours de marge mesures.
+   *
+   * ⚠️ ON NE COMPTE PAS DEPUIS LE DERNIER PASSAGE (corrige en revue le 13/09).
+   * Un passage peut se terminer « ok » SANS faire avancer l'archive — le
+   * commentaire de « Continuite de l'archive » le dit deja : « une serie peut
+   * cesser d'etre rendue par l'API alors que le passage se termine en ok ».
+   * Mesure : collecte du matin meme + archive arretee trente jours plus tot, et
+   * la bande annonçait « il reste 28 jours » en neutre sur trente jours DEJA
+   * PERDUS. Ce qui compte est l'AGE DU DERNIER JOUR ARCHIVE. On retient donc le
+   * plus defavorable des deux, et on dit lequel mord.
+   *
+   * ⚠️ UN ECHEC DE COLLECTE COMPTE AUTANT QU'UN RETARD : un passage en erreur,
+   * partiel, ou reste ouvert aggrave l'etat sans toucher au compte a rebours.
+   */
+  function echeanceCollecte(au){
+    var vide = { jours:NaN, limite:28, reste:null, etat:'critique',
+                 soucis:['illisible'], cause:'', jPassage:NaN, jArchive:null, perte:true };
+    var e = au && au.etat;
+    if(!e) return vide;
+
+    var jPassage = joursDepuis(e.dernier_passage);
+    var archiveConnue = ('age_dernier_jour_actifs' in e);
+    var jArchive = archiveConnue ? entierOuNul(e.age_dernier_jour_actifs) : null;
+
+    // ⚠️ UNE LISTE, PAS UNE SEULE CAUSE (corrige en revue le 13/09 au soir).
+    // `souci` etait un scalaire : chaque cause en effaçait une autre, et les
+    // affectations n'etaient meme pas coherentes entre elles. Le cas grave,
+    // mesure : colonne absente ET dernier passage EN ERREUR — la carte envoyait
+    // appliquer une migration SQL et ne disait pas un mot de la collecte
+    // echouee. Gaetan aurait fait le seul geste qui ne servait a rien.
+    var soucis = [];
+
+    // Rien n'a jamais ete archive : aucun compte a rebours n'a de sens.
+    if(archiveConnue && jArchive === null && !isFinite(jPassage)){
+      return { jours:NaN, limite:28, reste:null, etat:'critique',
+               soucis:['jamais'], cause:'', jPassage:NaN, jArchive:null, perte:true };
+    }
+
+    var j = NaN, cause = '';
+    if(jArchive !== null){ j = jArchive; cause = 'archive'; }
+    if(isFinite(jPassage) && (!isFinite(j) || jPassage > j)){ j = jPassage; cause = 'passage'; }
+    if(archiveConnue && jArchive === null) soucis.push('archive-vide');
+    // ⚠️ UN REPLI SILENCIEUX EST UN MENSONGE PAR OMISSION. Sans la colonne, on
+    // retombe sur l'age du passage — c'est-a-dire exactement la mesure dont on
+    // vient d'etablir qu'elle est insuffisante — et l'ecran redevenait vert,
+    // indiscernable d'une console en bonne sante. Ailleurs cette page dit
+    // toujours ce qu'elle ne peut pas mesurer (`marqueInterne`, `etatCodes`).
+    if(!archiveConnue) soucis.push('colonne-absente');
+    if(e.passages_bloques > 0) soucis.push('bloque');
+    if(e.dernier_etat === 'erreur') soucis.push('erreur');
+    else if(e.dernier_etat === 'partiel') soucis.push('partiel');
+
+    var etat = (!isFinite(j) || j >= 28) ? 'critique' : (j >= 8 ? 'attention' : 'ok');
+    if(soucis.indexOf('archive-vide') >= 0) etat = 'critique';
+    if(soucis.indexOf('bloque') >= 0)       etat = 'critique';
+    if(soucis.indexOf('erreur') >= 0)       etat = 'critique';
+    if(soucis.indexOf('partiel') >= 0 && etat === 'ok') etat = 'attention';
+
+    return {
+      jours: j, limite: 28,
+      // ⚠️ `floor(limite - j)`, JAMAIS `limite - floor(j)`. Le second divergeait
+      // de l'etat sur tout l'intervalle [limite, limite+1[ : a 14,2 jours il
+      // affichait « a faire aujourd'hui » sous un lisere deja rouge.
+      reste: isFinite(j) ? joursRestants(28, j, j >= 28) : null,
+      etat: etat, soucis: soucis, cause: cause,
+      jPassage: jPassage, jArchive: jArchive, perte: true
+    };
+  }
+
+  /**
+   * ⚠️ `floor(limite - age)`, JAMAIS `limite - floor(age)`. Le second divergeait
+   * de l'etat sur tout l'intervalle [limite, limite+1[ : a 14,2 jours il
+   * affichait « a faire aujourd'hui » sous un lisere deja rouge.
+   *
+   * ⚠️ ET UNE TOLERANCE D'UNE SECONDE. `age` vient d'une soustraction de deux
+   * horloges : un age « de 40 jours » vaut en realite 40 jours et quelques
+   * millisecondes, et sans marge l'arrondi rend 13 la ou douze jours seulement
+   * sont passes — un jour de perte annonce en trop, sur le seul chiffre de la
+   * page qui dit une perte.
+   */
+  function joursRestants(limite, age, depasse){
+    // UNE SECONDE de tolerance. `age` vient d'une soustraction de deux horloges :
+    // un age « de 40 jours » vaut en realite 40 jours et quelques millisecondes,
+    // et sans marge `ceil` rend 13 la ou douze jours seulement sont passes.
+    // Une seconde est negligeable devant un seuil de 28 jours, et absorbe aussi
+    // bien le temps de chargement de la page qu'une horloge de poste mal reglee.
+    var marge = 1 / 86400;
+    // ⚠️ DEUX ARRONDIS, ET C'EST VOULU.
+    //   Avant l'echeance, on arrondit VERS LE BAS : « il reste 7 jours » veut
+    //   dire « au moins sept jours pleins », jamais un de plus qu'il n'y en a.
+    //   Apres, on arrondit VERS LE HAUT, avec un plancher a 1 : des que l'etat
+    //   est au rouge, le texte doit dire un depassement — sinon on lit « à faire
+    //   aujourd'hui » sous un lisere rouge, ce qui est exactement la divergence
+    //   relevee en revue. Et `floor` seul rendait 13 la ou douze jours sont
+    //   passes : un jour de perte annonce en trop.
+    if(depasse) return -Math.max(1, Math.ceil(age - limite - marge));
+    return Math.floor(limite - age + marge);
+  }
+
+  /**
+   * « il reste 12 jours », « à faire aujourd'hui », et deux facons tres
+   * differentes de dire un depassement.
+   *
+   * ⚠️ `perte` N'EST PAS UN DETAIL DE STYLE. Une sauvegarde en retard se
+   * rattrape d'un clic. Une collecte dépassée ne se rattrape PAS : les jours
+   * sont perdus. Ecrire « en retard de 3 jours » sur la seconde promet un
+   * rattrapage impossible — et contredit le commentaire d'`echeanceCollecte`
+   * trois lignes plus haut.
+   */
+  function delaiTexte(reste, perte){
+    if(reste === null)  return 'jamais fait';
+    if(reste <  0){
+      var n = -reste, s = (n > 1) ? 's' : '';
+      return perte ? (n + ' jour' + s + ' déjà perdu' + s)
+                   : ('en retard de ' + n + ' jour' + s);
+    }
+    if(reste === 0)     return "à faire aujourd'hui";
+    return 'il reste ' + reste + ' jour' + (reste > 1 ? 's' : '');
+  }
+
+  /**
+   * La bande « À faire ». Elle ne cree AUCUN bouton : ils sont dans le HTML,
+   * leurs ecouteurs sont poses une fois au chargement. On ne remplit que le
+   * delai, la phrase, et la couleur du liseré.
+   */
+  /**
+   * ⚠️ ELLE REND SES TOTAUX. Les deux echeances ne sont plus des voyants de la
+   * grille : si personne ne les comptait, le bandeau du haut pourrait annoncer
+   * « Rien a signaler » au-dessus d'une carte rouge. Et si la GRILLE les
+   * comptait, le bandeau dirait « regardez les voyants ci-dessous » en
+   * designant une grille toute verte. Les deux totaux sont donc separes, et
+   * c'est le bandeau qui dit ou regarder.
+   */
+  function rendreAFaire(au, sv){
+    var c = echeanceCollecte(au);
+    $('tache-collecte').className = 'tache ' + c.etat;
+    // ⚠️ CHAQUE SOUCI A SON TITRE. `archive-vide` retombait sur le compte a
+    // rebours ordinaire, calcule depuis le PASSAGE, et affichait « il reste
+    // 26 jours » sur une carte ROUGE. Un texte qui contredit sa couleur, c'est
+    // le defaut corrige la passe d'avant, revenu par une autre porte.
+    function aSouci(nom){ return c.soucis.indexOf(nom) >= 0; }
+    $('delai-collecte').textContent =
+        aSouci('illisible')    ? 'état illisible'
+      : aSouci('jamais')       ? 'jamais collecté'
+      : aSouci('archive-vide') ? 'rien d’archivé'
+      : delaiTexte(c.reste, c.perte);
+    // ⚠️ LA PHRASE NOMME LA GRANDEUR QUI MORD. Poser « au-delà de 28 jours les
+    // jours non collectés sont perdus » sous un nombre qui mesure autre chose,
+    // c'est le défaut que ce dossier corrige depuis six passes.
+    $('dit-collecte').innerHTML =
+      (aSouci('illisible')
+        ? 'La vue d’état n’a rien rendu : impossible de dire si l’archive est à jour. '
+        : (aSouci('archive-vide')
+            ? '<b>Aucun jour de clients actifs n’est archivé</b>, alors que des '
+              + 'passages ont eu lieu. '
+            : (c.cause === 'archive'
+                ? 'Le dernier jour archivé a <b>' + Math.floor(c.jours) + ' j</b>'
+                  + (isFinite(c.jPassage)
+                      ? ' (dernier passage il y a ' + Math.floor(c.jPassage) + ' j). '
+                      : '. ')
+                : (c.cause === 'passage'
+                    ? 'Dernière collecte il y a <b>' + Math.floor(c.jours) + ' j</b>'
+                      + (c.jArchive !== null
+                          ? ' (dernier jour archivé : ' + c.jArchive + ' j). '
+                          : '. ')
+                    : '<b>Aucune collecte n’a jamais eu lieu.</b> '))))
+      + (aSouci('erreur')  ? '⚠️ Le dernier passage est <b>en erreur</b>. '  : '')
+      + (aSouci('partiel') ? '⚠️ Le dernier passage est <b>partiel</b>. '   : '')
+      + (aSouci('bloque')  ? '⚠️ Un passage est <b>resté ouvert</b>. '      : '')
+      + (aSouci('colonne-absente')
+          ? '⚠️ <b>La vue ne porte pas l’âge du dernier jour archivé</b> : ce compte '
+            + 'à rebours part du dernier passage, qui peut réussir sans faire avancer '
+            + 'l’archive. Appliquez la migration pour retrouver la bonne mesure. '
+          : '')
+      + 'Un jour qui dépasse <b>28 jours</b> sans être collecté est perdu '
+      + '<b>définitivement</b> : RevenueCat ne le rend plus.';
+
+    var s = echeanceSauvegarde(sv);
+    $('tache-sauvegarde').className = 'tache ' + s.etat;
+    $('delai-sauvegarde').textContent = delaiTexte(s.reste, s.perte);
+    $('dit-sauvegarde').innerHTML =
+      (isFinite(s.jours)
+        ? 'Dernier fichier généré il y a <b>' + Math.floor(s.jours) + ' j</b>. '
+        : '<b>Aucun fichier n’a jamais été généré.</b> ')
+      + 'Le plan gratuit de Supabase ne fait <b>aucune sauvegarde automatique</b> : '
+      + 'sans ce fichier, la base n’a pas de copie.';
+
+    var t = { critique:0, attention:0 };
+    if(c.etat === 'critique') t.critique++; else if(c.etat === 'attention') t.attention++;
+    if(s.etat === 'critique') t.critique++; else if(s.etat === 'attention') t.attention++;
+    return t;
+  }
+
+  // ── Les sections qui se replient ───────────────────────────────────
+  //
+  // ⚠️ L'ETAT EST MEMORISE. Gaetan ouvre cette page tous les jours : sans
+  // memoire, il rouvrirait les memes sections tous les jours. Le filtre de
+  // perimetre est deja memorise depuis le lot 3 ; l'un des deux sans l'autre
+  // n'aurait aucun sens.
+  //
+  // ⚠️ MAIS CE REGLAGE-LA NE PEUT PAS CASSER LA PAGE, contrairement a celui du
+  // perimetre : il ne fait qu'ajouter une classe CSS, il ne touche a aucun
+  // calcul. Il n'a donc pas besoin du desarmement de `remettreFiltreParDefaut`.
+  var CLE_REPLIS = 'pilou.console.sections.ouvertes';
+  var replisOuverts = {};
+
+  function lireReplis(){
+    try{
+      var brut = window.localStorage.getItem(CLE_REPLIS);
+      if(!brut) return;
+      var o = JSON.parse(brut);
+      if(o && typeof o === 'object'){
+        // Meme doctrine que le filtre de version : on ne garde que les cles
+        // valant EXACTEMENT `true`.
+        for(var k in o){
+          if(Object.prototype.hasOwnProperty.call(o, k) && o[k] === true) replisOuverts[k] = true;
+        }
+      }
+    }catch(e){ /* sans effet : tout reste replie, c'est le defaut */ }
+  }
+  function ecrireReplis(){
+    try{ window.localStorage.setItem(CLE_REPLIS, JSON.stringify(replisOuverts)); }
+    catch(e){ /* sans effet : le choix ne vaut alors que pour cet onglet */ }
+  }
+
+  /**
+   * ⚠️ APPELE UNE SEULE FOIS, AU CHARGEMENT. Le contenu des sections est
+   * redessine a chaque rendu, mais leur titre, lui, ne l'est jamais : les
+   * ecouteurs survivent, et l'etat ouvert/ferme ne se referme pas sous les
+   * yeux de Gaetan au rendu suivant.
+   */
+  function preparerReplis(){
+    lireReplis();
+    var sections = document.querySelectorAll('section.repliable');
+    for(var i = 0; i < sections.length; i++) preparerUnRepli(sections[i]);
+  }
+
+  function preparerUnRepli(s){
+    var t = s.querySelector('.titre');
+    if(!t) return;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'plier-titre';
+    b.setAttribute('aria-controls', s.id);
+    b.setAttribute('aria-label', 'Afficher ou masquer cette section');
+    b.textContent = '\u25B8';
+    t.appendChild(b);
+
+    function poser(ouverte){
+      b.setAttribute('aria-expanded', ouverte ? 'true' : 'false');
+    }
+    function basculer(){
+      var ouverte = s.classList.toggle('ouverte');
+      poser(ouverte);
+      if(ouverte) replisOuverts[s.id] = true; else delete replisOuverts[s.id];
+      ecrireReplis();
+    }
+    // ⚠️ `stopPropagation` : sans lui, un clic sur le bouton declencherait AUSSI
+    // l'ecouteur du titre par remontee, et la section s'ouvrirait puis se
+    // refermerait dans le meme clic.
+    b.addEventListener('click', function(e){ e.stopPropagation(); basculer(); });
+    t.addEventListener('click', basculer);
+
+    if(replisOuverts[s.id] === true){ s.classList.add('ouverte'); poser(true); }
+    else poser(false);
+  }
+
   function indicateur(quoi, valeur, etat, detail){
+    var calme = (etat === 'ok');
     return '<div class="ind '+etat+'">'
-         + '<div class="quoi">'+ech(quoi)+'</div>'
+         + '<div class="quoi">'+ech(quoi)
+         + ((detail && calme)
+             ? '<span class="aide"><button type="button" aria-label="Explication">?</button>'
+               + '<span class="bulle">'+ech(detail)+'</span></span>'
+             : '')
+         + '</div>'
          + '<div class="valeur num">'+ech(valeur)+'</div>'
-         + (detail ? '<div class="detail">'+ech(detail)+'</div>' : '')
+         + ((detail && !calme) ? '<div class="detail">'+ech(detail)+'</div>' : '')
          + '</div>';
   }
 
@@ -682,7 +1066,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-officine','s-audience','s-sauvegarde'];
+    var ids = ['afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-officine','s-audience','s-sauvegarde'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
 
@@ -874,30 +1258,26 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     donneesCourantes = d;
     preparerParcours(d.parcoursJour);
 
-    var compte = rendreAlertes(d.alertes, d.sauvegarde,
-                               { etat: d.audEtat, mesures: d.audMesures });
+    var compte = rendreAlertes(d.alertes, { etat: d.audEtat, mesures: d.audMesures });
+    var taches = rendreAFaire({ etat: d.audEtat }, d.sauvegarde);
     rendreSauvegarde(d.sauvegarde);
     rendreAudience(d.audEtat, d.audJours, d.audMesures);
     // ⚠️ LE BANDEAU RESUME LE PIRE DE CE QUI EST EN DESSOUS.
     // Defaut trouve au banc d'essai le 09/09 : le bandeau affichait « Console
     // ouverte » en vert alors que sept voyants etaient rouges. Un bandeau vert
     // au-dessus d'un tableau en feu, c'est un tableau de bord qui ment par
-    // hierarchie visuelle. Il dit maintenant ce que disent les voyants.
-    if(compte.critique > 0){
-      afficherEtat('critique',
-        compte.critique + (compte.critique > 1 ? ' alertes rouges. ' : ' alerte rouge. '),
-        'Regardez les voyants ci-dessous avant toute autre chose.');
-    } else if(compte.attention > 0){
-      afficherEtat('attention',
-        compte.attention + (compte.attention > 1 ? ' points à surveiller. ' : ' point à surveiller. '),
-        'Rien de rouge, mais quelque chose mérite un coup d’œil.');
-    } else {
-      afficherEtat('ok','Rien à signaler. ',
-        'Les ' + (VUES.length + 1) + ' vues répondent et aucun voyant n’est allumé.');
-    }
+    // hierarchie visuelle.
+    //
+    // ⚠️ ET IL DIT OU REGARDER, PARCE QU'IL Y A DESORMAIS DEUX ENDROITS.
+    // Depuis que les deux echeances ont quitte la grille pour la bande « À
+    // faire », un total unique faisait annoncer « 1 alerte rouge, regardez les
+    // voyants ci-dessous » au-dessus d'une grille entierement verte. Le total
+    // reste juste, la phrase nomme le ou les endroits, et chaque nombre annonce
+    // correspond a quelque chose de VISIBLE. Releve en revue le 13/09 au soir.
+    afficherBandeau(compte, taches);
     rendreResume(d.resume, d.audJours, d.alertes);
     rendreAbonnes(d.abonnes);
-    rendreArgent(d.argent);
+    rendreArgent(d.argent, d.alertes);
     rendreParcours(d.parcours);
     rendreParcoursJour();
     rendreCodes(d.codes);
@@ -907,9 +1287,46 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     dessinerPerimetre();
   }
 
-  function rendreAlertes(a, sv, au){
+  /**
+   * Le bandeau d'etat, a partir de DEUX totaux : la grille des voyants, et la
+   * bande « À faire ». Chaque nombre annonce doit correspondre a quelque chose
+   * qu'on peut effectivement voir a l'ecran.
+   */
+  function afficherBandeau(grille, taches){
+    function ou(g, t){
+      if(g > 0 && t > 0) return 'Regardez « À faire » en haut de page, et les voyants ci-dessous.';
+      if(t > 0)          return 'C’est dans « À faire », en haut de page.';
+      return 'Regardez les voyants ci-dessous.';
+    }
+    var cr = grille.critique + taches.critique;
+    var at = grille.attention + taches.attention;
+    if(cr > 0){
+      afficherEtat('critique', cr + (cr > 1 ? ' alertes rouges. ' : ' alerte rouge. '),
+        ou(grille.critique, taches.critique));
+    } else if(at > 0){
+      // Meme localisation que pour le rouge : c'est la ou il y a le plus a
+      // chercher qu'une aide manquait.
+      afficherEtat('attention', at + (at > 1 ? ' points à surveiller. ' : ' point à surveiller. '),
+        'Rien de rouge. ' + ou(grille.attention, taches.attention));
+    } else {
+      afficherEtat('ok','Rien à signaler. ',
+        'Les ' + (VUES.length + 1) + ' vues répondent, et rien n’attend en haut de page.');
+    }
+  }
+
+  // ⚠️ `sv` A ETE RETIRE DE LA SIGNATURE : son seul usage est parti avec le
+  // voyant « Sauvegarde », que la bande « À faire » remplace.
+  function rendreAlertes(a, au){
     if(!a){
-      $('grille-alertes').innerHTML = '<div class="rien">Alertes illisibles.</div>';
+      // ⚠️ UN VRAI VOYANT, PAS UNE PHRASE. La page rendait ici du texte hors
+      // grille tout en comptant 1 rouge : le bandeau annonçait « 1 alerte
+      // rouge » et aucun `.ind.critique` n'existait. C'est l'invariant que le
+      // test 47 vient d'eriger, viole par la page elle-meme dans le seul cas
+      // qu'il ne couvrait pas.
+      $('grille-alertes').innerHTML = indicateur('Alertes', 'illisibles', 'critique',
+        'La vue des alertes n’a rien rendu. Aucun voyant de cette grille ne peut '
+        + 'être calculé : ni la quarantaine, ni les octrois, ni les comptes. '
+        + 'L’absence de données n’est pas une absence de problème.');
       return { critique:1, attention:0 };
     }
     var h = '', compte = { critique:0, attention:0 };
@@ -934,54 +1351,34 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             ? 'L’alarme ne mesure plus. Le « 0 » ci-contre ne prouve rien.'
             : 'Dernière mesure : ' + quandTexte(a.alarme_derniere_mesure));
 
-    // 3. ⚠️ TROIS VOYANTS ONT ETE RETIRES ICI LE 13/09/2026. IL FAUT SAVOIR
-    //    POURQUOI, SINON QUELQU'UN LES REMETTRA.
+    // 3. ⚠️ QUATRE VOYANTS ONT ETE RETIRES ICI. IL FAUT SAVOIR POURQUOI,
+    //    SINON QUELQU'UN LES REMETTRA.
     //
-    //    « Webhook de paiement », « Echecs silencieux de scan » et « Archivage
-    //    des mesures » etaient tous les trois nourris par `scan_metrics`, dont
-    //    la collecte est ARRETEE depuis le 12/09 (decision du 09/09 : la tache
-    //    lisait les journaux de l'hebergeur depuis un service hors de l'Union).
+    //    Le 13/09 au matin : « Webhook de paiement », « Echecs silencieux de
+    //    scan » et « Archivage des mesures », tous les trois nourris par
+    //    `scan_metrics`, dont la collecte est ARRETEE depuis le 12/09. Le pire
+    //    des trois etait le webhook : il affichait encore « repond » sur un
+    //    dernier succes date du 09/09, alors que le PREMIER paiement reel etait
+    //    arrive le 12/09. Un voyant vert sur une mesure gelee.
     //
-    //    Le pire des trois etait le webhook : le 13/09 il affichait encore
-    //    « repond » sur un dernier succes date du 09/09 — alors que le PREMIER
-    //    CLIENT PAYANT etait passe le 12/09 a 13h37. Faux dans les deux sens, et
-    //    il le serait reste pour toujours. Les deux autres annoncaient honnetement
-    //    « mesure arretee » : une brique qui annonce qu'elle ne mesure plus rien
-    //    n'est plus une brique, c'est une cicatrice.
+    //    Le 13/09 au soir : « Dernier evenement de facturation ». Cette grille
+    //    s'appelle « ce qui doit reveiller la nuit ». Sur les dix voyants
+    //    qu'elle portait, NEUF pouvaient passer a l'orange ou au rouge. Celui-la
+    //    etait ecrit en dur a 'ok' et son propre texte l'avouait : « ce voyant
+    //    ne passe jamais au rouge ». Il ne se lisait pas davantage : il compte
+    //    aussi les annulations, les expirations, les acces offerts a 0 € et les
+    //    achats de test, et avec un seul client payant « 23 heures » et
+    //    « 30 jours » veulent dire la meme chose — rien. Il ne pouvait pas
+    //    distinguer un webhook en panne d'une absence de vente.
+    //    Un voyant qui ne peut pas alerter n'a rien a faire dans les alertes.
+    //    LE FAIT N'EST PAS PERDU : il est passe sous le tableau des evenements
+    //    de facturation, ou il est a sa place. Voir `rendreArgent`.
     //
-    //    ⚠️ CE RETRAIT LAISSE UN ANGLE MORT, ET ON L'ECRIT A L'ECRAN.
-    //    « Quarantaine non rejouee » NE LE COUVRE PAS : la quarantaine n'attrape
-    //    qu'un corps SIGNE et mal forme. Une signature invalide, un 500 de la
-    //    fonction, ou RevenueCat qui n'appelle plus, n'ecrivent RIEN, nulle part.
-    //    RevenueCat reessaie cinq fois puis abandonne. Aucune detection
-    //    automatique de cette panne n'existe aujourd'hui. Le seul fait verifiable
-    //    est la date du dernier evenement RECU, ci-dessous.
-    // ⚠️ « EVENEMENT », PAS « PAIEMENT » — corrige en revue adverse le 13/09.
-    //    La valeur est `max(recu_le)` sur TOUS les evenements de facturation.
-    //    Sur les cinq lignes presentes au 13/09, QUATRE ne sont pas des ventes :
-    //    une annulation, une expiration, un acces offert a 0 USD, et un achat de
-    //    test en bac a sable. Un voyant « dernier paiement » se serait donc
-    //    allume, tout frais, le jour ou un client ANNULE son abonnement —
-    //    l'exact inverse de la verite, sur le chiffre qui compte le plus.
-    if('dernier_evenement_facturation' in a){
-      h += ind('Dernier événement de facturation',
-            a.dernier_evenement_facturation
-              ? dureeTexte(heuresDepuis(a.dernier_evenement_facturation))
-              : 'jamais',
-            'ok',
-            (a.dernier_evenement_facturation
-              ? 'Reçu le ' + quandTexte(a.dernier_evenement_facturation) + '. '
-              : 'Aucun événement de facturation reçu à ce jour. ')
-            + 'CE N’EST PAS UNE VENTE : les annulations, les expirations, les accès '
-            + 'offerts à 0 € et les achats de test comptent aussi. FAIT, PAS VERDICT '
-            + '— ce voyant ne passe jamais au rouge : sans activité il vieillit sans '
-            + 'qu’il y ait la moindre panne. Aucune détection automatique d’une panne '
-            + 'du webhook n’existe : la référence reste le tableau de bord RevenueCat.');
-    } else {
-      // ⚠️ UN DEMI-DEPLOIEMENT DOIT SE VOIR. Entre la publication de cette page et
-      // l'etape 2 du SQL, `v_admin_alertes` ne porte pas encore cette colonne :
-      // la grille perdait trois voyants et n'en gagnait aucun, EN SILENCE. Une
-      // migration interrompue serait restee invisible pour toujours.
+    // ⚠️ LE DEMI-DEPLOIEMENT, LUI, RESTE UNE ALERTE. Entre la publication de
+    // cette page et l'etape 2 du SQL, `v_admin_alertes` ne porte pas encore la
+    // colonne : la grille perdait trois voyants et n'en gagnait aucun, EN
+    // SILENCE. Une migration interrompue serait restee invisible pour toujours.
+    if(!('dernier_evenement_facturation' in a)){
       h += ind('Migration du 13/09', 'incomplète', 'attention',
             'L’étape 2 du SQL n’a pas été appliquée : la vue des alertes ne porte pas '
             + 'encore la date du dernier événement de facturation, et les vues mortes '
@@ -1023,20 +1420,14 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           a.codes_epuises > 0 ? 'Ces codes ne donnent plus rien en pharmacie.' : 'Aucun code bloqué.');
 
 
-    // ⚠️ AJOUTE LE 10/09 — LE VOYANT DE SAUVEGARDE.
-    // Le plan gratuit n'a AUCUNE sauvegarde automatique (documentation
-    // Supabase, verifiee le 10/09). Une base sans copie est une base qu'un
-    // incident efface. Ce voyant ne dit pas « la sauvegarde existe » : il dit
-    // quand un fichier a ete GENERE. Le serveur ne sait pas ce qu'il est
-    // devenu.
-    var jSv = joursDepuis(sv && sv.derniere);
-    h += ind('Sauvegarde',
-          isFinite(jSv) ? (jSv < 1 ? "aujourd'hui" : Math.floor(jSv) + ' j') : 'jamais',
-          (!isFinite(jSv) || jSv > 14) ? 'critique' : (jSv > 8 ? 'attention' : 'ok'),
-          !isFinite(jSv)
-            ? "Aucun fichier n'a jamais été généré. La base n'a AUCUNE copie."
-            : 'Dernier export généré le ' + quandTexte(sv.derniere)
-              + ' — ' + nb(sv.lignes) + ' lignes, ' + octetsTexte(sv.octets) + '.');
+    // ⚠️ LE VOYANT « SAUVEGARDE » A ETE RETIRE ICI, POUR LA MEME RAISON QUE
+    // CELUI DE LA COLLECTE. La bande « À faire » du haut porte deja le compte a
+    // rebours, sa couleur et le bouton. Le detail chiffre de la derniere
+    // sauvegarde — date, lignes, octets, empreinte — n'est pas perdu : il est
+    // dans le tableau de la section Sauvegarde.
+    //
+    // ⚠️ SON ETAT COMPTE TOUJOURS, MAIS PAS ICI : voir la note de la collecte
+    // quelques lignes plus bas. C'est `rendreAFaire` qui le compte.
 
     // ⚠️ AJOUTE LE 11/09 — LE VOYANT QUI VOIT VENIR UNE PERTE DEFINITIVE.
     // L'archivage est MANUEL. Au-dela de 32 jours d'age, l'API rend 0 au lieu
@@ -1047,31 +1438,21 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // les voyants d'audience DISPARAISSAIENT de la grille et le bandeau affichait
     // « Rien a signaler ». Le meme mode de panne que celui du 09/09, deplace d'un
     // cran : l'absence de donnees n'est pas une absence de probleme.
-    if(!(au && au.etat)){
-      h += ind('Collecte d\u2019audience', 'illisible', 'critique',
-            'La vue d\u2019\u00e9tat n\u2019a rien rendu. Impossible de dire si l\u2019archive est '
-            + '\u00e0 jour, ni si la derni\u00e8re collecte a r\u00e9ussi. '
-            + 'L\u2019absence de donn\u00e9es n\u2019est pas une absence de probl\u00e8me.');
-    }
-    if(au && au.etat){
-      var eAu = au.etat;
-      var jAu = joursDepuis(eAu.dernier_passage);
-      var etAu = (!isFinite(jAu) || jAu >= 28) ? 'critique' : (jAu >= 8 ? 'attention' : 'ok');
-      if(eAu.dernier_etat === 'erreur') etAu = 'critique';
-      else if(eAu.dernier_etat === 'partiel' && etAu === 'ok') etAu = 'attention';
-      if(eAu.passages_bloques > 0) etAu = 'critique';
-      h += ind('Collecte d\u2019audience',
-            isFinite(jAu) ? (jAu < 1 ? "aujourd\u2019hui" : Math.floor(jAu) + ' j') : 'jamais',
-            etAu,
-            (!isFinite(jAu)
-              ? 'Aucune collecte n\u2019a jamais eu lieu. '
-              : 'Derni\u00e8re collecte ' + quandTexte(eAu.dernier_passage)
-                + ', \u00e9tat \u00ab ' + nb(eAu.dernier_etat) + ' \u00bb, '
-                + nb(eAu.lignes_dernier_passage) + ' ligne(s). ')
-            + (eAu.passages_bloques > 0
-                ? nb(eAu.passages_bloques) + ' passage(s) rest\u00e9(s) ouverts. ' : '')
-            + 'Elle est manuelle : au-del\u00e0 de 28 jours, les jours de clients actifs sont perdus.');
+    // ⚠️ LE VOYANT « COLLECTE D'AUDIENCE » A ETE RETIRE ICI (13/09/2026, soir).
+    //
+    // Remarque de Gaetan, et elle est juste : depuis que la bande « À faire »
+    // porte le compte a rebours ET sa couleur, en haut de page, ce voyant
+    // affichait le MEME nombre, plus bas, dans une grille de dix. Le meme
+    // chiffre deux fois n'aide personne a decider.
+    //
+    // ⚠️ SON ETAT COMPTE TOUJOURS, MAIS PAS ICI. Il est compte par `rendreAFaire`,
+    // qui rend ses propres totaux : le bandeau du haut additionne les deux, et
+    // sa PHRASE dit dans lequel des deux endroits regarder. Compter une echeance
+    // dans le total de la grille faisait annoncer « 1 alerte rouge, regardez les
+    // voyants ci-dessous » au-dessus d'une grille ou aucun voyant n'est rouge.
+    // Releve en revue le 13/09 au soir.
 
+    if(au && au.etat){
       // Le retard ne suffit pas : une serie peut cesser d'etre rendue par l'API
       // alors que le passage se termine en « ok ». Le trou, lui, se voit.
       var trous = 0, retard = 0, incoh = 0, iM;
@@ -1085,9 +1466,16 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           if(mM.forme === 'INCOHERENT') incoh++;
         }
       }
+      // ⚠️ LE RETARD FAIT MONTER L'ETAT (corrige en revue le 13/09). `retard`
+      // etait calcule puis seulement IMPRIME : une serie trente jours en retard
+      // laissait le voyant vert sur « sans trou », et le seul nombre qui disait
+      // la verite partait dans une infobulle qu'il faut survoler.
+      var etCont = (trous > 0 || incoh > 0 || retard >= 8) ? 'attention' : 'ok';
+      if(trous >= 28 || retard >= 28) etCont = 'critique';
       h += ind('Continuit\u00e9 de l\u2019archive',
-            trous > 0 ? trous + ' j manquant(s)' : 'sans trou',
-            (trous > 0 || incoh > 0) ? 'attention' : 'ok',
+            trous > 0 ? trous + ' j manquant(s)'
+                      : (retard >= 8 ? retard + ' j de retard' : 'sans trou'),
+            etCont,
             (trous > 0
               ? 'Une s\u00e9rie au moins a ' + trous + ' jour(s) jamais collect\u00e9(s). '
                 + 'Au-del\u00e0 de 32 jours ils ne se rattrapent plus. '
@@ -1497,7 +1885,11 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           : '');
   }
 
-  function rendreArgent(rows){
+  // ⚠️ `alertes` N'EST PAS UN AJOUT DECORATIF. La date du dernier evenement de
+  // facturation etait un voyant dans la grille des alertes, ou elle ne pouvait
+  // rien alerter. Elle est ici, sous le tableau des evenements : un fait date,
+  // a cote des evenements qu'il date.
+  function rendreArgent(rows, alertes){
     var toutes = rows || [];
     var lignes = sansNosTests(toutes).map(function(r){
       return { cases:[
@@ -1515,7 +1907,32 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       ['Mois','Environnement','Magasin','Produit','Type','Événements','Montant brut'],
       lignes, 'aucun événement enregistré', 12)
       + mentionPerimetre(toutes, MOT_BAC, U_EVENEMENTS)
-      + '<div class="rien">Une ligne par <b>mois</b> et par type d\u2019\u00e9v\u00e9nement \u2014 ce n\u2019est pas un \u00e9v\u00e9nement par ligne. Le webhook RevenueCat est branch\u00e9 depuis le <b>8 septembre 2026</b> : rien d\u2019ant\u00e9rieur ne figure ici.</div>';
+      + '<div class="rien">Une ligne par <b>mois</b> et par type d\u2019\u00e9v\u00e9nement \u2014 ce n\u2019est pas un \u00e9v\u00e9nement par ligne. Le webhook RevenueCat est branch\u00e9 depuis le <b>8 septembre 2026</b> : rien d\u2019ant\u00e9rieur ne figure ici.</div>'
+      + faitDernierEvenement(alertes);
+  }
+
+  /**
+   * ⚠️ UN FAIT, PAS UN VOYANT — et c'est tout le sujet (13/09/2026, soir).
+   * Ce chiffre a ete un voyant dans « ce qui doit reveiller la nuit ». Il ne
+   * pouvait pas reveiller : son etat etait ecrit en dur a « ok ». Il ne se
+   * lisait pas non plus — il compte les annulations, les expirations, les
+   * acces offerts a 0 € et les achats de test. Ici, sous le tableau qu'il
+   * date, il redevient ce qu'il a toujours ete : une date.
+   */
+  function faitDernierEvenement(alertes){
+    if(!alertes || !('dernier_evenement_facturation' in alertes)) return '';
+    var d = alertes.dernier_evenement_facturation;
+    return '<div class="rien">'
+      + (d
+          ? 'Dernier événement reçu le <b>' + quandTexte(d) + '</b>, il y a '
+            + dureeTexte(heuresDepuis(d)) + '.'
+          : '<b>Aucun événement de facturation reçu à ce jour.</b>')
+      + ' ⚠️ <b>Ce n’est pas une date de vente</b> : les annulations, les '
+      + 'expirations, les accès offerts à 0 € et les achats de test comptent '
+      + 'aussi. Et ce n’est pas un signe de bonne santé : sans activité, cette '
+      + 'date vieillit sans qu’il y ait la moindre panne. <b>Aucune détection '
+      + 'automatique d’une panne du webhook n’existe</b> — la référence reste le '
+      + 'tableau de bord RevenueCat.</div>';
   }
 
   function rendreParcours(rows){
@@ -2593,9 +3010,26 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       ['Mesure','Jours non nuls','Dernière'], lignes, 'aucune mesure', 8);
   }
 
-  function rendreSauvegarde(sv, garderMessage){
+  /**
+   * ⚠️ UN RENDU N'EST PAS UN RESULTAT (corrige en revue le 13/09).
+   *
+   * `rendreEtatSauvegarde` remplissait `#sauvegarde-resultat` a CHAQUE rendu,
+   * avant tout clic. Tant que ce bloc vivait en bas de page, il ne genait
+   * personne. Depuis que le bouton est remonte dans la bande « À faire », il
+   * s'affichait en PERMANENCE en haut de l'ecran : l'age de la sauvegarde une
+   * seconde fois, a une precision plus vague que la carte (« moins de 8 jours »
+   * sous « il y a 2 j »), suivi d'une ligne de commande `certutil` — pour
+   * quelqu'un qui n'est pas developpeur, sur l'ecran qu'il ouvre chaque matin.
+   * C'etait exactement la plainte qui a lance ce lot, recreee trente pixels
+   * plus haut.
+   *
+   * `#sauvegarde-resultat` est desormais reserve au resultat d'une ACTION. La
+   * fraicheur de la sauvegarde est dite une fois, et c'est assez : le compte a
+   * rebours de la bande « À faire ». (Le voyant « Sauvegarde » de la grille a
+   * ete retire dans le meme lot, pour la meme raison : il disait la meme chose.)
+   */
+  function rendreSauvegarde(sv){
     rendreTableauSauvegarde(sv);
-    if(!garderMessage) rendreEtatSauvegarde(sv);
   }
 
   function rendreTableauSauvegarde(sv){
@@ -2613,32 +3047,6 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     }
     h += '</tbody></table>';
     $('cadre-sauvegarde').innerHTML = h;
-  }
-
-  function rendreEtatSauvegarde(sv){
-    var j = joursDepuis(sv && sv.derniere);
-    if(!sv || !sv.derniere){
-      direSauvegarde('critique',
-        "<b>Aucun export n'a jamais été généré depuis cette base.</b>"
-        + "Si c'est la première fois, la base n'a aucune copie : générez-en une. "
-        + "Si vous venez de RESTAURER la base, ce rouge est NORMAL — le journal des "
-        + "sauvegardes est volontairement hors du périmètre sauvegardé, il repart "
-        + "donc vide. Ce n'est pas une panne.");
-    } else if(j > 14){
-      direSauvegarde('critique', '<b>Dernier export généré il y a ' + Math.floor(j)
-        + ' jours.</b>C\'est trop. Générez-en un maintenant.');
-    } else if(j > 8){
-      direSauvegarde('attention', '<b>Dernier export généré il y a ' + Math.floor(j)
-        + ' jours.</b>La cadence prévue est hebdomadaire.');
-    } else {
-      // ⚠️ « export GENERE », jamais « sauvegarde a jour ». Le serveur sait qu'un
-      // fichier a ete PRODUIT ; il ne sait pas s'il a ete ecrit sur le disque, ni
-      // conserve. Dire « à jour » serait affirmer ce qu'on ignore.
-      direSauvegarde('ok', '<b>Dernier export généré il y a moins de 8 jours.</b>'
-        + 'Le serveur sait qu’un fichier a été produit — il ne sait pas où il est. '
-        + 'Vérification sur votre poste : '
-        + '<code>certutil -hashfile "&lt;fichier&gt;" SHA256</code>');
-    }
   }
 
   function sauvegarder(){
@@ -2731,7 +3139,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             b.disabled = false;
             // `true` : on garde a l'ecran le message qui porte l'empreinte.
             return lire('v_admin_sauvegarde').then(function(s){
-              if(!s.error && s.data && s.data.length) rendreSauvegarde(s.data[0], true);
+              // Le tableau se met a jour ; le message du succes reste a l'ecran.
+              if(!s.error && s.data && s.data.length) rendreSauvegarde(s.data[0]);
             });
           });
         });
@@ -2778,6 +3187,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   });
   $('btn-recharger').addEventListener('click', charger);
   $('btn-sauvegarde').addEventListener('click', sauvegarder);
+  preparerReplis();
   $('btn-collecte').addEventListener('click', collecter);
 
   // Repliage : delegue, donc il survit a chaque rechargement des tableaux.

@@ -625,6 +625,23 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     @media (max-width:420px){.store-badge-img img{height:44px}}
     .store-badge-static{cursor:default;user-select:none}
     #telecharger{scroll-margin-top:88px}
+    .qr-open{display:none}
+    .qr-modal{border:none;padding:0;margin:auto;background:var(--white);color:var(--ink);border-radius:24px;box-shadow:var(--shadow-xl);max-width:min(680px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto}
+    .qr-modal::backdrop{background:rgba(15,17,23,.55)}
+    .qr-modal-inner{padding:32px 32px 28px;text-align:center}
+    .qr-modal-titre{font-size:21px;font-weight:700;color:var(--ink);letter-spacing:-.4px;line-height:1.25;margin:0 0 10px}
+    .qr-modal-texte{font-size:15px;color:var(--muted);line-height:1.6;margin:0 auto 26px;max-width:430px}
+    .qr-pair{display:flex;justify-content:center;align-items:flex-start;gap:40px;flex-wrap:wrap}
+    .qr{margin:0;width:276px}
+    .qr img{display:block;box-sizing:content-box;width:260px;height:260px;background:#fff;padding:8px;border-radius:14px;border:1px solid var(--border)}
+    .qr figcaption{margin-top:12px;display:flex;flex-direction:column;gap:3px}
+    .qr-pour{font-size:15px;font-weight:700;color:var(--ink);line-height:1.35}
+    .qr-dom{font-size:13px;color:var(--muted)}
+    .qr-close{margin-top:28px;height:44px;padding:0 26px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;background:var(--brand-dark);border:none;border-radius:12px;cursor:pointer}
+    @media (min-width:860px) and (hover:hover) and (pointer:fine){
+      html.js .qr-open{display:inline-flex;align-items:center;justify-content:center;margin-top:18px;height:44px;padding:0 20px;font-family:inherit;font-size:14px;font-weight:600;color:var(--brand-dark);background:var(--white);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:background .2s,border-color .2s}
+      html.js .qr-open:hover{background:var(--surface);border-color:var(--brand-mid)}
+    }
     .store-badge-icon{width:24px;height:24px;flex-shrink:0;fill:var(--brand-dark);opacity:.9}
     .store-badge-label{display:flex;flex-direction:column;align-items:flex-start;gap:2px;line-height:1}
     .store-badge-sub{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
@@ -1309,8 +1326,21 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="cta-band-title">Prêt à ne plus rien oublier&#8239;?</div>
       <p class="cta-band-sub">Pilou est disponible sur l’App&nbsp;Store et sur Google&nbsp;Play.</p>
       <span class="store-badges"><a class="store-badge-img" href="https://apps.apple.com/fr/app/pilou-pilulier-ordonnance/id6806332290"><img src="/badge-app-store-fr.svg" alt="Télécharger Pilou dans l’App Store" width="127" height="40"></a><a class="store-badge-img" href="https://play.google.com/store/apps/details?id=com.pilou.app"><img src="/badge-google-play-fr.svg" alt="Télécharger Pilou sur Google Play" width="135" height="40"></a></span>
+      <button type="button" class="qr-open" id="qrOpen" aria-haspopup="dialog">Ouvrir Pilou sur mon téléphone</button>
     </div>
   </div>
+
+<dialog class="qr-modal" id="qrModal" aria-labelledby="qrModalTitre">
+  <div class="qr-modal-inner">
+    <h2 class="qr-modal-titre" id="qrModalTitre">Ouvrir Pilou sur votre téléphone</h2>
+    <p class="qr-modal-texte">Ouvrez l’appareil photo de votre téléphone, visez le code qui correspond à votre appareil, puis touchez le lien qui apparaît.</p>
+    <div class="qr-pair">
+      <figure class="qr"><img src="/qr-app-store.svg" alt="" width="260" height="260"><figcaption><span class="qr-pour">Pour iPhone</span><span class="qr-dom">apps.apple.com</span></figcaption></figure>
+      <figure class="qr"><img src="/qr-google-play.svg" alt="" width="260" height="260"><figcaption><span class="qr-pour">Pour tous les autres téléphones</span><span class="qr-dom">play.google.com</span></figcaption></figure>
+    </div>
+    <button type="button" class="qr-close" id="qrClose">Fermer</button>
+  </div>
+</dialog>
 
 <!-- TRUST -->
 <section class="trust-section" aria-label="Confiance et sécurité">
@@ -1547,6 +1577,17 @@ if (reduceMotion) {
   if(next)next.onclick=function(){step(1);}; if(prev)prev.onclick=function(){step(-1);};
   scroller.addEventListener("keydown",function(e){ if(e.key==="ArrowRight"){e.preventDefault();step(1);} if(e.key==="ArrowLeft"){e.preventDefault();step(-1);} });
   update();
+})();
+</script>
+<script>
+// Codes QR - progressif : sans JavaScript, ou sans <dialog>, le bouton reste masque.
+(function(){
+  var b=document.getElementById('qrOpen'), d=document.getElementById('qrModal');
+  if(!b||!d||typeof d.showModal!=='function'){ if(b)b.style.display='none'; return; }
+  b.addEventListener('click',function(){ d.showModal(); });
+  var c=document.getElementById('qrClose');
+  if(c)c.addEventListener('click',function(){ d.close(); });
+  d.addEventListener('click',function(e){ if(e.target===d) d.close(); });
 })();
 </script>
 </body>

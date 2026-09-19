@@ -151,6 +151,10 @@ nav{
 .guide-cta-title{font-size:21px;font-weight:700;color:var(--ink);letter-spacing:-.4px;margin-bottom:4px}
 .guide-cta-sub{font-size:15px;color:var(--muted);line-height:1.6;max-width:420px;margin-bottom:18px}
 .store-badge{display:inline-flex;align-items:center;gap:12px;padding:10px 20px;border-radius:14px;background:transparent;color:var(--ink);border:1.5px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+    .store-badges{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+    .store-badge-img{display:inline-block;line-height:0}
+    .store-badge-img img{display:block;height:48px;width:auto}
+    @media (max-width:420px){.store-badge-img img{height:44px}}
 .store-badge-static{cursor:default;user-select:none}
 .store-badge-icon{width:24px;height:24px;flex-shrink:0;fill:var(--brand-dark);opacity:.9}
 .store-badge-label{display:flex;flex-direction:column;align-items:flex-start;gap:2px;line-height:1}
@@ -506,11 +510,8 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   <div class="guide-cta">
     <div class="guide-cta-inner">
       <div class="guide-cta-title">Pilou veille sur votre stock</div>
-      <p class="guide-cta-sub">Suivi du stock avec alerte quand une boîte approche de la fin, rappels à l'heure, lecture d'ordonnance. Sans compte. Vos traitements et votre historique restent sur votre téléphone. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil : le scan d'ordonnance, analysé dans l'Union européenne, et la recherche de la molécule d'un médicament. Nous n'enregistrons ni la photo ni ces recherches.</p>
-      <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.pilou.app" aria-label="Télécharger Pilou sur Google Play">
-        <svg class="store-badge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3.18 23.76a2 2 0 0 1-1.1-1.8V2.04A2 2 0 0 1 3.18.28l12.1 11.74-12.1 11.74zm1.67-1.62 10.26-9.95-2.1-2.03-8.16 11.98zm0-22.28 8.16 11.98 2.1-2.03-10.26-9.95zm13.08 4.72-2.6 1.5-2.38-2.31 2.38-2.31 2.6 1.5a1 1 0 0 1 0 1.62zm-2.6 12.12 2.6-1.5a1 1 0 0 0 0-1.62l-2.6-1.5-2.38 2.31 2.38 2.31z"/></svg>
-        <span class="store-badge-label"><span class="store-badge-sub">Télécharger sur</span><span class="store-badge-name">Google Play</span></span>
-      </a>
+      <p class="guide-cta-sub">Suivi du stock avec alerte quand une boîte approche de la fin, rappels à l'heure, lecture d'ordonnance. Sans compte. Vos traitements et votre historique restent sur votre téléphone, et sur iPhone dans votre sauvegarde iCloud si vous l'avez activée. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil : le scan d'ordonnance, analysé dans l'Union européenne, et la recherche de la molécule d'un médicament. Nous n'enregistrons ni la photo ni ces recherches.</p>
+      <span class="store-badges"><a class="store-badge-img" href="https://apps.apple.com/fr/app/pilou-pilulier-ordonnance/id6806332290"><img src="/badge-app-store-fr.svg" alt="Télécharger Pilou dans l’App Store" width="127" height="40"></a><a class="store-badge-img" href="https://play.google.com/store/apps/details?id=com.pilou.app"><img src="/badge-google-play-fr.svg" alt="Télécharger Pilou sur Google Play" width="135" height="40"></a></span>
     </div>
   </div>
 

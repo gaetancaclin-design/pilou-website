@@ -619,7 +619,12 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     /* ─── Badge store (statique, pre-lancement) ───────────────────── */
     .hero-store{display:flex;justify-content:center;margin-top:6px}
     .store-badge{display:inline-flex;align-items:center;gap:12px;padding:10px 20px;border-radius:14px;background:transparent;color:var(--ink);border:1.5px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+    .store-badges{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+    .store-badge-img{display:inline-block;line-height:0}
+    .store-badge-img img{display:block;height:48px;width:auto}
+    @media (max-width:420px){.store-badge-img img{height:44px}}
     .store-badge-static{cursor:default;user-select:none}
+    #telecharger{scroll-margin-top:88px}
     .store-badge-icon{width:24px;height:24px;flex-shrink:0;fill:var(--brand-dark);opacity:.9}
     .store-badge-label{display:flex;flex-direction:column;align-items:flex-start;gap:2px;line-height:1}
     .store-badge-sub{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
@@ -818,8 +823,8 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   "url": "https://pilou-app.fr/",
   "image": "https://pilou-app.fr/og-image.png",
   "applicationCategory": "HealthApplication",
-  "operatingSystem": "Android",
-  "downloadUrl": "https://play.google.com/store/apps/details?id=com.pilou.app",
+  "operatingSystem": ["Android", "iOS"],
+  "installUrl": ["https://apps.apple.com/fr/app/pilou-pilulier-ordonnance/id6806332290", "https://play.google.com/store/apps/details?id=com.pilou.app"],
   "countriesSupported": "FR",
   "featureList": "Lecture ordonnance, Rappels médicaments, Suivi observance, Gestion stocks, Trousse de voyage, Journal de prises PDF",
   "inLanguage": "fr",
@@ -879,7 +884,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       "name": "Où sont stockées mes données de santé ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Sur votre téléphone. Ce que vous enregistrez dans Pilou — traitements, posologies, prises, historique et stocks — y reste : nous n’en gardons aucune copie. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil. Le scan : la photo de votre ordonnance est envoyée à notre serveur dans l’Union européenne, puis analysée par un service de Google au sein de l’Union européenne pour en extraire le texte ; nous ne l’enregistrons pas. La recherche de molécule : lorsque la molécule d’un médicament manque, seul le premier mot de son nom est envoyé, pour chacun des médicaments concernés. Voir notre politique de confidentialité."
+        "text": "Sur votre téléphone. Ce que vous enregistrez dans Pilou — traitements, posologies, prises, historique et stocks — y reste : nous n’en gardons aucune copie. Sur iPhone, une copie peut figurer dans votre sauvegarde iCloud, si vous l’avez activée. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil. Le scan : la photo de votre ordonnance est envoyée à notre serveur dans l’Union européenne, puis analysée par un service de Google au sein de l’Union européenne pour en extraire le texte ; nous ne l’enregistrons pas. La recherche de molécule : lorsque la molécule d’un médicament manque, seul le premier mot de son nom est envoyé, pour chacun des médicaments concernés. Voir notre politique de confidentialité."
       }
     },
     {
@@ -927,7 +932,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       "name": "Faut-il créer un compte pour utiliser Pilou ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Non. Pilou fonctionne sans compte, sans email et sans mot de passe : vous commencez directement, et vos traitements restent enregistrés sur votre téléphone. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil. Elles sont décrites dans notre politique de confidentialité."
+        "text": "Non. Pilou fonctionne sans compte, sans email et sans mot de passe : vous commencez directement, et vos traitements restent enregistrés sur votre téléphone — et, sur iPhone, dans votre sauvegarde iCloud si vous l’avez activée. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil. Elles sont décrites dans notre politique de confidentialité."
       }
     },
     {
@@ -935,7 +940,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       "name": "Sur quels téléphones Pilou est-il disponible ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Pilou fonctionne sur les téléphones Android à partir d’Android 7. La version iPhone est en cours de publication sur l’App Store."
+        "text": "Pilou fonctionne sur les téléphones Android à partir d’Android 7 et sur iPhone à partir d’iOS 15."
       }
     }
   ]
@@ -986,7 +991,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <h1 class="fade-up visible fade-up-d1">Pour ne plus oublier<br><em>vos médicaments</em></h1>
       <p class="hero-sub fade-up visible fade-up-d2">Photographiez votre ordonnance. Pilou la lit et prépare votre pilulier en quelques secondes. Vérifiez, ajustez si besoin, validez.</p>
       <div class="hero-store fade-up visible fade-up-d3" id="heroStore">
-        <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.pilou.app" aria-label="Télécharger Pilou sur Google Play"><svg class="store-badge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3.18 23.76a2 2 0 0 1-1.1-1.8V2.04A2 2 0 0 1 3.18.28l12.1 11.74-12.1 11.74zm1.67-1.62 10.26-9.95-2.1-2.03-8.16 11.98zm0-22.28 8.16 11.98 2.1-2.03-10.26-9.95zm13.08 4.72-2.6 1.5-2.38-2.31 2.38-2.31 2.6 1.5a1 1 0 0 1 0 1.62zm-2.6 12.12 2.6-1.5a1 1 0 0 0 0-1.62l-2.6-1.5-2.38 2.31 2.38 2.31z"/></svg><span class="store-badge-label"><span class="store-badge-sub">Télécharger sur</span><span class="store-badge-name">Google Play</span></span></a>
+        <span class="store-badges"><a class="store-badge-img" href="https://apps.apple.com/fr/app/pilou-pilulier-ordonnance/id6806332290"><img src="/badge-app-store-fr.svg" alt="Télécharger Pilou dans l’App Store" width="127" height="40"></a><a class="store-badge-img" href="https://play.google.com/store/apps/details?id=com.pilou.app"><img src="/badge-google-play-fr.svg" alt="Télécharger Pilou sur Google Play" width="135" height="40"></a></span>
       </div>
       <div class="hero-reassure fade-up visible fade-up-d3">Simple à prendre en main. Gratuit, sans publicité.</div>
       <div class="trust-row fade-up visible fade-up-d4">
@@ -1199,7 +1204,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
       <div class="feat fade-up fade-up-d2">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></div>
         <div class="feat-name">Sur votre téléphone, sauf deux exceptions</div>
-        <div class="feat-desc">Médicaments, posologies et historique enregistrés uniquement sur votre appareil. Aucun compte requis. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil : la lecture d’ordonnance, analysée au sein de l’Union européenne et non conservée, et la recherche de la molécule d’un médicament. Conforme RGPD.</div>
+        <div class="feat-desc">Médicaments, posologies et historique enregistrés sur votre appareil. Aucun compte requis. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil : la lecture d’ordonnance, analysée au sein de l’Union européenne et non conservée, et la recherche de la molécule d’un médicament. Conforme RGPD.</div>
       </div>
       <div class="feat fade-up fade-up-d3">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1m-2 0H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h12"/><path d="M6 8V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"/></svg></div>
@@ -1258,7 +1263,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>14 jours d’historique</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Rappels illimités</li>
         </ul>
-        <a class="price-btn-s" href="https://play.google.com/store/apps/details?id=com.pilou.app">Télécharger l’app</a>
+        <a class="price-btn-s" href="#telecharger">Voir où télécharger</a>
                 <div class="price-note">Gratuit pour toujours · Aucune carte requise</div>
       </div>
       <div class="price-card featured fade-up fade-up-d2">
@@ -1289,7 +1294,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Trousse de voyage</li>
           <li class="price-item"><div class="chk"><svg viewBox="0 0 10 10"><path d="M2 5l2 2 4-4"/></svg></div>Journal de prises à remettre à votre médecin ou pharmacien</li>
         </ul>
-        <a class="price-btn-p" href="https://play.google.com/store/apps/details?id=com.pilou.app">Télécharger l’app</a>
+        <a class="price-btn-p" href="#telecharger">Voir où télécharger</a>
                 <div class="price-note">Sans engagement, résiliable à tout moment</div>
       </div>
     </div>
@@ -1298,12 +1303,12 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 </section>
 
 <!-- CTA RAPPEL 1 (apres tarifs) -->
-  <div class="cta-band">
+  <div class="cta-band" id="telecharger">
     <div class="cta-band-inner fade-up">
       <div class="cta-band-eyebrow">Convaincu&#8239;?</div>
       <div class="cta-band-title">Prêt à ne plus rien oublier&#8239;?</div>
-      <p class="cta-band-sub">Pilou est disponible sur Google&nbsp;Play.</p>
-      <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.pilou.app" aria-label="Télécharger Pilou sur Google Play"><svg class="store-badge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3.18 23.76a2 2 0 0 1-1.1-1.8V2.04A2 2 0 0 1 3.18.28l12.1 11.74-12.1 11.74zm1.67-1.62 10.26-9.95-2.1-2.03-8.16 11.98zm0-22.28 8.16 11.98 2.1-2.03-10.26-9.95zm13.08 4.72-2.6 1.5-2.38-2.31 2.38-2.31 2.6 1.5a1 1 0 0 1 0 1.62zm-2.6 12.12 2.6-1.5a1 1 0 0 0 0-1.62l-2.6-1.5-2.38 2.31 2.38 2.31z"/></svg><span class="store-badge-label"><span class="store-badge-sub">Télécharger sur</span><span class="store-badge-name">Google Play</span></span></a>
+      <p class="cta-band-sub">Pilou est disponible sur l’App&nbsp;Store et sur Google&nbsp;Play.</p>
+      <span class="store-badges"><a class="store-badge-img" href="https://apps.apple.com/fr/app/pilou-pilulier-ordonnance/id6806332290"><img src="/badge-app-store-fr.svg" alt="Télécharger Pilou dans l’App Store" width="127" height="40"></a><a class="store-badge-img" href="https://play.google.com/store/apps/details?id=com.pilou.app"><img src="/badge-google-play-fr.svg" alt="Télécharger Pilou sur Google Play" width="135" height="40"></a></span>
     </div>
   </div>
 
@@ -1313,12 +1318,12 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   <div class="section-wrap">
     <div class="eyebrow fade-up">Confiance</div>
     <h2 class="fade-up fade-up-d1">Conçu pour vos données de santé</h2>
-    <p class="section-lead fade-up fade-up-d2">Pilou a été conçu avec une conviction : ce que vous enregistrez — traitements, prises, historique — reste sur votre téléphone. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil : le scan d’ordonnance, analysé au sein de l’Union européenne, et la recherche de la molécule d’un médicament, qui envoie le premier mot de son nom. Nous n’enregistrons ni la photo ni ces recherches.</p>
+    <p class="section-lead fade-up fade-up-d2">Pilou a été conçu avec une conviction : ce que vous enregistrez — traitements, prises, historique — reste sur votre téléphone, et sur iPhone dans votre sauvegarde iCloud si vous l’avez activée. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil : le scan d’ordonnance, analysé au sein de l’Union européenne, et la recherche de la molécule d’un médicament, qui envoie le premier mot de son nom. Nous n’enregistrons ni la photo ni ces recherches.</p>
     <div class="trust-grid">
       <div class="trust-card fade-up fade-up-d1">
         <div class="trust-card-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
         <div class="trust-card-title">Ce qui sort de votre téléphone</div>
-        <div class="trust-card-desc">Posologies, prises et historique restent sur votre téléphone. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil : la photo d’ordonnance, analysée au sein de l’Union européenne, et l’envoi du premier mot du nom d’un médicament quand Pilou doit retrouver sa molécule.</div>
+        <div class="trust-card-desc">Posologies, prises et historique restent sur votre téléphone, et sur iPhone dans votre sauvegarde iCloud si vous l’avez activée. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil : la photo d’ordonnance, analysée au sein de l’Union européenne, et l’envoi du premier mot du nom d’un médicament quand Pilou doit retrouver sa molécule.</div>
       </div>
       <div class="trust-card fade-up fade-up-d2">
         <div class="trust-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
@@ -1382,7 +1387,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         </details>
         <details class="faq-item">
           <summary class="faq-q">Où sont stockées mes données de santé&#8239;?<span class="faq-icon"></span></summary>
-          <div class="faq-a">Sur votre téléphone. Ce que vous enregistrez dans Pilou — traitements, posologies, prises, historique et stocks — y reste : nous n’en gardons aucune copie. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil. Le scan : la photo de votre ordonnance est envoyée à notre serveur dans l’Union européenne, puis analysée par un service de Google au sein de l’Union européenne pour en extraire le texte ; nous ne l’enregistrons pas. La recherche de molécule : lorsque la molécule d’un médicament manque, seul le premier mot de son nom est envoyé, pour chacun des médicaments concernés. Voir notre politique de confidentialité.</div>
+          <div class="faq-a">Sur votre téléphone. Ce que vous enregistrez dans Pilou — traitements, posologies, prises, historique et stocks — y reste : nous n’en gardons aucune copie. Sur iPhone, une copie peut figurer dans votre sauvegarde iCloud, si vous l’avez activée. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil. Le scan : la photo de votre ordonnance est envoyée à notre serveur dans l’Union européenne, puis analysée par un service de Google au sein de l’Union européenne pour en extraire le texte ; nous ne l’enregistrons pas. La recherche de molécule : lorsque la molécule d’un médicament manque, seul le premier mot de son nom est envoyé, pour chacun des médicaments concernés. Voir notre politique de confidentialité.</div>
         </details>
         <details class="faq-item">
           <summary class="faq-q">Pilou fonctionne-t-il sans connexion internet&#8239;?<span class="faq-icon"></span></summary>
@@ -1406,11 +1411,11 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
         </details>
         <details class="faq-item">
           <summary class="faq-q">Faut-il créer un compte pour utiliser Pilou&#8239;?<span class="faq-icon"></span></summary>
-          <div class="faq-a">Non. Pilou fonctionne sans compte, sans email et sans mot de passe&#8239;: vous commencez directement, et vos traitements restent enregistrés sur votre téléphone. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil. Elles sont décrites dans notre politique de confidentialité.</div>
+          <div class="faq-a">Non. Pilou fonctionne sans compte, sans email et sans mot de passe&#8239;: vous commencez directement, et vos traitements restent enregistrés sur votre téléphone — et, sur iPhone, dans votre sauvegarde iCloud si vous l’avez activée. Deux opérations seulement transmettent le contenu de vos données de santé hors de votre appareil. Elles sont décrites dans notre politique de confidentialité.</div>
         </details>
         <details class="faq-item">
           <summary class="faq-q">Sur quels téléphones Pilou est-il disponible&#8239;?<span class="faq-icon"></span></summary>
-          <div class="faq-a">Pilou fonctionne sur les téléphones Android à partir d’Android 7. La version iPhone est en cours de publication sur l’App Store.</div>
+          <div class="faq-a">Pilou fonctionne sur les téléphones Android à partir d’Android 7 et sur iPhone à partir d’iOS 15.</div>
         </details>
       </div>
       <a class="faq-more fade-up" href="/support/">Voir toutes les questions</a>

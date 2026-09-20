@@ -1696,6 +1696,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         + '⚠️ « Déjà connue » n’est pas « quotidienne » : quelqu’un vu il y a trois '
         + 'semaines et revenu hier compte ici. RevenueCat compte des <b>installations</b>, '
         + 'pas des personnes.<br><br>'
+        + '⚠️ <b>Un nombre négatif est désormais possible dans le tableau jour par jour, '
+        + 'sur la ligne du jour en cours</b> (20/09/2026). Avant le verrou horaire, les '
+        + 'onze séries étaient lues une fois par jour, dans la même boucle : « actifs » et '
+        + '« nouveaux » venaient forcément du même passage, et un négatif était '
+        + 'logiquement impossible. Avec plusieurs collectes par jour, une série peut '
+        + 'échouer à un passage et garder sa valeur précédente pendant que les autres '
+        + 'avancent. Un négatif sur le <b>jour en cours</b> signifie donc « une série a '
+        + 'manqué un passage », et non plus « anomalie de données ». '
+        + 'Il n’est volontairement <b>pas masqué</b> : un chiffre lissé serait un chiffre '
+        + 'qui ment. Sur les jours <b>clos</b>, un négatif garde son sens d’origine et '
+        + 'reste anormal.<br><br>'
         + '🔴 <b>Ce chiffre ne dit rien sur la saisie d’un traitement, ni sur le fait que '
         + 'quelqu’un prenne ses médicaments.</b> Cette mesure-là n’existe pas, et sa '
         + 'création a été écartée le 20/08 — c’est une donnée de santé.<br><br>'
@@ -2860,15 +2871,37 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           + (o.motif ? '<br>Détail : ' + ech(String(o.motif)) : '')
           + (partiel ? '<br>Une série au moins n’a pas été lue. Sans gravité si cela ne se '
                      + 'répète pas — la prochaine collecte rattrapera.' : ''));
+        // 🔴 LE BOUTON EST REACTIVE ICI (20/09/2026). Jusqu'a ce jour, la branche
+        // du SUCCES etait la SEULE des quatre a ne pas le faire : apres une
+        // collecte reussie il restait grise jusqu'a un F5. C'etait sans
+        // consequence tant qu'une seconde collecte le meme jour rendait 409 de
+        // toute facon. Le verrou etant desormais HORAIRE, laisser le bouton
+        // grise empecherait d'utiliser ce qu'on vient justement d'ouvrir.
+        b.disabled = false;
         // On recharge la console pour que les tableaux montrent les nouvelles
         // lignes. Le message ci-dessus, lui, n'est PAS reecrit : c'est la
         // lecon du banc du 10/09 sur l'empreinte de sauvegarde effacee.
         charger();
       } else if(x.code === 409){
+        // ⚠️ LE 409 RECOUVRE DEUX SITUATIONS, et l'index les confond : il porte
+        // sur `etat in ('en_cours','ok')`. Soit une collecte TOURNE en ce moment
+        // (huit secondes), soit le creneau horaire est DEJA consomme (jusqu'a
+        // 59 minutes). Un message unique qui dirait « revenez dans une heure »
+        // serait faux dans le premier cas, et l'ecran affirmerait quelque chose
+        // de faux — ce que le dossier proscrit depuis le 09/09.
+        // L'heure est calculee ICI, sans dependre d'aucune donnee chargee : le
+        // creneau suivant est l'heure pleine qui suit, toujours.
+        var suivant = new Date();
+        suivant.setMinutes(0, 0, 0);
+        suivant.setHours(suivant.getHours() + 1);
+        var hhmm = ('0' + suivant.getHours()).slice(-2) + ' h '
+                 + ('0' + suivant.getMinutes()).slice(-2);
         direCollecte('attention',
-          '<b>Déjà collecté aujourd’hui.</b> Une seule collecte réussie par jour : '
-          + 'c’est un garde-fou, pas une panne. Revenez demain. '
-          + 'Si la collecte du jour avait échoué, elle serait rejouable — dites-le-moi.');
+          '<b>Déjà collecté dans l’heure en cours.</b> Une collecte par heure : '
+          + 'c’est un garde-fou, pas une panne. Vous pourrez recollecter '
+          + '<b>à partir de ' + hhmm + '</b>.<br>'
+          + 'Si une collecte vient d’être lancée depuis un autre onglet, elle dure '
+          + 'une dizaine de secondes : réessayez juste après.');
         b.disabled = false;
       } else if(x.code === 401){
         direCollecte('critique',
@@ -2912,11 +2945,27 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
          [['quand', quandTexte(e.dernier_passage)],
           ['état', nb(e.dernier_etat)],
           ['lignes ajoutées', nb(e.lignes_dernier_passage)],
-          ['passages mauvais', nb(e.mauvais_cinq_derniers) + ' sur ' + nb(e.passages_examines) + ' examiné(s)']],
+          ['passages mauvais', (Number(e.passages_examines) > 0
+              ? nb(e.mauvais_cinq_derniers) + ' sur ' + nb(e.passages_examines) + ' examiné(s)'
+              : 'aucun passage depuis 5 jours')],
+          // ⚠️ AJOUTE LE 20/09 avec le verrou horaire. Sans cette ligne, un refus
+          // 409 n'avait aucune explication visible AILLEURS que dans le message
+          // ephemere du bouton : en rouvrant la page, plus rien ne disait pourquoi.
+          ['prochaine collecte possible',
+             (Number(e.collecte_en_cours) > 0) ? 'une collecte est en cours'
+             : (!e.prochain_creneau || new Date(e.prochain_creneau) <= new Date())
+               ? 'maintenant' : quandTexte(e.prochain_creneau)]],
          'La collecte est <b>manuelle</b> : rien ne se déclenche tout seul. Au-delà de '
          + '<b>28 jours</b> sans collecte, les jours de clients actifs deviennent '
-         + 'définitivement illisibles chez RevenueCat. « 0 mauvais » est affiché sur le '
-         + 'nombre de passages réellement examinés : sur un seul passage, un zéro ne prouve rien.',
+         + 'définitivement illisibles chez RevenueCat.<br><br>'
+         + '⚠️ <b>Une collecte par heure au maximum</b> (20/09/2026). Motif : la valeur '
+         + 'du jour en cours n’est qu’une fraction de la valeur finale — mesuré entre '
+         + '11 % et 83 % sur neuf jours, et toujours marquée « incomplet ». Une seule '
+         + 'collecte par jour laissait donc la colonne « Actifs » d’aujourd’hui afficher '
+         + 'un chiffre divisé par six jusqu’au lendemain.<br><br>'
+         + '« 0 mauvais » est affiché sur le nombre de passages réellement examinés, '
+         + '<b>sur les 5 derniers jours</b> : sur un seul passage, un zéro ne prouve rien — '
+         + 'et « aucun passage depuis 5 jours » n’est pas une bonne nouvelle.',
          (!isFinite(j) || j >= 28));
     h += res('Archive', nb(e.lignes_archivees) + ' lignes',
          [['du', jourTexte(e.premier_jour_archive)],
@@ -2929,7 +2978,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
          + 'Une valeur corrigée par RevenueCat ajoute une ligne, elle n’écrase pas l’ancienne — '
          + 'et la console affiche toujours la <b>dernière</b> lecture de chaque jour.');
     h += res('Révisions refusées', nb(e.revisions_refusees_cinq),
-         [['renommages écrits', nb(e.renommages_cinq)]],
+         [['renommages écrits', nb(e.renommages_cinq)],
+          ['fenêtre observée', '5 derniers jours', true]],
          'RevenueCat a corrigé un jour vieux de <b>plus de 14 jours</b> : la correction est '
          + 'refusée et comptée ici. Ce n’est pas une perte — c’est ce qui empêche un '
          + 'effacement rétroactif de réécrire l’histoire. Un chiffre qui monte chaque semaine '

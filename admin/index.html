@@ -1275,7 +1275,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // reste juste, la phrase nomme le ou les endroits, et chaque nombre annonce
     // correspond a quelque chose de VISIBLE. Releve en revue le 13/09 au soir.
     afficherBandeau(compte, taches);
-    rendreResume(d.resume, d.audJours, d.alertes);
+    rendreResume(d.resume, d.audJours, d.alertes, d.audEtat);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent, d.alertes);
     rendreParcours(d.parcours);
@@ -1544,11 +1544,16 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return null;
   }
 
-  function rendreResume(r, audJours, alertes){
+  function rendreResume(r, audJours, alertes, audEtat){
     if(!r){ $('resume').innerHTML = ''; $('resume-note').innerHTML = ''; return; }
     var h = '';
     var hier = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
     var gHier = ligneAudience(audJours, hier);
+    // ⚠️ EN UTC, comme les jours de l'archive — surtout pas l'heure locale : entre
+    // minuit et 2 h du matin a Paris, la date locale est deja demain alors que le
+    // jour archive est encore hier, et la tuile ne trouverait aucune ligne.
+    var auj   = new Date().toISOString().slice(0, 10);
+    var gAuj  = ligneAudience(audJours, auj);
     var rcNouveaux30 = sommeAudience(audJours, 'nouveaux', 30);
 
     // ⚠️ LE GRAND CHIFFRE EST CELUI DES 30 DERNIERS JOURS, PAS LE CUMUL.
@@ -1642,6 +1647,29 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             + 'des signalements qui ne sont jamais arrivés. <b>Notre mesure n’a rien vu '
             + 'avant le ' + ech(jourTexte(r.mesure_depuis)) + '.</b>'
           : '')
+      // ⚠️ AJOUTE LE 20/09/2026. La cause principale de l'ecart avait ete trouvee
+      // par la revue adverse du 19/09 et n'etait ecrite NULLE PART a l'ecran : le
+      // document recommandait de la porter dans cette bulle, et ca n'avait pas ete
+      // fait. Sans elle, ce chiffre se lit comme un compteur d'installations — ce
+      // qu'il n'est pas.
+      + '<br><br>🔴 <b>Ce que ce compteur mesure vraiment : les arrivées qui restent '
+      + 'au moins une à cinq minutes dans l’application — pas le volume d’installations.</b>'
+      + '<br>L’envoi du signal est retardé de 1 à 5 minutes, la minuterie ne tourne que '
+      + 'pendant que Pilou est <b>à l’écran</b>, et chaque retour au premier plan retire un '
+      + 'nouveau délai au hasard. <b>Quelqu’un qui ouvre Pilou, regarde trente secondes et '
+      + 'ferme n’est jamais compté.</b><br><br>'
+      + 'Mesure du 20/09/2026, sur les 28 jours où les deux compteurs existent : '
+      + '<b>77 chez nous contre 207 chez RevenueCat</b>, soit 2,7 fois plus. Mais le '
+      + 'rapport n’est pas constant — et c’est ça qui est instructif : les <b>7 jours</b> '
+      + 'où les deux chiffres sont identiques au chiffre près sont les jours calmes '
+      + '(1,7 arrivée en moyenne) ; les <b>20 jours</b> d’écart sont les jours chargés '
+      + '(9,7 en moyenne). Autrement dit, les arrivées motivées vont au bout du parcours '
+      + 'et sont comptées ; les arrivées de masse — publicité, curiosité — ouvrent et '
+      + 'repartent sans jamais l’être.<br><br>'
+      + '⚠️ Et ce n’est <b>pas</b> un pur sous-comptage : le <b>05/09</b>, notre mesure a '
+      + 'compté 3 quand RevenueCat en comptait 2. Réinstallations et essais font aussi '
+      + 'sur-compter. Sept causes de sous-compte et quatre de sur-compte sont recensées '
+      + 'au dossier du 19/09.'
       + '<br><br>Téléchargements et désinstallations : <b>Play Console</b>. '
       + 'Les personnes qui <b>reviennent</b>, elles, sont mesurées ci-contre.';
 
@@ -1682,20 +1710,58 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // de quelqu'un qui s'en sert. MESURE : le 20/08, 92 actifs dont 87 nouveaux
     // — le chiffre disait 92 et ne designait que du passage. Le grand chiffre
     // est donc REVENANTS = actifs - nouveaux, et « actifs » passe en detail.
-    if(gHier && gHier.revenants != null){
-      var rev = Number(gHier.revenants);
+    // ⚠️ BASCULE SUR AUJOURD'HUI LE 20/09/2026, ET C'EST LE VERROU HORAIRE QUI
+    // L'A RENDUE POSSIBLE. Tant que la collecte n'avait lieu qu'une fois par jour,
+    // la valeur du jour en cours ne valait rien — MESURE sur neuf jours : entre
+    // 11 % et 83 % de la valeur finale, soit un sixieme en moyenne. Afficher hier
+    // etait alors le seul choix honnete. Depuis qu'on peut recollecter toutes les
+    // heures, le jour en cours devient lisible — A CONDITION de dire qu'il est
+    // PROVISOIRE, en permanence : un chiffre qui monte sans le dire est un chiffre
+    // qui ment. Hier reste, en detail, comme point de comparaison stable.
+    //
+    // ⚠️ DEUX « 8 » SUR LE MEME ECRAN, le 20/09 : « revenues hier » valait 8 et
+    // « ouvertures aujourd'hui » valait 8 aussi. Gaetan a cherche le chiffre du
+    // jour dans une tuile qui parlait de la veille, et le mot « hier » n'etait
+    // visible que dans le detail, en petit. Le titre porte desormais le jour.
+    var gRef = (gAuj && gAuj.revenants != null) ? gAuj : gHier;
+    var surAuj = (gRef === gAuj);
+    if(gRef && gRef.revenants != null){
+      var rev = Number(gRef.revenants);
       var moy = sommeAudience(audJours, 'revenants', 7);
-      h += res('Personnes qui reviennent', nb(gHier.revenants),
-        [['Actifs hier', nb(gHier.actifs)],
-         ['dont nouveaux', nb(gHier.nouveaux)],
-         ['Moyenne 7 jours', moy == null ? '—' : (Math.round(moy / 7 * 10) / 10)],
-         ['Hier', ech(jourTexte(hier)), true]],
-        'Parmi les personnes actives hier, celles qui étaient <b>déjà connues</b>. '
-        + 'C’est le plus proche substitut d’un usage régulier que l’on puisse obtenir '
-        + '<b>sans rien mesurer dans l’application</b>.<br><br>'
+      var lignesRev = [
+        [(surAuj ? 'Ouvertures aujourd’hui' : 'Ouvertures hier'), nb(gRef.actifs)],
+        ['dont nouvelles', nb(gRef.nouveaux)],
+        ['Moyenne 7 jours (jours clos)', moy == null ? '—' : (Math.round(moy / 7 * 10) / 10)]
+      ];
+      if(surAuj && gHier && gHier.revenants != null){
+        lignesRev.push(['Hier ' + jourTexte(hier),
+          nb(gHier.revenants) + ' revenues sur ' + nb(gHier.actifs) + ' ouvertures']);
+      }
+      lignesRev.push([(surAuj ? 'Aujourd’hui' : 'Hier'),
+        ech(jourTexte(surAuj ? auj : hier)) + (surAuj ? ' — provisoire' : ''), true]);
+      h += res('Personnes revenues ' + (surAuj ? 'aujourd’hui' : 'hier'), nb(gRef.revenants),
+        lignesRev,
+        (surAuj
+          ? '⏳ <b>Chiffre provisoire.</b> La journée n’est pas finie : il ne peut que '
+            + 'monter, et il ne se fige qu’à minuit (heure UTC). Il ne vaut que ce que '
+            + 'vaut la <b>dernière collecte</b>'
+            + (audEtat && audEtat.dernier_passage
+                 ? ', faite le <b>' + ech(quandTexte(audEtat.dernier_passage)) + '</b>'
+                 : '')
+            + '. Pour le rafraîchir : « Collecter maintenant », en haut de page — '
+            + 'une fois par heure au maximum.<br><br>'
+          : '')
+        + 'Parmi les personnes ayant <b>ouvert</b> Pilou, celles qui étaient '
+        + '<b>déjà connues</b>. C’est le plus proche substitut d’un usage régulier que '
+        + 'l’on puisse obtenir <b>sans rien mesurer dans l’application</b>.<br><br>'
+        + '« Ouvertures » et non « installations » : RevenueCat ne voit que l’<b>activité '
+        + 'de son SDK</b>, qui ne tourne que lorsque l’application est ouverte. '
+        + 'Quelqu’un qui télécharge Pilou sans jamais l’ouvrir n’existe pas ici. '
+        + 'Les <b>téléchargements</b>, eux, ne sont visibles que dans Play Console et '
+        + 'App Store Connect — ils ne sont branchés sur aucune tuile de cette page.<br><br>'
         + '⚠️ « Déjà connue » n’est pas « quotidienne » : quelqu’un vu il y a trois '
-        + 'semaines et revenu hier compte ici. RevenueCat compte des <b>installations</b>, '
-        + 'pas des personnes.<br><br>'
+        + 'semaines et revenu aujourd’hui compte ici. RevenueCat compte des '
+        + '<b>installations</b>, pas des personnes.<br><br>'
         + '⚠️ <b>Un nombre négatif est désormais possible dans le tableau jour par jour, '
         + 'sur la ligne du jour en cours</b> (20/09/2026). Avant le verrou horaire, les '
         + 'onze séries étaient lues une fois par jour, dans la même boucle : « actifs » et '
@@ -1709,8 +1775,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         + 'reste anormal.<br><br>'
         + '🔴 <b>Ce chiffre ne dit rien sur la saisie d’un traitement, ni sur le fait que '
         + 'quelqu’un prenne ses médicaments.</b> Cette mesure-là n’existe pas, et sa '
-        + 'création a été écartée le 20/08 — c’est une donnée de santé.<br><br>'
-        + 'Le jour en cours n’est pas affiché : il est incomplet jusqu’à minuit UTC.',
+        + 'création a été écartée le 20/08 — c’est une donnée de santé.'
+        // ⚠️ LA PHRASE « le jour en cours n'est pas affiche » ETAIT ICI ET EST
+        // DEVENUE FAUSSE le 20/09 : la tuile affiche desormais le jour en cours.
+        // Une bulle d'aide qui decrit un comportement abandonne est pire que pas
+        // de bulle du tout. Remplacee par la regle reellement appliquee.
+        + (surAuj
+             ? '<br><br>La <b>moyenne 7 jours</b> ci-dessus ne compte que des jours '
+               + '<b>clos</b> : y mêler le jour en cours la ferait baisser chaque matin '
+               + 'pour une raison qui n’a rien à voir avec les utilisateurs.'
+             : '<br><br>Le jour en cours n’a pas encore de valeur lisible : aucune '
+               + 'collecte n’a eu lieu depuis minuit UTC.'),
         rev < 0);
     }
 

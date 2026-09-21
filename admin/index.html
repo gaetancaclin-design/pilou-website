@@ -208,6 +208,8 @@ details.repli .corps{
 .aide:hover>.bulle, .aide:focus-within>.bulle{display:block}
 .res.alerte{border-color:color-mix(in srgb, var(--critique) 35%, transparent)}
 .res.alerte .valeur{color:var(--critique)}
+.res.attention{border-color:color-mix(in srgb, var(--attention) 35%, transparent)}
+.res.attention .valeur{color:var(--attention)}
 .plier{width:auto; display:block; margin:0; border-radius:0;
   border:0; border-top:1px solid var(--trait);
   background:var(--carte-2); color:var(--encre-2);
@@ -1316,7 +1318,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // reste juste, la phrase nomme le ou les endroits, et chaque nombre annonce
     // correspond a quelque chose de VISIBLE. Releve en revue le 13/09 au soir.
     afficherBandeau(compte, taches);
-    rendreResume(d.resume, d.audJours, d.alertes, d.audEtat);
+    rendreResume(d.resume, d.audJours, d.alertes, d.audEtat, d.scan);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent, d.alertes);
     rendreParcours(d.parcours);
@@ -1551,8 +1553,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   // `lignes` : [[libelle, valeur], ...] — une par ligne, alignees.
   // `aide`   : le texte de la bulle. Absent => pas de « ? ».
+  // `alerte` : true => rouge (classe `alerte`) ; la chaine 'attention' => orange.
   function res(quoi, valeur, lignes, aide, alerte){
-    var h = '<div class="res'+(alerte?' alerte':'')+'">'
+    var h = '<div class="res'+(alerte === 'attention' ? ' attention' : (alerte ? ' alerte' : ''))+'">'
           + '<div class="quoi">'+ech(quoi)
           + (aide
               ? '<span class="aide"><button type="button" aria-label="Explication">?</button>'
@@ -1592,9 +1595,15 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return null;
   }
 
-  function rendreResume(r, audJours, alertes, audEtat){
+  function rendreResume(r, audJours, alertes, audEtat, scan){
     if(!r){ $('resume').innerHTML = ''; $('resume-note').innerHTML = ''; return; }
     var h = '';
+    // Lot vert 1 bis (21/09/2026) : « Scans aujourd'hui » ouvre le resume, a la
+    // demande de Gaetan (« les metriques en haut »). Elle remplace « Appels
+    // d'analyse · 24 h », qui lisait le compteur anti-abus : ni reussite, ni
+    // echec, ni duree, et un chiffre qui baissait quand on tapait sur le
+    // service. Celle-ci lit les compteurs ecrits par la fonction de scan.
+    h += tuileScan(scan, r);
     var hier = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
     var gHier = ligneAudience(audJours, hier);
     // ⚠️ EN UTC, comme les jours de l'archive — surtout pas l'heure locale : entre
@@ -1961,29 +1970,6 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + 'qu’une au moins n’est jamais arrivée. Pour un état des ventes qui fait foi, la '
       + 'référence reste le tableau de bord RevenueCat.');
 
-    // ⚠️ UN FAIT, PAS UNE MESURE D'USAGE — et la bulle dit ses quatre trous.
-    // Remplace la tuile « Scans sur 30 jours », retiree le 13/09/2026 avec la
-    // collecte gelee : elle serait descendue jusqu'a zero toute seule, et ce
-    // zero se serait lu comme « plus personne ne scanne ».
-    if(alertes && 'scans_engages_24h' in alertes){
-      h += res('Appels d’analyse · 24 h', nb(alertes.scans_engages_24h), null,
-        '<b>Ce qu’il compte :</b> les appels d’analyse d’ordonnance <b>arrivés '
-        + 'jusqu’au serveur</b> sur les 24 dernières heures glissantes. Source : le '
-        + 'compteur anti-abus, seule mesure de scan encore vivante depuis l’arrêt de '
-        + 'la collecte le 12/09/2026.<br><br>'
-        + '<b>Ce qu’il ne compte pas</b>, et il faut le savoir avant de le lire :<br>'
-        + '• les demandes <b>refusées par le plafond anti-abus</b> — le chiffre '
-        + '<b>baisse</b> donc quand quelqu’un tape sur le service ;<br>'
-        + '• les images trop volumineuses, écartées avant le compteur ;<br>'
-        + '• la réussite, l’échec, la durée : <b>rien de tout cela n’est mesuré</b>.'
-        + '<br><br><b>Vos appareils de test sont comptés dedans</b> : cette table ne '
-        + 'porte aucune colonne d’appareil. L’écriture est « au mieux » — une panne '
-        + 'de la table laisse passer le scan sans le compter. Purge à <b>24 h</b> : '
-        + 'aucun historique, aucune comparaison avec hier, et <b>un zéro ne prouve '
-        + 'pas qu’il n’y a pas eu de scan</b>.<br><br>'
-        + 'La mesure d’usage qui fait foi reste « Ont tenté un scan », plus bas.');
-    }
-
     $('resume').innerHTML = h;
     $('resume-note').innerHTML = '';
   }
@@ -2314,7 +2300,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     liste.push('les voyants d’alertes et la sauvegarde');
     if(etatCodes() === 'sourd') liste.push('les codes pharmacie');
     liste.push('le parcours d’entrée par semaine');
-    liste.push('les tuiles « Clients payants » et « Appels d’analyse »');
+    liste.push('les tuiles « Clients payants » et « Scans aujourd’hui »');
     liste.push('l’audience RevenueCat');
     return liste;
   }
@@ -2584,7 +2570,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     'delais_google','erreurs_apres_google','pannes_avant_google','refus_limiteur',
     'images_refusees','requetes_invalides','exceptions','non_classes','servis_par_secours',
     'fins_longueur','fins_filtre','fins_autres','limiteur_ouvert','t_moins_5','t_5_10','t_10_20','t_20_30','t_30_60',
-    't_60_75','t_plus_75'];
+    't_60_75','t_plus_75','servis_lents'];
 
   // Une ligne lue, ou la raison pour laquelle elle ne l'est pas.
   function ligneScan(r){
@@ -2714,6 +2700,75 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       ], '', 0);
   }
 
+  // ⚠️ « UN SCAN QUI DECONNE » = un ECHEC POUR LE PATIENT (liste vide, reponse
+  // illisible, erreur ou delai, panne de notre serveur avant l'appel a Google,
+  // liste arrivee apres 75 s) ou un scan REUSSI MAIS LENT (liste rendue entre
+  // 30 et 75 s : `servis_lents` + `incertains`). Un echec n'est JAMAIS compte
+  // aussi comme lent.
+  // Le seuil de lenteur est un CHOIX, pas une mesure : 30 s. Historique du
+  // 06/08 au 12/09 (scan_metrics) : mediane 3,2 s, 9 appels sur 10 sous 32,9 s.
+  // La fenetre est « aujourd'hui ET hier » (jours UTC) : un echec a 23 h 50 ne
+  // doit pas disparaitre du voyant dix minutes plus tard, a minuit.
+  var SCAN_SEUIL_LENT_S = 30;
+  function scanRecent(L, auj){
+    var hier = jourMoins(auj, 1), o = { env:0, echecs:0, lents:0 };
+    for(var i=0;i<L.length;i++){
+      var r = L[i];
+      if(r.jour !== auj && r.jour !== hier) continue;
+      o.env += r.envoyes;
+      o.echecs += r.vides + r.echecs + r.perdus_tardifs + r.pannes_avant_google;
+      o.lents += r.servis_lents + r.incertains;
+    }
+    return o;
+  }
+
+  // La tuile du haut. Aujourd'hui (UTC) en grand ; hier+aujourd'hui et 7 jours
+  // en detail. Jamais de zero invente : illisible => « — », en rouge, et la
+  // bulle le dit.
+  function tuileScan(rows, resume){
+    var titre = 'Scans aujourd’hui (UTC)';
+    var lu = lignesScan(rows), auj = jourServeurValide(resume);
+    if(lu.cause || auj === null){
+      return res(titre, '—', null,
+        '<b>Ce chiffre n’a pas pu être lu</b> — n’en concluez rien. '
+        + ech(lu.cause || 'la date de la base manque') + '.', true);
+    }
+    var L = lu.lignes, t = null, b7 = jourMoins(auj, 7), e7 = 0, s7 = 0;
+    for(var i=0;i<L.length;i++){
+      if(L[i].jour === auj) t = L[i];
+      if(L[i].jour > b7){ e7 += L[i].envoyes; s7 += L[i].servis_probables; }
+    }
+    var rec = scanRecent(L, auj);
+    var envoyes = t ? t.envoyes : 0, servis = t ? t.servis_probables : 0;
+    var echecsAuj = t ? (t.vides + t.echecs + t.perdus_tardifs + t.pannes_avant_google) : 0;
+    var refusAuj = t ? (t.refus_limiteur + t.images_refusees) : 0;
+    var alarme = (rec.echecs + rec.lents) > 0;
+    return res(titre,
+      (alarme ? '⚠ ' : '') + (envoyes ? servis + ' / ' + envoyes : ((echecsAuj || refusAuj) ? '0 / 0' : 'aucun')),
+      [['Servis au patient', String(servis)],
+       ['… dont lents (30 à 60 s)', String(t ? t.servis_lents : 0)],
+       ['Incertains (60 à 75 s)', String(t ? t.incertains : 0)],
+       ['Échecs pour le patient', String(echecsAuj)],
+       ['Refusés (anti-abus, image)', String(refusAuj)],
+       ['Hier + aujourd’hui : échecs / lents', rec.echecs + ' / ' + rec.lents, true],
+       ['7 jours : servis / envoyés', s7 + ' / ' + e7, true]],
+      '<b>Le grand chiffre</b> : tentatives servies au patient sur tentatives envoyées à '
+      + 'l’analyse, aujourd’hui en temps universel (le jour bascule à 2 h du matin à Paris '
+      + 'en été). « Servie » = une liste non vide rendue en moins de 60 s côté serveur.<br><br>'
+      + '<b>Échecs pour le patient</b> : liste vide, réponse illisible, erreur ou délai, panne '
+      + 'de notre serveur, ou liste arrivée après 75 s, quand l’application avait abandonné.<br><br>'
+      + '<b>Lents</b> : listes rendues, mais en plus de ' + SCAN_SEUIL_LENT_S + ' s. Un échec '
+      + 'n’est jamais compté aussi comme lent.<br><br>'
+      + '<b>La tuile passe à l’orange</b>, marquée ⚠, dès qu’un échec ou un scan lent a eu '
+      + 'lieu aujourd’hui ou hier. Seuil de ' + SCAN_SEUIL_LENT_S + ' s choisi, pas mesuré : '
+      + 'la médiane historique est de 3,2 s.<br><br>'
+      + 'Compté <b>par tentative</b>, pas par personne ; <b>vos propres essais sont '
+      + 'dedans</b>. Il n’existe pas de liste scan par scan : les compteurs sont tenus '
+      + 'par jour, sans heure ni identifiant, comme l’annonce la politique. Le détail '
+      + 'jour par jour est dans la section « Scan d’ordonnance ».',
+      alarme ? 'attention' : false);
+  }
+
   // Le voyant de la grille. Rend `null` si rien ne peut etre dit honnetement.
   function voyantScan(rows, resume){
     var lu = lignesScan(rows);
@@ -2731,6 +2786,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     if(nc > 0) return { quoi:'Scan d’ordonnance', valeur: nc + ' sans issue', etat:'critique',
       detail: nc + ' tentative(s) sur 7 jours n’ont reçu aucune issue : c’est un défaut de NOTRE '
         + 'code de mesure. Les autres chiffres du scan ne sont pas sûrs.' };
+    var rec = scanRecent(lu.lignes, auj);
+    if(rec.echecs + rec.lents > 0) return { quoi:'Scan d’ordonnance',
+      valeur: (rec.echecs ? rec.echecs + ' échec(s)' : '') + (rec.echecs && rec.lents ? ' · ' : '')
+            + (rec.lents ? rec.lents + ' lent(s)' : ''),
+      etat:'attention',
+      detail:'Aujourd’hui et hier (UTC) : ' + rec.echecs + ' échec(s) pour le patient (liste vide, '
+        + 'réponse illisible, erreur ou délai, panne de notre serveur, ou liste arrivée après 75 s) '
+        + 'et ' + rec.lents + ' scan(s) réussi(s) mais en plus de ' + SCAN_SEUIL_LENT_S + ' s, sur '
+        + rec.env + ' envoyé(s) à l’analyse.'
+        + (ex > 0 ? ' Aussi : ' + ex + ' exception(s) sur 7 jours.' : '')
+        + ' Le détail est dans la section « Scan d’ordonnance ». Nos propres essais sont comptés.' };
     if(ex > 0) return { quoi:'Scan d’ordonnance', valeur: ex + ' exception(s)', etat:'attention',
       detail: ex + ' appel(s) sur 7 jours ont fait planter la fonction avant son code prévu (par '
         + 'exemple un corps de requête vide). Ce n’est pas forcément un patient : l’application '

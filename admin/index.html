@@ -446,6 +446,42 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       leur numéro de version n'a pas été décoché.</div></details>
   </section>
 
+  <section id="s-scan">
+    <div class="titre"><h2>Scan d'ordonnance</h2><span class="sous">compté par le serveur, tentative par tentative</span></div>
+    <div class="cadre" id="cadre-scan-jours"></div>
+    <div class="cadre" id="cadre-scan-detail"></div>
+    <div class="cadre" id="cadre-scan-durees"></div>
+    <details class="repli"><summary>⚠️ Ce que ces chiffres disent, et ce qu'ils ne disent pas</summary>
+      <div class="corps"><b>Une ligne compte des tentatives, pas des personnes.</b> Quand une
+      première tentative échoue en moins de 12 secondes, l'application en refait une seconde :
+      quelqu'un qui échoue puis réussit compte un échec et une réussite. Un taux par tentative
+      n'est pas un taux par personne : il peut être plus haut ou plus bas.<br><br>
+      <b>« Servies » veut dire : une liste non vide, rendue en moins de 60 secondes côté serveur.</b>
+      Le serveur ne vérifie pas ce qu'elle contient. Cette durée ne comprend ni l'envoi de la photo, ni le réseau, ni le
+      démarrage de la fonction : elle est optimiste. L'application abandonne à 75 secondes. Entre
+      60 et 75 secondes, on ne sait pas si la personne a reçu sa liste (« incertaines ») ; au-delà
+      de 75 secondes, la réponse est arrivée après l'abandon (« perdues ») : la personne a vu un
+      échec.<br><br>
+      <b>Une liste rendue ne dit pas que la personne l'a gardée.</b> Cela ne se mesure que dans
+      l'application, et ce n'est pas encore le cas.<br><br>
+      <b>Une liste vide, c'est un échec pour la personne</b> : elle lit « Aucun médicament n'a pu
+      être extrait ». Parmi elles, « sans texte » compte les fois où le modèle s'est arrêté sans rien
+      écrire (limite de longueur, filtre, arrêt inconnu) et où la fonction a mis une liste vide à la
+      place : c'est un défaut technique, pas une photo illisible.<br><br>
+      <b>Le jour est en temps universel</b>, comme le reste de la console : à Paris, il bascule à
+      2 h du matin en été, 1 h en hiver. <b>Nos propres essais sont comptés</b> : rien ne permet de
+      les distinguer.<br><br>
+      <b>« Envoyées »</b> = les tentatives pour lesquelles la fonction a appelé Google, que Google
+      ait répondu ou non.<br><br>
+      <b>Ce que le compteur ne voit pas</b> : une fonction arrêtée net par la plateforme, un refus
+      de la passerelle avant notre code, un scan abandonné avant d'arriver au serveur, et un
+      compteur dont l'écriture a échoué (l'erreur est seulement journalisée). Et n'importe qui
+      peut appeler la fonction : des appels fabriqués gonfleraient ces chiffres.<br><br>
+      <b>Ni image, ni texte, ni nom de médicament, ni adresse IP, ni identifiant</b> : seulement
+      l'issue technique de chaque tentative, comptée par jour. Les anciennes mesures de scan
+      (jusqu'au 12/09/2026) sont dans une autre table, figée, et ne sont pas reprises ici.</div></details>
+  </section>
+
   <section id="s-officine" class="repliable">
     <div class="titre"><h2>Canal officine</h2><span class="sous">codes et attributions</span></div>
     <div class="cadre" id="cadre-codes"></div>
@@ -1066,7 +1102,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-officine','s-audience','s-sauvegarde'];
+    var ids = ['afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-scan','s-officine','s-audience','s-sauvegarde'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
 
@@ -1100,7 +1136,11 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     { cle:'sauvegarde',   vue:'v_admin_sauvegarde',            unique:true },
     { cle:'audEtat',      vue:'v_admin_audience_etat',         unique:true },
     { cle:'audJours',     vue:'v_admin_audience_jours',        ordre:{col:'jour',      asc:false} },
-    { cle:'audMesures',   vue:'v_admin_audience_mesures',      ordre:{col:'graphique', asc:true} }
+    { cle:'audMesures',   vue:'v_admin_audience_mesures',      ordre:{col:'graphique', asc:true} },
+    // Lot vert 1 (21/09/2026) : compteurs du scan ecrits par le serveur.
+    // ⚠️ LA MIGRATION D'ABORD : tant que la vue n'existe pas, cette ligne fait
+    // echouer TOUTE la console (« lecture impossible »), et c'est voulu.
+    { cle:'scan',         vue:'v_admin_scan',                  ordre:{col:'jour',      asc:false} }
   ];
 
   // ── UN ETAT QUE PLUSIEURS BLOCS PARTAGENT (13/09/2026, lot 2) ─────────────
@@ -1258,7 +1298,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     donneesCourantes = d;
     preparerParcours(d.parcoursJour);
 
-    var compte = rendreAlertes(d.alertes, { etat: d.audEtat, mesures: d.audMesures });
+    var compte = rendreAlertes(d.alertes, { etat: d.audEtat, mesures: d.audMesures,
+                                            scan: d.scan, resume: d.resume });
     var taches = rendreAFaire({ etat: d.audEtat }, d.sauvegarde);
     rendreSauvegarde(d.sauvegarde);
     rendreAudience(d.audEtat, d.audJours, d.audMesures);
@@ -1280,6 +1321,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     rendreArgent(d.argent, d.alertes);
     rendreParcours(d.parcours);
     rendreParcoursJour();
+    rendreScan(d.scan, d.resume);
     rendreCodes(d.codes);
     rendreAccesOfferts(d.acces);
     rendreAttributions(d.attributions);
@@ -1496,6 +1538,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             + 'jour par jour n\u2019est PAS affich\u00e9 : ses colonnes pourraient d\u00e9signer '
             + 'autre chose. \u00c0 v\u00e9rifier avant de le r\u00e9tablir.');
     }
+
+    // Lot vert 1 (21/09/2026) : le scan revient dans la grille, nourri cette
+    // fois par un compteur VIVANT (le voyant retire le 13/09 lisait une table
+    // figee). Voir `voyantScan`.
+    var vs = voyantScan(au && au.scan, au && au.resume);
+    if(vs) h += ind(vs.quoi, vs.valeur, vs.etat, vs.detail);
 
     $('grille-alertes').innerHTML = h;
     return compte;
@@ -2521,6 +2569,185 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           ['Jour','Signalements','Ont tenté un scan','Versions'],
           lignes, 'aucun signalement avec ce filtre', 14);
   }
+
+  // ── Scan d'ordonnance (lot vert 1, 21/09/2026) ─────────────────────────────
+  //
+  // Source : `v_admin_scan`, 14 jours, une ligne par jour UTC, ecrite par la
+  // fonction `analyze-prescription` elle-meme. PAR TENTATIVE, pas par personne.
+  //
+  // ⚠️ MIEUX VAUT RIEN QU'UN CHIFFRE FAUX. Chaque colonne passe par
+  // `entierOuNul`. Si une seule manque, ou si l'identite
+  //     envoyees = servies + incertaines + perdues + vides + echecs
+  // ne tombe pas juste, la section ne montre AUCUN chiffre et dit pourquoi.
+  var SCAN_COLONNES = ['envoyes','servis_probables','incertains','perdus_tardifs',
+    'vides','vides_sans_texte','illisibles','erreurs_google','erreurs_google_quota',
+    'delais_google','erreurs_apres_google','pannes_avant_google','refus_limiteur',
+    'images_refusees','requetes_invalides','exceptions','non_classes','servis_par_secours',
+    'fins_longueur','fins_filtre','fins_autres','limiteur_ouvert','t_moins_5','t_5_10','t_10_20','t_20_30','t_30_60',
+    't_60_75','t_plus_75'];
+
+  // Une ligne lue, ou la raison pour laquelle elle ne l'est pas.
+  function ligneScan(r){
+    if(!r || typeof r.jour !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(r.jour))
+      return { cause:'jour illisible' };
+    var o = { jour: r.jour };
+    for(var i=0;i<SCAN_COLONNES.length;i++){
+      var v = entierOuNul(r[SCAN_COLONNES[i]]);
+      if(v === null || v < 0) return { cause:'colonne « ' + SCAN_COLONNES[i] + ' » illisible' };
+      o[SCAN_COLONNES[i]] = v;
+    }
+    if(o.vides_sans_texte > o.vides)
+      return { cause:'le ' + jourTexte(r.jour) + ', plus de listes vides « sans texte » que de listes vides' };
+    o.echecs = o.illisibles + o.erreurs_google + o.delais_google + o.erreurs_apres_google;
+    o.lentes = o.t_30_60 + o.t_60_75 + o.t_plus_75;
+    if(o.servis_probables + o.incertains + o.perdus_tardifs + o.vides + o.echecs !== o.envoyes)
+      return { cause:'le ' + jourTexte(r.jour) + ', les issues ne font pas le total des tentatives' };
+    if(o.t_moins_5 + o.t_5_10 + o.t_10_20 + o.t_20_30 + o.t_30_60 + o.t_60_75 + o.t_plus_75 !== o.envoyes)
+      return { cause:'le ' + jourTexte(r.jour) + ', les durées ne font pas le total des tentatives' };
+    return o;
+  }
+
+  // Toutes les lignes, ou `{ cause }` des qu'une seule est illisible.
+  function lignesScan(rows){
+    if(!Array.isArray(rows)) return { cause:'la vue n’a rien rendu' };
+    var out = [];
+    for(var i=0;i<rows.length;i++){
+      var l = ligneScan(rows[i]);
+      if(l.cause) return l;
+      out.push(l);
+    }
+    return { lignes: out };
+  }
+
+  function pctScan(n, sur){
+    return sur > 0 ? Math.round(100 * n / sur) + ' %' : '—';
+  }
+
+  // Le jour de reference vient de la base (`v_admin_resume.jour_serveur`),
+  // jamais de l'horloge du poste. Absent : on ne calcule pas de fenetre.
+  function jourServeurValide(resume){
+    var j = resume && resume.jour_serveur;
+    return (typeof j === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(j)
+            && isFinite(Date.parse(j + 'T00:00:00Z'))) ? j : null;
+  }
+  function jourMoins(j, n){
+    return new Date(Date.parse(j + 'T00:00:00Z') - n * 86400000).toISOString().slice(0, 10);
+  }
+
+  function rendreScan(rows, resume){
+    var cJ = $('cadre-scan-jours'), cD = $('cadre-scan-detail'), cT = $('cadre-scan-durees');
+    var lu = lignesScan(rows);
+    if(lu.cause){
+      cJ.innerHTML = '<div class="rien avert"><b>Scan d’ordonnance — NON AFFICHÉ.</b> '
+        + ech(lu.cause) + '. Mieux vaut rien qu’un chiffre faux.</div>';
+      cD.innerHTML = ''; cT.innerHTML = '';
+      return;
+    }
+    var L = lu.lignes, auj = jourServeurValide(resume);
+    if(!L.length){
+      cJ.innerHTML = '<div class="rien"><b>Scan d’ordonnance</b> — aucune tentative comptée '
+        + 'sur les 14 derniers jours (ou depuis la mise en service du compteur).</div>';
+      cD.innerHTML = ''; cT.innerHTML = '';
+      return;
+    }
+
+    // 1. Jour par jour
+    var lignes = [];
+    for(var i=0;i<L.length;i++){
+      var r = L[i], enCours = (auj !== null && r.jour === auj);
+      lignes.push({ grisee: enCours, cases: [
+        { texte: jourTexte(r.jour) + (enCours ? ' *' : '') },
+        { texte: String(r.envoyes) },
+        { texte: r.servis_probables + (r.envoyes ? ' (' + pctScan(r.servis_probables, r.envoyes) + ')' : '') },
+        { texte: String(r.incertains) },
+        { texte: String(r.perdus_tardifs), classe: r.perdus_tardifs ? 'attention' : '' },
+        { texte: String(r.vides) },
+        { texte: String(r.echecs), classe: r.echecs ? 'attention' : '' },
+        { texte: String(r.lentes) }
+      ]});
+    }
+    cJ.innerHTML = tableau('Jour par jour — tentatives envoyées à l’analyse · « servies » = liste '
+      + 'rendue en moins de 60 s · * jour en cours (UTC)',
+      ['Jour','Envoyées','Servies','Incertaines','Perdues','Vides','Échecs','> 30 s'],
+      lignes, 'aucune donnée', 7);
+
+    // 2. Detail du jour le plus recent
+    var d = L[0];
+    var titre = (auj !== null && d.jour === auj) ? 'Aujourd’hui (UTC, en cours)'
+                                                 : 'Dernier jour compté : ' + jourTexte(d.jour);
+    function l2(libelle, v){ return { cases:[{ texte: libelle }, { texte: String(v) }] }; }
+    cD.innerHTML = tableau(titre + ' — le détail', ['', 'Tentatives'], [
+      l2('Envoyées à l’analyse', d.envoyes),
+      l2('Servies (liste rendue en moins de 60 s)', d.servis_probables),
+      l2('Incertaines (liste rendue entre 60 et 75 s)', d.incertains),
+      l2('Perdues (liste rendue après 75 s : l’application avait abandonné)', d.perdus_tardifs),
+      l2('Liste vide', d.vides),
+      l2('… dont sans texte du modèle (défaut technique)', d.vides_sans_texte),
+      l2('Réponse illisible', d.illisibles),
+      l2('Erreur de Google (dont quota : ' + d.erreurs_google_quota + ')', d.erreurs_google),
+      l2('Délai dépassé chez Google', d.delais_google),
+      l2('Panne après la réponse de Google', d.erreurs_apres_google),
+      l2('Panne avant l’appel à Google (non envoyées)', d.pannes_avant_google),
+      l2('Refusées par l’anti-abus (non envoyées)', d.refus_limiteur),
+      l2('Images refusées, format ou taille (non envoyées)', d.images_refusees),
+      l2('Requêtes invalides (non envoyées)', d.requetes_invalides),
+      l2('Servies par la région de secours', d.servis_par_secours),
+      l2('Modèle arrêté par la limite de longueur', d.fins_longueur),
+      l2('Modèle arrêté par un filtre', d.fins_filtre),
+      l2('Modèle arrêté pour une autre raison, ou sans raison donnée', d.fins_autres),
+      l2('Anti-abus contourné sur erreur', d.limiteur_ouvert),
+      l2('Exceptions hors du code prévu', d.exceptions),
+      l2('Sans issue enregistrée (défaut de la mesure)', d.non_classes)
+    ], '', 0);
+
+    // 3. Durees sur les 14 jours
+    var t = { a:0, b:0, c:0, e:0, f:0, g:0, h:0, n:0 };
+    for(var k=0;k<L.length;k++){
+      t.a += L[k].t_moins_5; t.b += L[k].t_5_10; t.c += L[k].t_10_20; t.e += L[k].t_20_30;
+      t.f += L[k].t_30_60; t.g += L[k].t_60_75; t.h += L[k].t_plus_75; t.n += L[k].envoyes;
+    }
+    function l3(libelle, v){ return { cases:[{ texte: libelle }, { texte: String(v) }, { texte: pctScan(v, t.n) }] }; }
+    cT.innerHTML = tableau('Durées côté serveur, ' + L.length + ' jour(s) compté(s) — tentatives envoyées à l’analyse',
+      ['Durée', 'Tentatives', 'Part'], [
+        l3('moins de 5 s', t.a), l3('5 à 10 s', t.b), l3('10 à 20 s', t.c), l3('20 à 30 s', t.e),
+        l3('30 à 60 s', t.f), l3('60 à 75 s', t.g), l3('plus de 75 s', t.h)
+      ], '', 0);
+  }
+
+  // Le voyant de la grille. Rend `null` si rien ne peut etre dit honnetement.
+  function voyantScan(rows, resume){
+    var lu = lignesScan(rows);
+    if(lu.cause) return { quoi:'Scan d’ordonnance', valeur:'illisible', etat:'critique',
+      detail:'Les compteurs du scan n’ont pas pu être lus : ' + lu.cause + '.' };
+    var auj = jourServeurValide(resume);
+    if(auj === null) return null;
+    var b7 = jourMoins(auj, 7), b3 = jourMoins(auj, 3);
+    var env = 0, serv = 0, nc = 0, ex = 0, recents = 0;
+    for(var i=0;i<lu.lignes.length;i++){
+      var r = lu.lignes[i];
+      if(r.jour > b7){ env += r.envoyes; serv += r.servis_probables; nc += r.non_classes; ex += r.exceptions; }
+      if(r.jour > b3) recents++;
+    }
+    if(nc > 0) return { quoi:'Scan d’ordonnance', valeur: nc + ' sans issue', etat:'critique',
+      detail: nc + ' tentative(s) sur 7 jours n’ont reçu aucune issue : c’est un défaut de NOTRE '
+        + 'code de mesure. Les autres chiffres du scan ne sont pas sûrs.' };
+    if(ex > 0) return { quoi:'Scan d’ordonnance', valeur: ex + ' exception(s)', etat:'attention',
+      detail: ex + ' appel(s) sur 7 jours ont fait planter la fonction avant son code prévu (par '
+        + 'exemple un corps de requête vide). Ce n’est pas forcément un patient : l’application '
+        + 'n’envoie jamais ce genre de requête. À regarder si cela se répète.' };
+    if(recents === 0) return { quoi:'Scan d’ordonnance', valeur:'rien depuis 3 jours', etat:'attention',
+      detail:'Aucune tentative comptée depuis 3 jours : soit personne n’a scanné, soit le compteur '
+        + 'est en panne. Un scan de test tranche.' };
+    if(env >= 5 && serv / env < 0.7) return { quoi:'Scan d’ordonnance', valeur: pctScan(serv, env) + ' servies',
+      etat:'attention',
+      detail:'Sur 7 jours, ' + serv + ' tentative(s) servie(s) sur ' + env + ' envoyée(s) à l’analyse. '
+        + 'Par tentative : une personne qui réessaie compte deux fois. Voir la section Scan.' };
+    return { quoi:'Scan d’ordonnance', valeur: env ? pctScan(serv, env) + ' servies' : 'aucun envoi', etat:'ok',
+      detail: env
+        ? 'Sur 7 jours, ' + serv + ' tentative(s) servie(s) sur ' + env + ' envoyée(s) à l’analyse.'
+        : 'Des tentatives ont été comptées ces 3 derniers jours, mais aucune n’a atteint l’analyse.' };
+  }
+
 
   // ⚠️ CE TABLEAU N'OBEIT PAS A L'INTERRUPTEUR, ET IL LE VERIFIE (13/09/2026).
   // `v_admin_codes` ne porte pas la colonne `interne` : la page ne peut pas

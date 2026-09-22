@@ -3053,7 +3053,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // Y écrire la date de la recette au câble, et seulement après l'avoir faite.
   // ⚠️ NE PAS remplacer ce verrou par un test sur la donnée : un seul événement,
   // fût-il d'un appareil de test, rouvrirait l'affichage sans rien prouver.
-  var MESURE_PREUVE_CABLE = null;
+  // ✅ LEVÉ LE 22/09/2026 : recette au câble sur le Samsung R3CTA026KLH.
+  // Ordonnance FICTIVE choisie dans la galerie, consentement accepté, analyse
+  // envoyée, 3 médicaments rendus. Compteurs relevés sur le téléphone
+  // (analyse_envoyee:1, liste_recue:1), envoi forcé, puis RETROUVÉS dans
+  // mesure_agregats. La chaîne téléphone -> base est prouvée de bout en bout.
+  var MESURE_PREUVE_CABLE = '2026-09-22';
 
   // PostgREST plafonne les réponses et TRONQUE EN SILENCE. La page garde déjà
   // à ce seuil ailleurs (parcours jour par jour). Pire cas calculé pour cette
@@ -3391,7 +3396,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         + 'personnes</b> : qui recommence compte deux fois. <b>Et cet entonnoir ne recouvre pas '
         + 'celui de la section « Scan d’ordonnance »</b> : celui-ci est compté par le téléphone et '
         + 'seulement par les versions 1.4.15 et suivantes, l’autre par le serveur et pour toutes '
-        + 'les versions. <b>Ils ne se totalisent jamais.</b></div>';
+        + 'les versions. <b>Ils ne se totalisent jamais.</b>'
+        + (MESURE_PREUVE_CABLE
+            ? '<br>« Analyse envoyée » et « liste reçue » ont été <b>prouvés au câble le '
+              + ech(jourTexte(MESURE_PREUVE_CABLE)) + '</b> : un zéro sur ces deux lignes est '
+              + 'désormais un vrai abandon, plus un défaut de mesure.'
+            : '')
+        + '</div>';
     }
 
     // ── 3. Écrans ───────────────────────────────────────────────────────────

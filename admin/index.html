@@ -448,6 +448,71 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       leur numéro de version n'a pas été décoché.</div></details>
   </section>
 
+  <section id="s-mesure">
+    <div class="titre"><h2>Parcours dans le temps</h2><span class="sous">mesuré par l’application, en cases hebdomadaires</span></div>
+    <div class="cadre" id="cadre-mesure-avert"></div>
+    <div class="cadre" id="cadre-mesure-retention"></div>
+    <div class="cadre" id="cadre-mesure-scan"></div>
+    <div class="cadre" id="cadre-mesure-ecrans"></div>
+    <div class="cadre" id="cadre-mesure-ventilation"></div>
+    <details class="repli"><summary>⚠️ Comment ces taux sont calculés, et ce qu’ils ne disent pas</summary>
+      <div class="corps"><b>Ce sont des cases, pas des lignes.</b> L’application n’envoie jamais
+      une ligne par installation : elle ajoute +n à des compteurs déjà groupés par semaine.
+      Aucun enregistrement ici ne correspond à une personne, et il n’existe aucun moyen d’en
+      reconstituer un.<br><br>
+      <b>La rétention se lit ainsi.</b> Le numérateur compte les retours des <b>4 dernières
+      semaines closes</b>. Le dénominateur compte les <b>accueils acceptés</b> sur quatre semaines
+      aussi, mais <b>décalées vers le passé</b> — d’une semaine pour un retour du 2ᵉ au 7ᵉ jour,
+      de trois semaines pour un retour du 8ᵉ au 30ᵉ jour. Sans ce décalage, on diviserait les
+      retours d’une génération par les arrivées d’une autre.<br><br>
+      <b>⚠️ Pour « revenu le lendemain », aucun décalage n’est possible</b> : les compteurs sont
+      hebdomadaires, on ne sait pas décaler de deux jours. Ce taux-là est donc <b>sous-estimé
+      quand les arrivées montent</b> — les accueils de fin de semaine reviennent la semaine
+      suivante, hors du numérateur. C’est exactement ce qui se produit pendant une campagne
+      publicitaire. Ne lisez pas une baisse de ce taux comme une baisse de qualité.<br><br>
+      <b>Et le décalage des deux autres est approché</b> : à la semaine entière, jamais au jour.
+      Sur de petits effectifs, cela suffit à déplacer un taux de quelques points — et après une
+      forte pointe d’arrivées, il peut y avoir plus de retours que d’accueils dans les fenêtres
+      comparées. La page refuse alors d’afficher un taux, et le dit.<br><br>
+      <b>Le plancher de 10 est une règle de confidentialité, pas un seuil de décision.</b>
+      C’est la <b>fourchette à 95 %</b> qui dit si un taux permet de trancher. Elle est calculée
+      par la méthode de Wilson, qui reste valide quand le taux vaut 0 % ou 100 % — la formule
+      usuelle, elle, annoncerait dans ces cas une certitude parfaite tirée de rien. Il faut
+      <b>plusieurs centaines d’accueils</b> pour distinguer, par exemple, 1 % de 4 %.<br><br>
+      <b>⛔ Ce taux ne se compare PAS aux 1,3 % de la campagne d’août.</b> Ce chiffre-là était
+      8 personnes retenues sur <b>606 installations</b> comptées par Google Play. Celui-ci est
+      un nombre de retours sur des <b>accueils acceptés</b> — et le trafic payé n’ouvre
+      l’application qu’une fois sur deux environ. Les deux dénominateurs diffèrent d’un facteur
+      2 à 3 : lire « 3,5 % contre 1,3 % » comme un progrès serait une erreur de lecture.<br><br>
+      <b>La semaine en cours est rendue depuis le 22/09/2026</b>, grisée et marquée. Elle est
+      incomplète par construction : on la regarde pour voir <i>ce qui se passe</i>, jamais pour
+      la comparer à une semaine close. Elle est écartée de tout calcul de rétention.<br><br>
+      <b>Une semaine absente n’est pas une semaine à zéro.</b> Si une semaine de la fenêtre n’a
+      produit aucune remontée, au numérateur comme au dénominateur, le taux n’est pas calculé.<br><br>
+      <b>L’entonnoir du scan compte des tentatives, pas des personnes.</b> Quelqu’un qui
+      recommence compte deux fois. Et il ne recouvre pas celui de la section « Scan
+      d’ordonnance » : celui-ci est compté par le téléphone et seulement par les versions 1.4.15
+      et suivantes, l’autre par le serveur et pour toutes les versions — <b>ils ne se totalisent
+      jamais</b>.<br><br>
+      <b>Ce que la mesure ne voit pas.</b> Quelqu’un qui installe et n’ouvre jamais ; quelqu’un
+      qui part avant d’accepter l’accueil ; <b>quelqu’un qui exerce son opposition</b> — ses
+      compteurs sont purgés et il cesse d’émettre, il est donc compté comme non revenu ; un envoi
+      perdu (l’application n’essaie qu’une fois par jour et pose son drapeau avant d’appeler :
+      une perte fait disparaître un jalon, donc la rétention est <b>sous-estimée</b>) ; une
+      réinstallation Android, comptée comme une nouvelle arrivée ; une restauration iCloud, dont
+      l’effet n’a jamais été vérifié.<br><br>
+      <b>La version ne porte que majeur.mineur</b> (« 01.04 ») : <b>1.4.15 et 1.4.16 sont
+      indiscernables</b> dans ces chiffres, alors que le sens de « accueil accepté » change
+      entre les deux — en 1.4.16 l’acceptation passe au premier geste. Pour la même raison, les
+      <b>puces de version</b> du bandeau « Parcours d’entrée » <b>n’agissent pas ici</b>.<br><br>
+      <b>N’importe qui peut appeler la fonction de mesure.</b> Des appels fabriqués gonfleraient
+      ces compteurs, et <b>rien ne les distingue</b> : la colonne « test » est fiable pour nos
+      propres appareils, puisque c’est notre application qui la pose — mais un appel fabriqué la
+      pose à ce qu’il veut. C’est pourquoi le compteur « rejet », affiché en haut de section,
+      <b>ne passe pas par l’interrupteur de périmètre</b>. Seul un saut anormal trahirait le
+      reste.<br><br>
+      <b>Cette section obéit à l’interrupteur de périmètre</b> en haut de page.</div></details>
+  </section>
   <section id="s-scan">
     <div class="titre"><h2>Scan d'ordonnance</h2><span class="sous">compté par le serveur, tentative par tentative</span></div>
     <div class="cadre" id="cadre-scan-jours"></div>
@@ -1104,7 +1169,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-scan','s-officine','s-audience','s-sauvegarde'];
+    var ids = ['afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-mesure','s-scan','s-officine','s-audience','s-sauvegarde'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
 
@@ -1142,7 +1207,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // Lot vert 1 (21/09/2026) : compteurs du scan ecrits par le serveur.
     // ⚠️ LA MIGRATION D'ABORD : tant que la vue n'existe pas, cette ligne fait
     // echouer TOUTE la console (« lecture impossible »), et c'est voulu.
-    { cle:'scan',         vue:'v_admin_scan',                  ordre:{col:'jour',      asc:false} }
+    { cle:'scan',         vue:'v_admin_scan',                  ordre:{col:'jour',      asc:false} },
+    // Lot vert 2 (22/09/2026) : mesure embarquee, agregee par semaine.
+    // ⚠️ MIGRATION D'ABORD, comme pour le scan : tant que la vue n'existe
+    // pas, cette ligne fait echouer TOUTE la console, et c'est voulu.
+    // ⚠️ Elle rend AUSSI la semaine en cours depuis le 22/09 : la colonne
+    // `semaine_en_cours` le dit, et le rendu la grise.
+    { cle:'mesure',       vue:'v_admin_mesure',                ordre:{col:'semaine',   asc:false} }
   ];
 
   // ── UN ETAT QUE PLUSIEURS BLOCS PARTAGENT (13/09/2026, lot 2) ─────────────
@@ -1317,7 +1388,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // voyants ci-dessous » au-dessus d'une grille entierement verte. Le total
     // reste juste, la phrase nomme le ou les endroits, et chaque nombre annonce
     // correspond a quelque chose de VISIBLE. Releve en revue le 13/09 au soir.
-    afficherBandeau(compte, taches);
+    // ⚠️ AVANT LE BANDEAU : `rendreMesure` rend { critique, attention }.
+    // Un bandeau vert au-dessus d'un bloc rouge, c'est le defaut du 09/09.
+    var mesure = rendreMesure(d.mesure);
+    afficherBandeau(compte, taches, mesure);
     rendreResume(d.resume, d.audJours, d.alertes, d.audEtat, d.scan);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent, d.alertes);
@@ -1336,22 +1410,33 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
    * bande « À faire ». Chaque nombre annonce doit correspondre a quelque chose
    * qu'on peut effectivement voir a l'ecran.
    */
-  function afficherBandeau(grille, taches){
-    function ou(g, t){
-      if(g > 0 && t > 0) return 'Regardez « À faire » en haut de page, et les voyants ci-dessous.';
-      if(t > 0)          return 'C’est dans « À faire », en haut de page.';
-      return 'Regardez les voyants ci-dessous.';
+  function afficherBandeau(grille, taches, mesure){
+    // ⚠️ TROISIEME SOURCE (22/09/2026) : la section « Parcours dans le temps ».
+    // Elle peut afficher un bloc rouge (charges rejetees) que personne ne
+    // comptait : le bandeau annoncait alors « rien a signaler » au-dessus.
+    // Chaque nombre annonce doit correspondre a quelque chose de VISIBLE, et
+    // la phrase doit dire OU, sinon Gaetan cherche.
+    mesure = mesure || { critique:0, attention:0 };
+    function ou(g, t, m){
+      var lieux = [];
+      if(t > 0) lieux.push('« À faire », en haut de page');
+      if(g > 0) lieux.push('les voyants ci-dessous');
+      if(m > 0) lieux.push('la section « Parcours dans le temps »');
+      if(!lieux.length) return 'Regardez les voyants ci-dessous.';
+      if(lieux.length === 1) return 'C’est dans ' + lieux[0] + '.';
+      return 'Regardez ' + lieux.slice(0, lieux.length - 1).join(', ')
+           + ' et ' + lieux[lieux.length - 1] + '.';
     }
-    var cr = grille.critique + taches.critique;
-    var at = grille.attention + taches.attention;
+    var cr = grille.critique + taches.critique + mesure.critique;
+    var at = grille.attention + taches.attention + mesure.attention;
     if(cr > 0){
       afficherEtat('critique', cr + (cr > 1 ? ' alertes rouges. ' : ' alerte rouge. '),
-        ou(grille.critique, taches.critique));
+        ou(grille.critique, taches.critique, mesure.critique));
     } else if(at > 0){
       // Meme localisation que pour le rouge : c'est la ou il y a le plus a
       // chercher qu'une aide manquait.
       afficherEtat('attention', at + (at > 1 ? ' points à surveiller. ' : ' point à surveiller. '),
-        'Rien de rouge. ' + ou(grille.attention, taches.attention));
+        'Rien de rouge. ' + ou(grille.attention, taches.attention, mesure.attention));
     } else {
       afficherEtat('ok','Rien à signaler. ',
         'Les ' + (VUES.length + 1) + ' vues répondent, et rien n’attend en haut de page.');
@@ -2903,6 +2988,494 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     $('cadre-attributions').innerHTML = tableau('Attributions',
       ['Semaine','État','Plateforme','Nombre'], lignes, 'aucune attribution', 12)
       + mentionPerimetre(toutes, MOT_INTERNES, U_OCTROIS);
+  }
+
+  // ── PARCOURS DANS LE TEMPS (lot vert 2 — mesure embarquée, 22/09/2026) ─────
+  //
+  // Source : `v_admin_mesure`, 26 semaines, une ligne par
+  // (semaine, clé, plateforme, version, ancienneté, test). Des CASES, jamais
+  // une ligne par installation : rien ici ne décrit une personne.
+  //
+  // ⚠️ LA SEMAINE EN COURS EST RENDUE DEPUIS LE 22/09, et elle est INCOMPLÈTE
+  // par construction. Elle est grisée, marquée « en cours », et ÉCARTÉE de
+  // tout calcul de rétention. La comparer à une semaine close ferait croire à
+  // un effondrement chaque lundi matin.
+  //
+  // ⚠️ MIEUX VAUT RIEN QU'UN CHIFFRE FAUX. Chaque ligne est validée ; une seule
+  // illisible et la section ne montre AUCUN chiffre, en disant pourquoi.
+
+  // Les 29 clés que la base accepte (contrainte CHECK de `mesure_agregats`,
+  // relue en base le 22/09/2026). Une clé que la base apprendrait avant cette
+  // page apparaîtrait dans « clés inconnues » — jamais ignorée en silence.
+  var MESURE_JALONS = ['jalon_accueil','jalon_revenu_j1','jalon_revenu_j2_7','jalon_revenu_j8_30'];
+  var MESURE_ECRANS = ['ecran_pilulier','ecran_traitements','ecran_historique','ecran_horaires',
+    'ecran_reglages','ecran_abonnement','ecran_aide','ecran_confidentialite','ecran_validation',
+    'ecran_prise','ecran_config_horaires'];
+  var MESURE_SCAN = ['scan_lance','scan_renouvellement','quota_atteint','photo_obtenue',
+    'photo_non_obtenue','consentement_affiche','consentement_refuse','saisie_manuelle_choisie',
+    'recadrage_annule','recadrage_indisponible','analyse_envoyee','liste_recue','echec_affiche'];
+
+  var MESURE_LIBELLES = {
+    jalon_accueil:'Accueil accepté', jalon_revenu_j1:'Revenu le lendemain',
+    jalon_revenu_j2_7:'Revenu du 2ᵉ au 7ᵉ jour', jalon_revenu_j8_30:'Revenu du 8ᵉ au 30ᵉ jour',
+    ecran_pilulier:'Pilulier', ecran_traitements:'Traitements', ecran_historique:'Historique',
+    ecran_horaires:'Horaires', ecran_reglages:'Réglages', ecran_abonnement:'Abonnement',
+    ecran_aide:'Aide', ecran_confidentialite:'Confidentialité', ecran_validation:'Validation',
+    ecran_prise:'Détail d’une prise', ecran_config_horaires:'Configuration des horaires',
+    scan_lance:'Scan lancé', scan_renouvellement:'dont renouvellements d’ordonnance',
+    quota_atteint:'Quota de scans atteint', photo_obtenue:'Photo obtenue',
+    photo_non_obtenue:'Photo non obtenue (annulation, refus caméra, échec)',
+    consentement_affiche:'Consentement affiché', consentement_refuse:'Consentement refusé',
+    saisie_manuelle_choisie:'Saisie manuelle choisie', recadrage_annule:'Recadrage abandonné',
+    recadrage_indisponible:'Recadrage indisponible', analyse_envoyee:'Analyse envoyée',
+    liste_recue:'Liste reçue', echec_affiche:'Échec affiché au patient'
+  };
+
+  var MESURE_PLATEFORMES = { and:'Android', ios:'iPhone', web:'Navigateur' };
+
+  // Décalage du dénominateur, EN SEMAINES, pour chaque jalon de retour.
+  // ⚠️ POUR J1 IL VAUT ZERO, ET CE N'EST PAS UNE PROTECTION. Les compteurs sont
+  // hebdomadaires : on ne sait pas décaler de deux jours. Le taux J1 est donc
+  // SOUS-ESTIME quand les arrivées montent — les accueils de fin de semaine
+  // reviennent la semaine suivante, hors du numérateur. C'est écrit à l'écran,
+  // à côté du chiffre, pas seulement dans le repli.
+  var MESURE_DECALAGE = { jalon_revenu_j1:0, jalon_revenu_j2_7:1, jalon_revenu_j8_30:3 };
+
+  // Sous ce seuil, aucune case n'est exploitée : règle de CONFIDENTIALITE posée
+  // le 21/09. Ce n'est PAS un seuil de décision — c'est la fourchette qui le dit.
+  var MESURE_PLANCHER = 10;
+
+  // ⚠️ VERROU EXPLICITE, A LEVER A LA MAIN. `analyse_envoyee` et `liste_recue`
+  // n'ont jamais produit une seule ligne en production, alors que le serveur
+  // comptait 6 scans servis sur 7 les mêmes jours. Le code qui les émet existe
+  // (`scanFlow.ts`) et il est testé, mais il n'a JAMAIS été vu à l'oeuvre.
+  // Tant que cette constante vaut null, ces deux étages affichent « — ».
+  // Y écrire la date de la recette au câble, et seulement après l'avoir faite.
+  // ⚠️ NE PAS remplacer ce verrou par un test sur la donnée : un seul événement,
+  // fût-il d'un appareil de test, rouvrirait l'affichage sans rien prouver.
+  var MESURE_PREUVE_CABLE = null;
+
+  // PostgREST plafonne les réponses et TRONQUE EN SILENCE. La page garde déjà
+  // à ce seuil ailleurs (parcours jour par jour). Pire cas calculé pour cette
+  // vue : 29 clés x 3 plateformes x 2 anciennetés x 2 test x 26 semaines par
+  // version = plusieurs milliers de lignes. Le risque est réel, pas théorique,
+  // et une troncature au milieu d'une semaine ancienne amputerait un
+  // dénominateur de rétention sans qu'aucune garde ne s'en aperçoive.
+  var MESURE_PLAFOND = 1000;
+
+  function aPropriete(o, c){ return Object.prototype.hasOwnProperty.call(o, c); }
+
+  function estCleMesure(c){
+    return MESURE_JALONS.indexOf(c) >= 0 || MESURE_ECRANS.indexOf(c) >= 0
+        || MESURE_SCAN.indexOf(c) >= 0 || c === 'rejet';
+  }
+
+  /**
+   * Lit et agrège les lignes de `v_admin_mesure`.
+   * Rend `{ cause }` si une seule ligne est illisible, sinon l'agrégat.
+   * `avecTest` : l'interrupteur de périmètre de la page.
+   *
+   * ⚠️ `total`, `parPlateforme` et `parAnciennete` ne comptent QUE les clés
+   * connues, et JAMAIS `rejet` : `rejet` n'est pas un geste de l'utilisateur,
+   * c'est un incident de la mesure elle-même.
+   * ⚠️ `rejetTotal` est compté AVANT le filtre de périmètre : une charge
+   * fabriquée peut se déclarer « appareil de test », et un compteur d'anomalie
+   * ne doit pas dépendre d'un drapeau que n'importe qui peut poser.
+   */
+  function agregerMesure(rows, avecTest){
+    if(!Array.isArray(rows)) return { cause:'la vue n’a rien rendu' };
+    if(rows.length >= MESURE_PLAFOND)
+      return { cause:'la vue a rendu ' + rows.length + ' lignes, soit le plafond de la base ('
+                   + MESURE_PLAFOND + ') : la liste est probablement TRONQUÉE, et une semaine '
+                   + 'amputée fausserait la rétention sans prévenir' };
+    var parSemaine = {}, total = {}, parPlateforme = {}, parAnciennete = {};
+    var versions = {}, inconnues = {}, semaineEnCours = null, ecartees = 0, rejetTotal = 0;
+
+    for(var i=0;i<rows.length;i++){
+      var r = rows[i];
+      if(!r || typeof r.semaine !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(r.semaine))
+        return { cause:'semaine illisible' };
+      if(typeof r.cle !== 'string' || !r.cle)
+        return { cause:'clé illisible, semaine du ' + jourTexte(r.semaine) };
+      if(typeof r.plateforme !== 'string' || !aPropriete(MESURE_PLATEFORMES, r.plateforme))
+        return { cause:'plateforme inconnue « ' + String(r.plateforme) + ' »' };
+      if(typeof r.version !== 'string' || !/^\d{2}\.\d{2}$/.test(r.version))
+        return { cause:'version illisible « ' + String(r.version) + ' »' };
+      if(r.anciennete !== 'r' && r.anciennete !== 'a')
+        return { cause:'ancienneté illisible, semaine du ' + jourTexte(r.semaine) };
+      if(typeof r.test !== 'boolean')
+        return { cause:'colonne « test » illisible, semaine du ' + jourTexte(r.semaine) };
+      if(typeof r.semaine_en_cours !== 'boolean')
+        return { cause:'colonne « semaine_en_cours » illisible — la migration du 22/09 est-elle passée ?' };
+      var n = entierOuNul(r.n);
+      if(n === null || n <= 0)
+        return { cause:'compteur illisible pour « ' + r.cle + ' », semaine du ' + jourTexte(r.semaine) };
+
+      if(r.semaine_en_cours){
+        if(semaineEnCours !== null && semaineEnCours !== r.semaine)
+          return { cause:'deux semaines différentes se disent « en cours »' };
+        semaineEnCours = r.semaine;
+      }
+
+      var connue = estCleMesure(r.cle);
+      if(!connue) inconnues[r.cle] = (aPropriete(inconnues, r.cle) ? inconnues[r.cle] : 0) + n;
+      if(r.cle === 'rejet'){ rejetTotal += n; continue; }
+      if(!avecTest && r.test){ ecartees += n; continue; }
+      if(!connue) continue;
+
+      if(!aPropriete(parSemaine, r.semaine))
+        parSemaine[r.semaine] = { _enCours: !!r.semaine_en_cours, _cases:{} };
+      var sc = parSemaine[r.semaine]._cases;
+      sc[r.cle] = (aPropriete(sc, r.cle) ? sc[r.cle] : 0) + n;
+      total[r.cle] = (aPropriete(total, r.cle) ? total[r.cle] : 0) + n;
+      if(!aPropriete(parPlateforme, r.plateforme)) parPlateforme[r.plateforme] = { _tot:0, _cases:{} };
+      var pc = parPlateforme[r.plateforme];
+      pc._cases[r.cle] = (aPropriete(pc._cases, r.cle) ? pc._cases[r.cle] : 0) + n;
+      pc._tot += n;
+      parAnciennete[r.anciennete] = (aPropriete(parAnciennete, r.anciennete) ? parAnciennete[r.anciennete] : 0) + n;
+      versions[r.version] = (aPropriete(versions, r.version) ? versions[r.version] : 0) + n;
+    }
+
+    return { semaines: Object.keys(parSemaine).sort().reverse(),
+             parSemaine:parSemaine, total:total,
+             parPlateforme:parPlateforme, parAnciennete:parAnciennete, versions:versions,
+             semaineEnCours:semaineEnCours, clesInconnues: Object.keys(inconnues).sort(),
+             ecartees:ecartees, rejetTotal:rejetTotal };
+  }
+
+  function totalMesure(a, cle){ return aPropriete(a.total, cle) ? a.total[cle] : 0; }
+  function caseMesure(a, semaine, cle){
+    if(!aPropriete(a.parSemaine, semaine)) return 0;
+    var c = a.parSemaine[semaine]._cases;
+    return aPropriete(c, cle) ? c[cle] : 0;
+  }
+
+  // La semaine précédant `s` de `k` semaines (les semaines sont des lundis UTC).
+  function semaineMoins(s, k){
+    return new Date(Date.parse(s + 'T00:00:00Z') - k * 7 * 86400000).toISOString().slice(0,10);
+  }
+
+  /**
+   * Fourchette de Wilson à 95 %, en POINTS de pourcentage : { bas, haut }.
+   * ⚠️ PAS DE « ± » SYMETRIQUE, ET PAS DE WALD. La formule usuelle
+   * 1,96·√(p(1−p)/n) rend ZERO quand p vaut 0 ou 1 — c'est-à-dire exactement
+   * au démarrage, quand on a dix accueils et aucun retour. Elle afficherait
+   * « 0 % ± 0 point », soit une certitude parfaite tirée de rien.
+   * Wilson reste valide aux bords et aux petits effectifs.
+   */
+  function fourchetteMesure(succes, sur){
+    if(!sur || sur < 0 || succes < 0 || succes > sur) return null;
+    var z = 1.96, p = succes / sur, d = 1 + z * z / sur;
+    var centre = (p + z * z / (2 * sur)) / d;
+    var demi = (z * Math.sqrt(p * (1 - p) / sur + z * z / (4 * sur * sur))) / d;
+    var bas = Math.round(1000 * (centre - demi)) / 10;
+    var haut = Math.round(1000 * (centre + demi)) / 10;
+    return { bas: bas < 0 ? 0 : bas, haut: haut > 100 ? 100 : haut };
+  }
+
+  /**
+   * Rétention : les 4 dernières semaines CLOSES au numérateur, autant de
+   * semaines au dénominateur, DECALEES du délai du jalon.
+   * Une semaine absente — au numérateur comme au dénominateur — interdit le
+   * calcul : une semaine sans remontée n'est pas une semaine à zéro.
+   */
+  function retentionMesure(a){
+    var closes = [];
+    for(var i=0;i<a.semaines.length;i++){
+      if(!a.parSemaine[a.semaines[i]]._enCours) closes.push(a.semaines[i]);
+    }
+    if(!closes.length) return { cause:'aucune semaine close : la mesure a moins d’une semaine' };
+    var fin = closes[0], fenetre = 4, out = [];
+    var jalons = ['jalon_revenu_j1','jalon_revenu_j2_7','jalon_revenu_j8_30'];
+    for(var k=0;k<jalons.length;k++){
+      var jalon = jalons[k], d = MESURE_DECALAGE[jalon];
+      var num = 0, den = 0, manque = null, sNum = [], sDen = [];
+      for(var w=0; w<fenetre; w++){
+        var sn = semaineMoins(fin, w), sd = semaineMoins(fin, w + d);
+        sNum.push(sn); sDen.push(sd);
+        if(!aPropriete(a.parSemaine, sn) && manque === null) manque = sn;
+        if(!aPropriete(a.parSemaine, sd) && manque === null) manque = sd;
+        num += caseMesure(a, sn, jalon);
+        den += caseMesure(a, sd, 'jalon_accueil');
+      }
+      out.push({ jalon:jalon, num:num, den:den, decalage:d,
+                 debutNum:sNum[sNum.length-1], finNum:sNum[0],
+                 debutDen:sDen[sDen.length-1], finDen:sDen[0],
+                 manque:manque });
+    }
+    return { lignes:out, fin:fin, fenetre:fenetre };
+  }
+
+  function pctMesure(n, sur){
+    return sur > 0 ? Math.round(1000 * n / sur) / 10 + ' %' : '—';
+  }
+
+  /**
+   * Dessine la section, et REND `{ critique, attention }`.
+   * ⚠️ LE BANDEAU DU HAUT DOIT POUVOIR COMPTER CE QUI EST ROUGE ICI. Un bandeau
+   * vert au-dessus d'un bloc rouge, c'est le défaut du 09/09 ; il ne se
+   * réintroduit pas par une section qui ne remonte rien.
+   */
+  function rendreMesure(rows){
+    var cR = $('cadre-mesure-retention'), cE = $('cadre-mesure-scan'),
+        cS = $('cadre-mesure-ecrans'), cV = $('cadre-mesure-ventilation'),
+        cA = $('cadre-mesure-avert');
+    function vider(){ cR.innerHTML=''; cE.innerHTML=''; cS.innerHTML=''; cV.innerHTML=''; }
+    var compte = { critique:0, attention:0 };
+
+    var a = agregerMesure(rows, compterNosTests());
+    if(a.cause){
+      vider();
+      cA.innerHTML = '<div class="rien avert"><b>Parcours dans le temps — NON AFFICHÉ.</b> '
+        + ech(a.cause) + '. Mieux vaut rien qu’un chiffre faux.</div>';
+      compte.critique++;
+      return compte;
+    }
+
+    // ── 0. Les avertissements, AVANT les chiffres ───────────────────────────
+    var av = [];
+    if(a.rejetTotal){
+      av.push('<b>' + a.rejetTotal + ' charge(s) rejetée(s) par le serveur.</b> Une charge '
+        + 'invalide est comptée sans être lue. Deux causes possibles, indiscernables ici : un '
+        + 'défaut de l’application, ou des appels fabriqués de l’extérieur. <b>Ce compteur ne '
+        + 'passe pas par l’interrupteur de périmètre</b> : un appel fabriqué pourrait se déclarer '
+        + '« appareil de test » et disparaître.');
+      compte.critique++;
+    }
+    if(MESURE_PREUVE_CABLE === null){
+      av.push('<b>Deux étages de l’entonnoir ne sont pas affichés : « analyse envoyée » et '
+        + '« liste reçue ».</b> Ils n’ont jamais produit une seule ligne en production, alors que '
+        + 'le serveur comptait des scans servis les mêmes jours. Le code qui les émet existe et il '
+        + 'est testé, mais il n’a jamais été vu à l’œuvre. Tant qu’une <b>recette au câble</b> ne '
+        + 'l’a pas prouvé, un zéro ici ne prouverait rien : ce serait peut-être un abandon réel, '
+        + 'peut-être un défaut de mesure.');
+      compte.attention++;
+    }
+    if(a.clesInconnues.length){
+      av.push('<b>Clés inconnues de cette page : ' + ech(a.clesInconnues.join(', ')) + '.</b> '
+        + 'La base compte quelque chose que cet écran ne sait pas nommer (tous appareils '
+        + 'confondus). <b>Ces clés sont exclues de tous les totaux ci-dessous</b> — elles ne sont '
+        + 'ni comptées ni oubliées, elles sont signalées.');
+      compte.attention++;
+    }
+    cA.innerHTML = av.length ? '<div class="rien avert">' + av.join('<br><br>') + '</div>' : '';
+
+    if(!a.semaines.length){
+      vider();
+      cR.innerHTML = '<div class="rien"><b>Parcours dans le temps</b> — aucune remontée '
+        + (compterNosTests() ? '' : 'hors appareils de test ')
+        + 'depuis la mise en service de la mesure (21/09/2026)'
+        + (a.ecartees ? ' — ' + a.ecartees + ' événement(s) de nos appareils de test sont écartés ; '
+            + 'l’interrupteur en haut de page les réintègre' : '')
+        + '.</div>';
+      return compte;
+    }
+
+    // ── 1. Rétention ────────────────────────────────────────────────────────
+    var noteRet = '<div class="rien" style="padding-top:0">'
+      + '<b>⛔ Ce taux ne se compare pas aux 1,3 % de la campagne d’août</b> : ce chiffre-là était '
+      + '8 personnes retenues sur 606 <b>installations</b> comptées par Google Play ; celui-ci '
+      + 'rapporte des retours à des <b>accueils acceptés</b>. Les deux dénominateurs diffèrent '
+      + 'd’un facteur 2 à 3.<br>'
+      + '<b>La fourchette, pas le taux, dit si l’on peut trancher</b> : tant qu’elle est large, le '
+      + 'chiffre du milieu ne décide de rien.<br>'
+      + '<b>Le décalage est approché</b> — les compteurs sont hebdomadaires, on ne sait pas '
+      + 'décaler de quelques jours. <b>Pour « revenu le lendemain », aucun décalage n’est '
+      + 'possible</b> : ce taux est donc <b>sous-estimé quand les arrivées montent</b>, ce qui est '
+      + 'précisément le cas pendant une campagne.</div>';
+    var ret = retentionMesure(a);
+    if(ret.cause){
+      cR.innerHTML = '<div class="rien"><b>Rétention</b> — ' + ech(ret.cause) + '. '
+        + 'Le premier calcul sera possible une fois une semaine entière écoulée.</div>' + noteRet;
+    } else {
+      var lr = [];
+      for(var i2=0;i2<ret.lignes.length;i2++){
+        var L = ret.lignes[i2], valeur = '—', fourchette = '', classe = 'attention';
+        if(L.manque){
+          fourchette = 'semaine du ' + jourTexte(L.manque) + ' sans aucune remontée : '
+                     + 'une semaine absente n’est pas une semaine à zéro';
+          compte.attention++;
+        } else if(L.num > L.den){
+          // ⚠️ PLUS DE RETOURS QUE D'ACCUEILS. Les deux fenêtres ne portent pas
+          // sur la même génération : après une pointe d'arrivées, le numérateur
+          // récolte ce qu'un dénominateur décalé ne contient pas. Un « 375 % »
+          // s'afficherait sans qu'aucune autre garde ne s'en émeuve.
+          fourchette = 'plus de retours (' + L.num + ') que d’accueils au dénominateur ('
+                     + L.den + ') : les deux fenêtres ne portent pas sur la même génération';
+          compte.attention++;
+        } else if(L.den < MESURE_PLANCHER){
+          fourchette = 'trop peu : ' + L.den + ' accueil(s), plancher à ' + MESURE_PLANCHER;
+        } else {
+          valeur = pctMesure(L.num, L.den);
+          classe = '';
+          var f = fourchetteMesure(L.num, L.den);
+          fourchette = f ? ('de ' + f.bas + ' % à ' + f.haut + ' %') : '—';
+        }
+        lr.push({ cases:[
+          { texte: MESURE_LIBELLES[L.jalon] },
+          { texte: String(L.num) },
+          { texte: String(L.den) },
+          { texte: valeur, classe: classe },
+          { texte: fourchette, classe: classe },
+          { texte: L.decalage ? L.decalage + ' sem.' : 'aucun (impossible)' }
+        ]});
+      }
+      cR.innerHTML = tableau(
+        'Rétention — ' + ret.fenetre + ' semaines closes, jusqu’à celle du ' + jourTexte(ret.fin)
+          + ' · la semaine en cours est écartée',
+        ['Jalon','Retours comptés','Accueils au dénominateur','Taux','Fourchette à 95 %','Décalage appliqué'],
+        lr, 'aucune semaine close', 0) + noteRet;
+    }
+
+    // ── 2. Entonnoir du scan, vu du téléphone ───────────────────────────────
+    var lance = totalMesure(a, 'scan_lance');
+    var etapes = ['scan_lance','photo_obtenue','consentement_affiche','analyse_envoyee','liste_recue'];
+    var aProuver = { analyse_envoyee:true, liste_recue:true };
+    var fuites = ['photo_non_obtenue','consentement_refuse','saisie_manuelle_choisie',
+      'recadrage_annule','recadrage_indisponible','quota_atteint','echec_affiche'];
+    var totEtapes = 0, x;
+    for(x=0;x<etapes.length;x++) totEtapes += totalMesure(a, etapes[x]);
+    for(x=0;x<fuites.length;x++) totEtapes += totalMesure(a, fuites[x]);
+
+    if(!totEtapes){
+      cE.innerHTML = '<div class="rien"><b>Entonnoir du scan, vu du téléphone</b> — aucun scan '
+        + 'compté sur la période' + (a.ecartees ? ' dans le périmètre affiché' : '') + '.</div>';
+    } else {
+      var le = [];
+      for(var e=0;e<etapes.length;e++){
+        var ce = etapes[e], ve = totalMesure(a, ce);
+        var masque = aProuver[ce] && MESURE_PREUVE_CABLE === null;
+        le.push({ cases:[
+          { texte: (e ? '↳ ' : '') + MESURE_LIBELLES[ce] },
+          { texte: masque ? '—' : String(ve), classe: masque ? 'attention' : '' },
+          { texte: masque ? 'non prouvé au câble'
+                          : (e === 0 ? (lance > 0 ? '100 %' : '—') : pctMesure(ve, lance)),
+            classe: masque ? 'attention' : '' }
+        ]});
+      }
+      // `scan_renouvellement` est un SOUS-ENSEMBLE de `scan_lance`, pas une
+      // fuite : il ne se soustrait de rien. Il a sa ligne, juste sous le total.
+      var renouv = totalMesure(a, 'scan_renouvellement');
+      if(renouv) le.splice(1, 0, { grisee:true, cases:[
+        { texte: '(' + MESURE_LIBELLES.scan_renouvellement + ')' },
+        { texte: String(renouv) },
+        { texte: pctMesure(renouv, lance) }
+      ]});
+      // Un scan lancé finit par une photo obtenue OU non obtenue. L'écart est
+      // réel : scan encore en cours au moment de l'envoi, envoi perdu, ou bord
+      // de la fenêtre de 26 semaines. On l'affiche plutôt que de laisser deux
+      // colonnes ne pas tomber juste.
+      var sansIssue = lance - (totalMesure(a, 'photo_obtenue') + totalMesure(a, 'photo_non_obtenue'));
+      if(sansIssue !== 0){
+        le.push({ grisee:true, cases:[
+          { texte: sansIssue > 0
+              ? '· Sans issue comptée (scan en cours à l’envoi, envoi perdu, ou bord de la fenêtre)'
+              : '· Issues en excès (photos comptées sans le scan correspondant dans la fenêtre)',
+            classe:'attention' },
+          { texte: String(sansIssue), classe:'attention' },
+          { texte: pctMesure(Math.abs(sansIssue), lance), classe:'attention' }
+        ]});
+      }
+      for(var f=0;f<fuites.length;f++){
+        var vf = totalMesure(a, fuites[f]);
+        if(!vf) continue;
+        le.push({ grisee:true, cases:[
+          { texte: '· ' + MESURE_LIBELLES[fuites[f]] },
+          { texte: String(vf) },
+          { texte: pctMesure(vf, lance) }
+        ]});
+      }
+      cE.innerHTML = tableau('Entonnoir du scan, vu du téléphone — toutes semaines confondues',
+        ['Étape', 'Tentatives', 'Part des scans lancés'], le, 'aucun scan compté', 0)
+        + '<div class="rien" style="padding-top:0"><b>Une ligne compte des tentatives, pas des '
+        + 'personnes</b> : qui recommence compte deux fois. <b>Et cet entonnoir ne recouvre pas '
+        + 'celui de la section « Scan d’ordonnance »</b> : celui-ci est compté par le téléphone et '
+        + 'seulement par les versions 1.4.15 et suivantes, l’autre par le serveur et pour toutes '
+        + 'les versions. <b>Ils ne se totalisent jamais.</b></div>';
+    }
+
+    // ── 3. Écrans ───────────────────────────────────────────────────────────
+    var totEcrans = 0, ecr = [], s;
+    for(s=0;s<MESURE_ECRANS.length;s++) totEcrans += totalMesure(a, MESURE_ECRANS[s]);
+    var tries = MESURE_ECRANS.slice().sort(function(u,v){
+      return totalMesure(a, v) - totalMesure(a, u);
+    });
+    for(var t=0;t<tries.length;t++){
+      var vt = totalMesure(a, tries[t]);
+      if(!vt) continue;
+      ecr.push({ cases:[
+        { texte: MESURE_LIBELLES[tries[t]] },
+        { texte: String(vt) },
+        { texte: pctMesure(vt, totEcrans) }
+      ]});
+    }
+    cS.innerHTML = tableau('Écrans ouverts — toutes semaines confondues',
+      ['Écran','Ouvertures','Part'], ecr, 'aucun écran compté', 0)
+      + '<div class="rien" style="padding-top:0">Un écran ouvert dix fois par la même personne '
+      + 'compte dix fois. <b>Ce tableau dit où l’on va, jamais combien de gens y vont.</b></div>';
+
+    // ── 4. Semaine par semaine, plateforme, ancienneté, version ─────────────
+    var lv = [];
+    for(var w2=0;w2<a.semaines.length;w2++){
+      var sw = a.semaines[w2], enCours = a.parSemaine[sw]._enCours;
+      lv.push({ grisee: enCours, cases:[
+        { texte: 'sem. du ' + jourTexte(sw) + (enCours ? ' (en cours)' : '') },
+        { texte: String(caseMesure(a, sw, 'jalon_accueil')) },
+        { texte: String(caseMesure(a, sw, 'jalon_revenu_j1')) },
+        { texte: String(caseMesure(a, sw, 'jalon_revenu_j2_7')) },
+        { texte: String(caseMesure(a, sw, 'jalon_revenu_j8_30')) },
+        { texte: String(caseMesure(a, sw, 'scan_lance')) }
+      ]});
+    }
+    var hv = tableau('Semaine par semaine'
+        + (a.semaineEnCours ? ' — la semaine du ' + jourTexte(a.semaineEnCours)
+            + ' est en cours, donc grisée et incomplète' : ' — aucune semaine en cours rendue'),
+      ['Semaine','Accueils','Retour J1','Retour J2-7','Retour J8-30','Scans lancés'], lv, '', 0);
+
+    var lp = [], pk = Object.keys(a.parPlateforme).sort();
+    for(var p2=0;p2<pk.length;p2++){
+      var cp = a.parPlateforme[pk[p2]];
+      lp.push({ cases:[
+        { texte: MESURE_PLATEFORMES[pk[p2]] },
+        { texte: String(aPropriete(cp._cases,'jalon_accueil') ? cp._cases.jalon_accueil : 0) },
+        { texte: String(aPropriete(cp._cases,'scan_lance') ? cp._cases.scan_lance : 0) },
+        { texte: String(cp._tot) }
+      ]});
+    }
+    hv += tableau('Par plateforme — toutes semaines confondues',
+      ['Plateforme','Accueils','Scans lancés','Événements comptés'], lp, '', 0);
+
+    var ra = aPropriete(a.parAnciennete,'r') ? a.parAnciennete.r : 0;
+    var aa = aPropriete(a.parAnciennete,'a') ? a.parAnciennete.a : 0;
+    var vlist = Object.keys(a.versions).sort(), vtxt = [];
+    for(var v2=0;v2<vlist.length;v2++) vtxt.push(vlist[v2] + ' (' + a.versions[vlist[v2]] + ')');
+    hv += '<div class="rien" style="padding-top:0">'
+       + '<b>Ancienneté</b> : ' + ra + ' événement(s) venus d’une installation de moins de '
+       + '7 jours, ' + aa + ' de 7 jours ou plus <b>ou d’ancienneté inconnue</b> — les '
+       + 'installations antérieures à la 1.4.15 n’ont aucun repère et tombent toutes dans le '
+       + 'second groupe.'
+       + '<br><b>Versions remontées</b> : ' + (vtxt.length ? ech(vtxt.join(', ')) : '—')
+       + ' — la mesure ne porte que <b>majeur.mineur</b> (« 01.04 » = 1.4.x, « 00.00 » = version '
+       + 'inconnue, nos essais au navigateur) : <b>1.4.15 et 1.4.16 sont indiscernables ici</b>, '
+       + 'alors que le sens de « accueil accepté » change entre les deux.'
+       + '<br><b>Les puces de version du bandeau « Parcours d’entrée » n’agissent pas sur cette '
+       + 'section</b> : la mesure ne porte pas le numéro de correctif. Seul l’interrupteur de '
+       + 'périmètre agit ici.'
+       // ⚠️ LE CADRAGE SE DIT D'APRES L'INTERRUPTEUR, PAS D'APRES LE COMPTE.
+       // Une premiere version écrivait « nos appareils de test sont comptés »
+       // dès que `ecartees` valait zéro — donc aussi quand l'interrupteur les
+       // écartait et qu'il n'y en avait simplement aucun. La page affirmait
+       // l'inverse de ce que faisait le bouton juste au-dessus.
+       + '<br><b>Cadrage</b> : '
+       + (compterNosTests()
+           ? 'nos appareils de test sont <b>comptés</b> (interrupteur en haut de page).'
+           : 'nos appareils de test sont <b>écartés</b>'
+             + (a.ecartees ? ' — ' + a.ecartees + ' événement(s) le sont ici' : '')
+             + '. L’interrupteur en haut de page les réintègre.')
+       + '</div>';
+    cV.innerHTML = hv;
+
+    return compte;
   }
 
   // ── CE QUE LE CANAL OFFICINE A REELLEMENT RAPPORTE ────────────────────────

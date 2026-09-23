@@ -12,8 +12,10 @@
      IP, comme pour tout le site : voir /mentions-legales/.
      ⚠️ PAS DE REDIRECTION AUTOMATIQUE VERS APPLE (revue adverse du 23/09) :
      le telephone qui scanne n'est pas forcement celui du patient (aidant,
-     pharmacien qui montre). Un code active sur le mauvais compte Apple est
-     perdu. La personne choisit. -->
+     pharmacien qui montre). Le code, lui, n'est PAS perdu : il est partage
+     par tous les clients du commercial (25 000 utilisations). Mais celui qui
+     scanne recevrait l'offre a la place du patient. La page PRE-OUVRE donc
+     le volet du telephone detecte, et la personne touche elle-meme le bouton. -->
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#718f7a">
@@ -86,13 +88,13 @@ a{color:var(--brand-darker)}
 
 <section class="carte volet" id="iphone" aria-labelledby="titre-iphone">
 <h3 id="titre-iphone" tabindex="-1">Sur iPhone</h3>
-<p class="encadre">Faites-le <strong>sur l’iPhone de la personne qui utilisera Pilou</strong>&#8239;: le code s’active sur le compte Apple de cet iPhone, une seule fois.</p>
+<p class="encadre">Faites-le <strong>sur l’iPhone de la personne qui utilisera Pilou</strong>&#8239;: l’offre s’active sur le compte Apple de cet iPhone.</p>
 <ol>
 <li>Touchez ce bouton&#8239;:
 <a class="bouton" href="https://apps.apple.com/redeem?ctx=offercodes&amp;id=6806332290&amp;code=04555854">Activer mon code chez Apple</a>
 <span class="petit cache" id="pas-iphone" role="note">Vous n’êtes pas sur un iPhone&#8239;: ouvrez cette page sur l’iPhone de la personne qui utilisera Pilou.</span></li>
 <li>Apple présente l’offre, en général sous le titre «&#8239;Activer l’offre spéciale&#8239;». Touchez «&#8239;Activer et installer&#8239;».</li>
-<li>Apple demande de confirmer. Son texte parle de renouvellement&#8239;: cette offre-ci ne se renouvelle pas, rien ne vous sera prélevé. Confirmez.</li>
+<li>Apple demande de confirmer, parfois avec le mot de passe du compte Apple ou Face ID. Son texte parle de renouvellement&#8239;: cette offre-ci ne se renouvelle pas, rien ne vous sera prélevé. Confirmez.</li>
 <li>Touchez «&#8239;Ouvrir&#8239;»&#8239;: Pilou+ est actif pendant 3 mois.</li>
 </ol>
 <p class="petit">Le bouton ne s’ouvre pas&#8239;? Ouvrez l’App Store, touchez votre photo en haut à droite, choisissez l’option pour utiliser un code, puis saisissez <strong>04555854</strong>.</p>
@@ -102,6 +104,7 @@ a{color:var(--brand-darker)}
 
 <section class="carte volet" id="android" aria-labelledby="titre-android">
 <h3 id="titre-android" tabindex="-1">Sur Android</h3>
+<p class="encadre">Faites-le <strong>sur le téléphone de la personne qui utilisera Pilou</strong>. Google Play peut vous demander votre compte Google.</p>
 <ol>
 <li>Installez Pilou depuis Google Play&#8239;:
 <a class="bouton" href="https://play.google.com/store/apps/details?id=com.pilou.app">Installer Pilou</a></li>
@@ -151,16 +154,24 @@ a{color:var(--brand-darker)}
       montrer(nom, true);
     });
   }
+  var defaut = null;  // le volet du telephone detecte, pose plus bas
   function depuisAdresse(focaliser){
     var h = location.hash.replace('#', '');
-    montrer(volets[h] ? h : null, focaliser);
+    montrer(volets[h] ? h : defaut, focaliser);
   }
   window.addEventListener('popstate', function(){ depuisAdresse(false); });
+
+  var ua = navigator.userAgent || '';
+  // iPad recent : il se declare « Macintosh » avec un ecran tactile.
+  var appleMobile = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var android = /Android/i.test(ua);
+  // PRE-OUVERTURE du volet du telephone detecte, SANS entree d'historique ni
+  // redirection : la personne voit tout de suite ses etapes, et garde les
+  // deux choix au-dessus si ce n'est pas le bon telephone.
+  defaut = appleMobile ? 'iphone' : (android ? 'android' : null);
   depuisAdresse(false);
 
   // Sur un appareil qui n'est pas un iPhone, on PREVIENT sans rediriger.
-  var ua = navigator.userAgent || '';
-  var appleMobile = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   if (!appleMobile) document.getElementById('pas-iphone').classList.remove('cache');
 
   var etat = document.getElementById('copie-etat');

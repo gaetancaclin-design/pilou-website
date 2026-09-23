@@ -44,6 +44,10 @@ h1{font:800 34px/1.15 Nunito,Inter,sans-serif;margin:0 0 10px;letter-spacing:-.0
 .puis{margin:18px 0 6px;font-size:17px}
 .code{margin:6px 0 0;text-align:center;font:800 42px/1.1 Nunito,Inter,sans-serif;letter-spacing:.1em;font-variant-numeric:tabular-nums}
 .code span+span{margin-left:.35em}
+.copier{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;margin:14px 0 0;border-radius:16px;border:2px solid var(--brand);background:var(--white);color:var(--brand-darker);font:700 18px/1 Inter,sans-serif;cursor:pointer}
+.copier.fait{background:var(--brand-light)}
+.copier:focus-visible{outline:3px solid var(--brand-darker);outline-offset:3px}
+.memo{margin:10px 0 0;text-align:center;font-size:15px;color:var(--muted)}
 .conditions{margin:6px 0 18px;font-size:15px;color:var(--muted);text-align:center}
 .bascule{display:block;margin:0 auto 18px;font-size:16px;color:var(--brand-darker);text-align:center}
 details{margin-top:auto;border-top:1px solid var(--border);padding-top:14px;font-size:16px}
@@ -74,8 +78,11 @@ footer a,details a{color:var(--brand-darker)}
 <a class="bouton" href="https://play.google.com/store/apps/details?id=com.pilou.app&amp;referrer=utm_source%3Dofficine%26utm_content%3D61293407">Installer Pilou</a>
 <p class="puis">Puis, dans Pilou&#8239;: <strong>Réglages</strong> → <strong>J’ai un code partenaire</strong>, et saisissez&#8239;:</p>
 <p class="code"><span aria-hidden="true">6129</span><span aria-hidden="true">3407</span><span class="lecteur">Code : 6, 1, 2, 9, 3, 4, 0, 7</span></p>
+<button type="button" class="copier cache" id="copier" data-code="61293407">Copier le code</button>
+<p class="memo">Il est aussi imprimé sur votre prospectus.</p>
 </section>
 
+<p class="lecteur" id="copie-etat" role="status" aria-live="polite"></p>
 <p class="conditions">Sans engagement. Ensuite, Pilou reste gratuit, ou Pilou+ à 2,99&#8239;€/mois ou 26,99&#8239;€/an.</p>
 <a class="bascule cache" id="bascule" href="#"></a>
 <a class="site" href="/">Découvrir Pilou sur pilou-app.fr</a>
@@ -95,6 +102,20 @@ footer a,details a{color:var(--brand-darker)}
 </footer>
 </main>
 <script>
+(function(){
+  // « Copier le code » : colle ensuite dans Pilou, dont le champ accepte le
+  // collage (pasteTransformer, CodeApporteurSheet.tsx). Montre seulement si
+  // le presse-papiers est disponible.
+  var bc = document.getElementById('copier'), etat = document.getElementById('copie-etat');
+  if (bc && navigator.clipboard && window.isSecureContext){
+    bc.classList.remove('cache');
+    bc.addEventListener('click', function(){
+      navigator.clipboard.writeText(bc.getAttribute('data-code')).then(function(){
+        bc.textContent = 'Code copié \u2713'; bc.classList.add('fait'); etat.textContent = 'Code copié.';
+      }, function(){});
+    });
+  }
+})();
 (function(){
   // Sans script : les deux actions restent visibles. Avec script : seule
   // celle du telephone detecte, et un lien discret pour voir l'autre.

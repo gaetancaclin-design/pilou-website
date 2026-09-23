@@ -1543,6 +1543,74 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
                   : 'Tout code saisi a donné son accès.'));
     }
 
+    // ⚠️ AJOUTE LE 23/09 — LES CODES OFFICINE ECHANGES SUR IPHONE.
+    // Sur iPhone, le client echange son code CHEZ APPLE : Pilou n'en voit rien,
+    // et c'est le webhook qui traduit le nom de l'offre en code pour attribuer
+    // l'echange a un commercial. Deux pannes y sont SILENCIEUSES — le client,
+    // lui, a bien ses trois mois, donc personne ne se plaindra :
+    //   - `offres_apple_inconnues` : des NOMS d'offre absents de `offres_apple`
+    //     (offre creee sans sa ligne, ou table videe par une restauration) ;
+    //   - `officine_ios_non_attribuees` : des CLIENTS dont le nom d'offre est
+    //     connu mais sans attribution `accorde`. Il NE S'ETEINT PAS SEUL : le
+    //     webhook repond 200 quoi qu'il arrive, RevenueCat ne rejoue rien. Le
+    //     rattrapage est manuel.
+    //   Une attribution par client (`attributions_app_user_id_key`) : le
+    //   premier code gagne. Un client deja servi n'est donc pas un ecart.
+    // ORANGE ET NON ROUGE : aucun client n'attend, et rien n'est perdu pour de
+    // bon (rattrapable pendant 23 mois). C'est la commission qui est en jeu.
+    // ⚠️ LES DEUX COLONNES, PAS UNE (revue adverse du 23/09) : tester la seule
+    // seconde laissait la premiere, absente, valoir 0 — un FAUX VERT. Et une
+    // valeur qui n'est pas un compte (null, negatif, texte) n'est jamais lue
+    // comme un zero : elle rend le voyant « illisible ».
+    // ⚠️ LE DEMI-DEPLOIEMENT SE VOIT, comme le 13/09 : sans les colonnes, la
+    // grille perdrait ce voyant EN SILENCE.
+    function compteLu(v){
+      var n = (typeof v === 'number') ? v : (typeof v === 'string' && /^[0-9]+$/.test(v) ? Number(v) : NaN);
+      return (isFinite(n) && n >= 0 && Math.floor(n) === n) ? n : null;
+    }
+    if(!('offres_apple_inconnues' in a) || !('officine_ios_non_attribuees' in a)){
+      h += ind('Migration du 23/09', 'incomplète', 'attention',
+            'La vue des alertes ne porte pas les deux compteurs des codes officine sur iPhone '
+            + '(migration « 20260923180000_offres_apple.sql »). Un code échangé chez Apple pourrait '
+            + 'n’être attribué à aucun commercial sans que rien ne le dise.');
+    } else {
+      var inconnues = compteLu(a.offres_apple_inconnues),
+          nonAttr = compteLu(a.officine_ios_non_attribuees);
+      if(inconnues === null || nonAttr === null){
+        h += ind('Codes officine sur iPhone', 'illisible', 'attention',
+              'La base a rendu une valeur qui n’est pas un compte. Impossible de dire si des '
+              + 'échanges iPhone ont échappé aux commerciaux.');
+      } else {
+        h += ind('Codes officine sur iPhone',
+              inconnues > 0 ? inconnues + (inconnues > 1 ? ' offres inconnues' : ' offre inconnue')
+                : (nonAttr > 0
+                    ? nonAttr + (nonAttr > 1 ? ' échanges non attribués' : ' échange non attribué')
+                    : 'aucun écart'),
+              (inconnues > 0 || nonAttr > 0) ? 'attention' : 'ok',
+              (inconnues > 0
+                ? (inconnues > 1
+                    ? inconnues + ' noms d’offre Apple sont inconnus en base : des offres ont été '
+                      + 'créées dans App Store Connect sans leur ligne dans la table des offres, '
+                    : 'Un nom d’offre Apple est inconnu en base : une offre a été créée dans '
+                      + 'App Store Connect sans sa ligne dans la table des offres, ')
+                  + 'ou la table a été vidée par une restauration. Leurs échanges ne sont attribués à '
+                  + 'aucun commercial. Ajouter la ligne ne suffit pas pour les échanges déjà reçus : '
+                  + 'ils passeront en « non attribués » et devront être rattrapés. '
+                : '')
+              + (nonAttr > 0
+                ? (nonAttr > 1
+                    ? nonAttr + ' clients iPhone ont échangé un code officine sans que leur échange soit'
+                    : 'Un client iPhone a échangé un code officine sans que son échange soit')
+                  + ' attribué à un commercial. '
+                  + (nonAttr > 1 ? 'Les clients ont bien leurs trois mois' : 'Le client a bien ses trois mois')
+                  + ' ; c’est la commission qui manque. Ce voyant ne s’éteint pas seul : rattrapage manuel (procédure « '
+                  + 'Rattrapage officine iPhone » du dossier du projet).'
+                : (inconnues > 0 ? ''
+                    : 'Aucun écart : chaque échange iPhone reçu sous un nom d’offre officine connu est '
+                      + 'attribué à un commercial (les 5 dernières minutes ne sont pas encore comptées).')));
+      }
+    }
+
     // 5. Information, pas alerte.
     h += ind('Codes à quota épuisé', nb(a.codes_epuises),
           a.codes_epuises > 0 ? 'attention' : 'ok',

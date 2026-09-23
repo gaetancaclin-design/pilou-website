@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vos 3 mois de Pilou+ offerts</title>
-<meta name="description" content="Activez vos 3 mois de Pilou+ offerts, sur iPhone ou sur Android.">
-<!-- Page d'orientation du depliant pharmacie. Une page par code.
-     PAS d'indexation : ce n'est pas une page publique du site.
-     AUCUN cookie, AUCUN traceur, AUCUNE requete vers un tiers : polices et
-     images servies depuis pilou-app.fr. L'hebergeur (GitHub) recoit l'adresse
-     IP, comme pour tout le site : voir /mentions-legales/.
-     ⚠️ PAS DE REDIRECTION AUTOMATIQUE VERS APPLE (revue adverse du 23/09) :
-     le telephone qui scanne n'est pas forcement celui du patient (aidant,
-     pharmacien qui montre). Le code, lui, n'est PAS perdu : il est partage
-     par tous les clients du commercial (25 000 utilisations). Mais celui qui
-     scanne recevrait l'offre a la place du patient. La page PRE-OUVRE donc
-     le volet du telephone detecte, et la personne touche elle-meme le bouton. -->
+<meta name="description" content="Activez vos 3 mois de Pilou+ offerts.">
+<!-- Page du QR code du prospectus pharmacie. Une page par code.
+     PAS d'indexation. AUCUN cookie, AUCUN traceur, AUCUNE requete vers un
+     tiers : polices et images servies depuis pilou-app.fr. L'hebergeur
+     (GitHub) recoit l'adresse IP, comme pour tout le site : /mentions-legales/.
+     UNE SEULE ACTION A L'ECRAN : celle du telephone detecte. Sans JavaScript,
+     ou sur un appareil non reconnu, les deux actions sont montrees.
+     Sur iPhone, c'est la personne qui touche le bouton : un lien vers l'App
+     Store ouvert par un appui s'ouvre dans l'App Store ; une redirection
+     automatique n'offre pas cette garantie (non mesure, donc pas tente).
+     Le code est partage par tous les clients du commercial : un scan par
+     erreur ne le « perd » pas. -->
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#718f7a">
@@ -28,166 +28,95 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--surface);color:var(--ink);font:400 18px/1.55 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.page{max-width:560px;margin:0 auto;padding:20px 16px 40px}
-header{display:flex;align-items:center;gap:10px;margin-bottom:18px}
-header img{width:40px;height:40px;border-radius:10px}
-header span{font:800 22px/1 Nunito,Inter,sans-serif;color:var(--brand-darker)}
-h1{font:800 32px/1.15 Nunito,Inter,sans-serif;margin:0 0 10px;color:var(--ink);letter-spacing:-.01em}
-.intro{margin:0 0 22px;color:var(--muted)}
-.carte{background:var(--white);border:1px solid var(--border);border-radius:22px;padding:20px;margin:0 0 18px;box-shadow:0 1px 2px rgba(16,24,20,.04)}
-.code-etiquette{margin:0;font-size:15px;font-weight:600;color:var(--brand-dark);text-transform:uppercase;letter-spacing:.06em}
-.code{display:flex;gap:.35em;justify-content:center;margin:8px 0 4px;font:800 44px/1.1 Nunito,Inter,sans-serif;letter-spacing:.08em;color:var(--ink);font-variant-numeric:tabular-nums}
-.code-note{margin:0;text-align:center;font-size:15px;color:var(--muted)}
-h2{font:800 24px/1.25 Nunito,Inter,sans-serif;margin:26px 0 6px}
-.aide{margin:0 0 14px;color:var(--muted);font-size:16px}
-.choix{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px}
-.choix a{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:96px;padding:14px 10px;border-radius:20px;background:var(--white);border:2px solid var(--border);color:var(--ink);text-decoration:none;font-weight:700;font-size:20px;text-align:center}
-.choix a small{font-weight:500;font-size:14px;color:var(--muted);margin-top:4px}
-.choix a[aria-current="true"]{border-color:var(--brand);background:var(--brand-light)}
-.choix a:focus-visible,.bouton:focus-visible,button:focus-visible{outline:3px solid var(--brand-darker);outline-offset:3px}
-.volet{scroll-margin-top:12px}
-.volet h3{font:800 22px/1.25 Nunito,Inter,sans-serif;margin:0 0 12px}
-ol{list-style:none;counter-reset:e;margin:0;padding:0}
-ol li{counter-increment:e;position:relative;padding-left:48px;margin:0 0 16px}
-ol li::before{content:counter(e);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--brand-darker);color:#fff;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center}
-.bouton{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;margin:12px 0 4px;padding:12px 18px;border-radius:16px;background:var(--brand-darker);color:#fff;font-weight:700;font-size:18px;text-decoration:none;border:0;cursor:pointer;font-family:inherit}
-.bouton.secondaire{background:var(--white);color:var(--brand-darker);border:2px solid var(--brand)}
-.encadre{background:#fff8e6;border:1px solid #f1dfae;border-radius:16px;padding:12px 14px;font-size:16px;margin:0 0 16px}
-.petit{font-size:15px;color:var(--muted);margin:10px 0 0}
-.offre h2{margin-top:0}
-.offre p{margin:0 0 10px}
-.prix{font-weight:700;color:var(--ink)}
-footer{margin-top:28px;font-size:14px;color:var(--muted);text-align:center}
-footer a{color:var(--brand-darker)}
-a{color:var(--brand-darker)}
-.cache{display:none}
+.page{max-width:520px;margin:0 auto;padding:28px 20px 36px;min-height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+header img{width:44px;height:44px;border-radius:12px}
+header span{font:800 24px/1 Nunito,Inter,sans-serif;color:var(--brand-darker)}
+h1{font:800 34px/1.15 Nunito,Inter,sans-serif;margin:0 0 10px;letter-spacing:-.01em}
+.sous-titre{margin:0 0 28px;color:var(--muted);font-size:19px}
+.action{background:var(--white);border:1px solid var(--border);border-radius:24px;padding:22px 20px;margin:0 0 16px;box-shadow:0 1px 3px rgba(16,24,20,.05)}
+.action h2{font:700 15px/1.3 Inter,sans-serif;margin:0 0 12px;color:var(--brand-dark);text-transform:uppercase;letter-spacing:.06em}
+.bouton{display:flex;align-items:center;justify-content:center;width:100%;min-height:64px;padding:14px 18px;border-radius:18px;background:var(--brand-darker);color:#fff;font-weight:700;font-size:21px;text-decoration:none;box-shadow:0 6px 16px rgba(48,90,64,.22)}
+.bouton:focus-visible,summary:focus-visible,.bascule:focus-visible{outline:3px solid var(--brand-darker);outline-offset:3px}
+.rassure{margin:14px 0 0;text-align:center;color:var(--muted);font-size:16px}
+.puis{margin:18px 0 6px;font-size:17px}
+.code{margin:6px 0 0;text-align:center;font:800 42px/1.1 Nunito,Inter,sans-serif;letter-spacing:.1em;font-variant-numeric:tabular-nums}
+.code span+span{margin-left:.35em}
+.conditions{margin:6px 0 18px;font-size:15px;color:var(--muted);text-align:center}
+.bascule{display:block;margin:0 auto 18px;font-size:16px;color:var(--brand-darker);text-align:center}
+details{margin-top:auto;border-top:1px solid var(--border);padding-top:14px;font-size:16px}
+summary{cursor:pointer;font-weight:600;color:var(--brand-darker);padding:6px 0}
+details p{margin:10px 0}
+footer{margin-top:18px;font-size:13px;color:var(--muted);text-align:center}
+footer a,details a{color:var(--brand-darker)}
+.cache{display:none!important}
 .lecteur{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.volet h3:focus{outline:none}
-@media (max-width:360px){.code{font-size:36px}h1{font-size:28px}}
+@media (max-width:360px){h1{font-size:29px}.code{font-size:36px}}
 </style>
 </head>
 <body>
 <main class="page">
-<header><img src="/logo-mark.png" alt="" width="40" height="40"><span>Pilou</span></header>
+<header><img src="/logo-mark.png" alt="" width="44" height="44"><span>Pilou</span></header>
 
 <h1>Vos 3 mois de Pilou+ offerts</h1>
-<p class="intro">Pilou est un pilulier dans votre téléphone&#8239;: il vous rappelle vos prises, lit votre ordonnance en photo et suit vos boîtes de médicaments.</p>
+<p class="sous-titre">Le pilulier dans votre téléphone.</p>
 
-<section class="carte" aria-labelledby="etiquette-code">
-<p class="code-etiquette" id="etiquette-code">Votre code</p>
+<section class="action" id="iphone" aria-labelledby="t-iphone">
+<h2 id="t-iphone">Sur iPhone</h2>
+<a class="bouton" href="https://apps.apple.com/redeem?ctx=offercodes&amp;id=6806332290&amp;code=04555854">Activer mes 3 mois</a>
+<p class="rassure">Apple vous demande de confirmer.<br>Rien ne vous sera prélevé.</p>
+</section>
+
+<section class="action" id="android" aria-labelledby="t-android">
+<h2 id="t-android">Sur Android</h2>
+<a class="bouton" href="https://play.google.com/store/apps/details?id=com.pilou.app&amp;referrer=utm_source%3Dofficine%26utm_content%3D04555854">Installer Pilou</a>
+<p class="puis">Puis, dans Pilou&#8239;: <strong>Réglages</strong> → <strong>J’ai un code partenaire</strong>, et saisissez&#8239;:</p>
 <p class="code"><span aria-hidden="true">0455</span><span aria-hidden="true">5854</span><span class="lecteur">Code : 0, 4, 5, 5, 5, 8, 5, 4</span></p>
-<p class="code-note">Vous en aurez besoin juste après.</p>
 </section>
 
-<h2 id="question">Pilou sera sur quel téléphone&#8239;?</h2>
-<p class="aide">Choisissez le téléphone de la personne qui utilisera Pilou.</p>
-<nav class="choix" aria-labelledby="question">
-<a href="#iphone" data-volet="iphone">iPhone<small>Apple</small></a>
-<a href="#android" data-volet="android">Android<small>Samsung, Xiaomi, Pixel…</small></a>
-</nav>
+<p class="conditions">Sans engagement. Ensuite, Pilou reste gratuit, ou Pilou+ à 2,99&#8239;€/mois ou 26,99&#8239;€/an.</p>
+<a class="bascule cache" id="bascule" href="#"></a>
 
-<section class="carte volet" id="iphone" aria-labelledby="titre-iphone">
-<h3 id="titre-iphone" tabindex="-1">Sur iPhone</h3>
-<p class="encadre">Faites-le <strong>sur l’iPhone de la personne qui utilisera Pilou</strong>&#8239;: l’offre s’active sur le compte Apple de cet iPhone.</p>
-<ol>
-<li>Touchez ce bouton&#8239;:
-<a class="bouton" href="https://apps.apple.com/redeem?ctx=offercodes&amp;id=6806332290&amp;code=04555854">Activer mon code chez Apple</a>
-<span class="petit cache" id="pas-iphone" role="note">Vous n’êtes pas sur un iPhone&#8239;: ouvrez cette page sur l’iPhone de la personne qui utilisera Pilou.</span></li>
-<li>Apple présente l’offre, en général sous le titre «&#8239;Activer l’offre spéciale&#8239;». Touchez «&#8239;Activer et installer&#8239;».</li>
-<li>Apple demande de confirmer, parfois avec le mot de passe du compte Apple ou Face ID. Son texte parle de renouvellement&#8239;: cette offre-ci ne se renouvelle pas, rien ne vous sera prélevé. Confirmez.</li>
-<li>Touchez «&#8239;Ouvrir&#8239;»&#8239;: Pilou+ est actif pendant 3 mois.</li>
-</ol>
-<p class="petit">Le bouton ne s’ouvre pas&#8239;? Ouvrez l’App Store, touchez votre photo en haut à droite, choisissez l’option pour utiliser un code, puis saisissez <strong>04555854</strong>.</p>
-<button type="button" class="bouton secondaire cache copier" data-code="04555854">Copier le code</button>
-<p class="petit">Apple refuse le code&#8239;? Sur iPhone, l’offre est réservée aux personnes qui n’ont jamais été abonnées à Pilou+, avec un compte Apple France. Écrivez-nous à <a href="mailto:contact@pilou-app.fr">contact@pilou-app.fr</a>.</p>
-</section>
-
-<section class="carte volet" id="android" aria-labelledby="titre-android">
-<h3 id="titre-android" tabindex="-1">Sur Android</h3>
-<p class="encadre">Faites-le <strong>sur le téléphone de la personne qui utilisera Pilou</strong>. Google Play peut vous demander votre compte Google.</p>
-<ol>
-<li>Installez Pilou depuis Google Play&#8239;:
-<a class="bouton" href="https://play.google.com/store/apps/details?id=com.pilou.app">Installer Pilou</a></li>
-<li>Ouvrez Pilou. À la première ouverture, Pilou vous demande d’accepter ses conditions. Touchez ensuite <strong>Réglages</strong> en bas de l’écran, puis «&#8239;J’ai un code partenaire&#8239;».</li>
-<li>Saisissez le code <strong>04555854</strong>, puis touchez «&#8239;Activer mon accès offert&#8239;». Une connexion Internet est nécessaire.
-<button type="button" class="bouton secondaire cache copier" data-code="04555854">Copier le code</button></li>
-</ol>
-<p class="petit">Aucune carte bancaire n’est demandée.</p>
-<p class="petit">Vous ne voyez pas «&#8239;J’ai un code partenaire&#8239;»&#8239;? Cette ligne n’apparaît que si Pilou+ n’est pas déjà actif sur le téléphone. En cas de doute, écrivez-nous à <a href="mailto:contact@pilou-app.fr">contact@pilou-app.fr</a>.</p>
-</section>
-
-<section class="carte offre" aria-labelledby="titre-offre">
-<h2 id="titre-offre">Ce que comprend l’offre</h2>
-<p><strong>3 mois de Pilou+ offerts.</strong> L’offre ne se renouvelle pas toute seule&#8239;: rien ne vous est prélevé.</p>
-<p>Ensuite, vous gardez Pilou gratuitement, rappels de prise compris. Ou, si vous le souhaitez, vous continuez avec Pilou+&#8239;: <span class="prix">2,99&#8239;€ par mois</span> ou <span class="prix">26,99&#8239;€ par an</span>. Dans ce cas, l’abonnement se renouvelle automatiquement et se résilie à tout moment.</p>
-<p class="petit">Pilou aide à s’organiser&#8239;; il ne remplace pas l’avis de votre médecin ou de votre pharmacien.</p>
-</section>
+<details>
+<summary>Besoin d’aide&#8239;?</summary>
+<p><strong>Sur iPhone.</strong> Faites-le sur l’iPhone de la personne qui utilisera Pilou. Apple peut demander le mot de passe du compte Apple ou Face ID. Son texte parle de renouvellement&#8239;: cette offre-ci ne se renouvelle pas. Ensuite, ouvrez Pilou.</p>
+<p>Le bouton ne s’ouvre pas&#8239;? Dans l’App Store, touchez votre photo en haut à droite, choisissez l’option pour utiliser un code, et saisissez <strong>04555854</strong>.</p>
+<p>Apple refuse le code&#8239;? Sur iPhone, l’offre est réservée aux personnes qui n’ont jamais été abonnées à Pilou+, avec un compte Apple France.</p>
+<p><strong>Sur Android.</strong> À la première ouverture, Pilou vous demande d’accepter ses conditions. Une connexion Internet est nécessaire. La ligne «&#8239;J’ai un code partenaire&#8239;» n’apparaît que si Pilou+ n’est pas déjà actif. Aucune carte bancaire n’est demandée.</p>
+<p><strong>Ensuite.</strong> Si vous choisissez Pilou+ après les 3 mois, l’abonnement se renouvelle automatiquement et se résilie à tout moment. Pilou aide à s’organiser&#8239;; il ne remplace pas l’avis de votre médecin ou de votre pharmacien.</p>
+<p>Une question&#8239;: <a href="mailto:contact@pilou-app.fr">contact@pilou-app.fr</a></p>
+</details>
 
 <footer>
-<p>Une question&#8239;? <a href="mailto:contact@pilou-app.fr">contact@pilou-app.fr</a></p>
-<p>Pilou est édité par AGC Logiciels.</p>
-<p class="lecteur" id="copie-etat" role="status" aria-live="polite"></p>
-<p><a href="/">pilou-app.fr</a> · <a href="/mentions-legales/">Mentions légales</a> · <a href="/confidentialite/">Confidentialité</a> · <a href="/cgu/">CGU</a></p>
+<p>Pilou est édité par AGC Logiciels · <a href="/mentions-legales/">Mentions légales</a> · <a href="/confidentialite/">Confidentialité</a> · <a href="/cgu/">CGU</a></p>
 </footer>
 </main>
 <script>
 (function(){
-  // Sans script, les deux volets restent visibles et les choix font defiler :
-  // la page fonctionne entierement sans JavaScript.
-  var liens = document.querySelectorAll('.choix a');
-  var volets = {iphone: document.getElementById('iphone'), android: document.getElementById('android')};
-  function montrer(nom, focaliser){
-    for (var k in volets){ volets[k].classList.toggle('cache', nom !== null && k !== nom); }
-    if (nom === null){ for (var k2 in volets){ volets[k2].classList.add('cache'); } }
-    for (var i = 0; i < liens.length; i++){
-      liens[i].setAttribute('aria-current', liens[i].getAttribute('data-volet') === nom ? 'true' : 'false');
-    }
-    // Le lecteur d'ecran suit le focus : on le pose sur le titre du volet.
-    if (nom && focaliser){ var t = volets[nom].querySelector('h3'); t.focus(); volets[nom].scrollIntoView({block: 'start'}); }
-  }
-  for (var i = 0; i < liens.length; i++){
-    liens[i].addEventListener('click', function(ev){
-      ev.preventDefault();
-      var nom = this.getAttribute('data-volet');
-      // Une entree d'historique : le bouton « retour » revient au choix.
-      if (history.pushState) history.pushState(null, '', '#' + nom);
-      montrer(nom, true);
-    });
-  }
-  var defaut = null;  // le volet du telephone detecte, pose plus bas
-  function depuisAdresse(focaliser){
-    var h = location.hash.replace('#', '');
-    montrer(volets[h] ? h : defaut, focaliser);
-  }
-  window.addEventListener('popstate', function(){ depuisAdresse(false); });
-
+  // Sans script : les deux actions restent visibles. Avec script : seule
+  // celle du telephone detecte, et un lien discret pour voir l'autre.
   var ua = navigator.userAgent || '';
   // iPad recent : il se declare « Macintosh » avec un ecran tactile.
-  var appleMobile = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var apple = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   var android = /Android/i.test(ua);
-  // PRE-OUVERTURE du volet du telephone detecte, SANS entree d'historique ni
-  // redirection : la personne voit tout de suite ses etapes, et garde les
-  // deux choix au-dessus si ce n'est pas le bon telephone.
-  defaut = appleMobile ? 'iphone' : (android ? 'android' : null);
-  depuisAdresse(false);
-
-  // Sur un appareil qui n'est pas un iPhone, on PREVIENT sans rediriger.
-  if (!appleMobile) document.getElementById('pas-iphone').classList.remove('cache');
-
-  var etat = document.getElementById('copie-etat');
-  var boutons = document.querySelectorAll('.copier');
-  if (navigator.clipboard && window.isSecureContext){
-    for (var j = 0; j < boutons.length; j++){
-      boutons[j].classList.remove('cache');
-      boutons[j].addEventListener('click', function(){
-        var b = this;
-        navigator.clipboard.writeText(b.getAttribute('data-code')).then(function(){
-          b.textContent = 'Code copié';
-          etat.textContent = 'Code copié.';
-        }, function(){ etat.textContent = ''; });
-      });
-    }
+  if (!apple && !android) return;           // appareil non reconnu : on montre tout
+  var ici = apple ? 'iphone' : 'android', autre = apple ? 'android' : 'iphone';
+  var bloc = {iphone: document.getElementById('iphone'), android: document.getElementById('android')};
+  var bascule = document.getElementById('bascule');
+  function montrer(nom){
+    var cache = nom === 'iphone' ? 'android' : 'iphone';
+    bloc[nom].classList.remove('cache');
+    bloc[cache].classList.add('cache');
+    // Le titre « Sur iPhone » n'a de sens que si l'on voit les deux.
+    bloc[nom].querySelector('h2').classList.add('lecteur');
+    bascule.textContent = nom === ici
+      ? (autre === 'android' ? 'Pas sur iPhone ? Voir pour Android' : 'Pas sur Android ? Voir pour iPhone')
+      : (ici === 'iphone' ? 'Revenir à l’iPhone' : 'Revenir à Android');
+    bascule.setAttribute('data-vers', nom === ici ? autre : ici);
   }
+  bascule.classList.remove('cache');
+  bascule.addEventListener('click', function(ev){ ev.preventDefault(); montrer(bascule.getAttribute('data-vers')); });
+  montrer(ici);
 })();
 </script>
 </body>

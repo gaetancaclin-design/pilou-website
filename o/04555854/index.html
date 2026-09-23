@@ -29,7 +29,9 @@
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--surface);color:var(--ink);font:400 18px/1.55 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .page{max-width:520px;margin:0 auto;padding:28px 20px 36px;min-height:100vh;display:flex;flex-direction:column}
-header{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+header{margin-bottom:28px}
+.marque{display:inline-flex;align-items:center;gap:10px;text-decoration:none}
+.site{display:block;margin:0 auto 18px;text-align:center;font-size:17px;font-weight:600;color:var(--brand-darker)}
 header img{width:44px;height:44px;border-radius:12px}
 header span{font:800 24px/1 Nunito,Inter,sans-serif;color:var(--brand-darker)}
 h1{font:800 34px/1.15 Nunito,Inter,sans-serif;margin:0 0 10px;letter-spacing:-.01em}
@@ -56,7 +58,7 @@ footer a,details a{color:var(--brand-darker)}
 </head>
 <body>
 <main class="page">
-<header><img src="/logo-mark.png" alt="" width="44" height="44"><span>Pilou</span></header>
+<header><a class="marque" href="/"><img src="/logo-mark.png" alt="" width="44" height="44"><span>Pilou</span></a></header>
 
 <h1>Vos 3 mois de Pilou+ offerts</h1>
 <p class="sous-titre">Le pilulier dans votre téléphone.</p>
@@ -76,6 +78,7 @@ footer a,details a{color:var(--brand-darker)}
 
 <p class="conditions">Sans engagement. Ensuite, Pilou reste gratuit, ou Pilou+ à 2,99&#8239;€/mois ou 26,99&#8239;€/an.</p>
 <a class="bascule cache" id="bascule" href="#"></a>
+<a class="site" href="/">Découvrir Pilou sur pilou-app.fr</a>
 
 <details>
 <summary>Besoin d’aide&#8239;?</summary>

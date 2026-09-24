@@ -593,12 +593,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       la console ne le fait donc jamais.<br><br>
       <b>« Déjà vus » = actifs moins nouveaux.</b> C'est le nombre de personnes actives ce
       jour-là qui étaient <b>déjà connues</b> — le plus proche substitut d'un usage régulier
-      sans rien mesurer dans l'application. <b>Mesure du 20 août : 92 actifs, dont 87
+      que RevenueCat puisse donner (la mesure de retour propre à Pilou est dans « Parcours dans le temps »). <b>Mesure du 20 août : 92 actifs, dont 87
       nouveaux, donc 5 déjà vus.</b> Le chiffre « 92 » ne désignait presque que du passage.
       ⚠️ « Déjà vu » n'est pas « quotidien », et RevenueCat compte des <b>installations</b>,
-      pas des personnes. <b>Rien ici ne dit si quelqu'un saisit un traitement ou prend ses
-      médicaments</b> : cette mesure n'existe pas, et elle a été écartée le 20/08 parce
-      qu'elle porterait sur une donnée de santé.</div></details>
+      pas des personnes. <b>Rien ici ne dit si quelqu'un a enregistré un traitement</b> (voir « Parcours
+      d'entrée » : une borne basse, relevée 1 à 5 minutes après l'acceptation des conditions). <b>La prise des
+      médicaments, elle, n'est jamais mesurée</b>, par choix : ce serait une donnée de santé.</div></details>
   </section>
 
   <section id="s-sauvegarde" class="repliable">
@@ -621,13 +621,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       attributions, événements de facturation, commissions, commissions
       archivées, mesures de scan (figées au 12/09/2026), parcours d'entrée, quarantaine, journal
       d'alerte et <b>archive d'audience</b>.<br><br>
-      <b>Cinq en sont exclues, et chacune pour un motif :</b> la base des
+      <b>Neuf en sont exclues, chacune pour un motif.</b> Les cinq premières : la base des
       médicaments (15&nbsp;846 lignes reconstructibles depuis un fichier du
       dépôt — prouvé le 10/09, empreinte identique) ; le compteur anti-abus
       (il contient des adresses IP, elles n'ont rien à faire sur un poste de
       travail) ; le tampon de tentatives (vidé en permanence) ; le journal
       des sauvegardes lui-même ; et le journal des passages d'archivage, qui
-      est le carnet de bord du dispositif, pas une donnée.<br><br>
+      est le carnet de bord du dispositif, pas une donnée. Les quatre autres, ajoutées depuis le
+      21/09 : les <b>compteurs du scan</b> et la <b>mesure de l'usage</b>
+      (des cases par jour ou par semaine, sans identifiant — <b>perdues si l'on restaure</b>,
+      à revoir), les <b>dépenses publicitaires</b> (vides tant que l'écran de saisie n'existe
+      pas) et les <b>offres Apple</b> (reconstructibles depuis les migrations).<br><br>
       <b>Le fichier ne fusionne pas, il restaure.</b> Chaque table y forme une
       section qui <b>refuse de s'exécuter</b> si la table n'est pas vide, vérifie
       que la structure n'a pas changé, puis recompte et re-empreinte ce qu'elle a
@@ -1963,7 +1967,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           : '')
         + 'Parmi les personnes ayant <b>ouvert</b> Pilou, celles qui étaient '
         + '<b>déjà connues</b>. C’est le plus proche substitut d’un usage régulier que '
-        + 'l’on puisse obtenir <b>sans rien mesurer dans l’application</b>.<br><br>'
+        + '<b>RevenueCat</b> puisse donner ; la mesure de retour propre à Pilou est dans '
+        + '« Parcours dans le temps ».<br><br>'
         + '« Ouvertures » et non « installations » : RevenueCat ne voit que l’<b>activité '
         + 'de son SDK</b>, qui ne tourne que lorsque l’application est ouverte. '
         + 'Quelqu’un qui télécharge Pilou sans jamais l’ouvrir n’existe pas ici. '
@@ -1983,9 +1988,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         + 'Il n’est volontairement <b>pas masqué</b> : un chiffre lissé serait un chiffre '
         + 'qui ment. Sur les jours <b>clos</b>, un négatif garde son sens d’origine et '
         + 'reste anormal.<br><br>'
-        + '🔴 <b>Ce chiffre ne dit rien sur la saisie d’un traitement, ni sur le fait que '
-        + 'quelqu’un prenne ses médicaments.</b> Cette mesure-là n’existe pas, et sa '
-        + 'création a été écartée le 20/08 — c’est une donnée de santé.'
+        + '🔴 <b>Ce chiffre ne dit rien sur la saisie d’un traitement</b> (voir « Parcours '
+        + 'd’entrée », borne basse à 1–5 minutes), <b>ni sur le fait que quelqu’un prenne '
+        + 'ses médicaments</b> : cette mesure-là n’existe pas, par choix, parce que ce serait '
+        + 'une donnée de santé.'
         // ⚠️ LA PHRASE « le jour en cours n'est pas affiche » ETAIT ICI ET EST
         // DEVENUE FAUSSE le 20/09 : la tuile affiche desormais le jour en cours.
         // Une bulle d'aide qui decrit un comportement abandonne est pire que pas

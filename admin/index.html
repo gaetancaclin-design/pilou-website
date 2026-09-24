@@ -138,8 +138,10 @@ section{margin:0 0 30px}
   display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
   margin:0 0 4px; padding-bottom:8px; border-bottom:1px solid var(--trait);
 }
-.titre h2{font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--encre-2)}
-.titre .sous{font-size:12.5px; color:var(--encre-3)}
+.titre h2{font-size:17px; font-weight:650; letter-spacing:-.01em; color:var(--encre)}
+.titre .sous{font-size:13px; color:var(--encre-2)}
+/* Refonte C1a (24/09/2026) : deux grands titres découpent la page. */
+.grand-titre{font-size:22px; font-weight:700; letter-spacing:-.02em; margin:38px 0 16px; color:var(--encre)}
 .note{
   margin:10px 0 0; font-size:12.5px; color:var(--encre-3); line-height:1.5;
   border-left:2px solid var(--trait-fort); padding-left:10px;
@@ -343,7 +345,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   border-bottom:1px solid color-mix(in srgb, var(--attention) 28%, transparent)}
 .rien.avert b{color:var(--attention)}
 #filtres-parcours:empty{display:none}
-/* ── Accueil « en un coup d'œil » (refonte C1b, 25/09/2026) ─────────────────
+/* ── Accueil « en un coup d'œil » (refonte C1b, 24/09/2026) ─────────────────
    Six tuiles et un sélecteur de période. Les couleurs ne disent que l'état ;
    tout le reste est en encre et en gris. Aucune police externe. */
 #s-accueil{margin:0 0 30px}
@@ -423,7 +425,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   <div class="etat" id="etat-console"><span class="pastille"></span><div id="etat-texte"></div></div>
 
-  <!-- ⚠️ ACCUEIL « EN UN COUP D'ŒIL » (refonte C1b, 25/09/2026).
+  <!-- ⚠️ ACCUEIL « EN UN COUP D'ŒIL » (refonte C1b, 24/09/2026).
        Les trois boutons de période sont ICI, EN DUR, comme les boutons de la
        bande « À faire » : leurs écouteurs sont posés une fois au chargement.
        Le rendu ne remplit que le titre, le sous-titre et les tuiles. -->
@@ -442,52 +444,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     <div class="acc-tuiles" id="accueil-tuiles"></div>
   </section>
 
-  <!-- ⚠️ LES BOUTONS SONT ICI, EN DUR, ET NON RECREES PAR LE RENDU.
-       Les ecouteurs sont poses une fois au chargement : un bouton redessine a
-       chaque rendu perdrait le sien en silence. Le rendu ne remplit que le
-       delai et la phrase, jamais les boutons. -->
-  <div class="afaire" id="afaire">
-    <div class="tache" id="tache-collecte">
-      <div class="tache-tete">
-        <span class="tache-quoi">Collecter l’audience</span>
-        <span class="tache-delai" id="delai-collecte">—</span>
-      </div>
-      <div class="tache-dit" id="dit-collecte"></div>
-      <button type="button" id="btn-collecte">Collecter maintenant</button>
-      <div id="collecte-resultat" role="status"></div>
-    </div>
-    <div class="tache" id="tache-sauvegarde">
-      <div class="tache-tete">
-        <span class="tache-quoi">Sauvegarder la base</span>
-        <span class="tache-delai" id="delai-sauvegarde">—</span>
-      </div>
-      <div class="tache-dit" id="dit-sauvegarde"></div>
-      <button type="button" id="btn-sauvegarde">Générer la sauvegarde</button>
-      <div id="sauvegarde-resultat" role="status"></div>
-    </div>
-  </div>
-
   <div class="cadre" id="bandeau-perimetre"></div>
-  <div class="resume" id="resume"></div>
-  <p class="note" id="resume-note" style="margin:-14px 0 26px"></p>
 
-  <section id="s-alertes">
-    <div class="titre"><h2>Alertes</h2><span class="sous">ce qui doit réveiller la nuit</span></div>
-    <div class="grille" id="grille-alertes"></div>
-  </section>
-
-  <section id="s-argent" class="repliable">
-    <div class="titre"><h2>Argent</h2>
-      <span class="sous">jamais additionné entre environnements ni entre devises</span></div>
-    <div class="cadre" id="cadre-abonnes"></div>
-    <div class="cadre" id="cadre-argent"></div>
-    <details class="repli"><summary>SANDBOX n'est pas une recette — et rien ne se totalise ici</summary>
-      <div class="corps">Les lignes SANDBOX sont vos essais de paiement, pas de l'argent
-      encaissé. Elles ne s'additionnent ni entre elles, ni avec la production, ni entre
-      euros et dollars. Un montant en dollars sur un « accès offert » est normal :
-      RevenueCat n'a pas de devise de magasin à écrire quand il n'y a aucune transaction,
-      et met USD par défaut.</div></details>
-  </section>
+  <h2 class="grand-titre" id="detail-titre">Dans le détail</h2>
 
   <section id="s-parcours">
     <div class="titre"><h2>Parcours d'entrée</h2><span class="sous">par semaine, puis jour par jour</span></div>
@@ -577,6 +536,35 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       reste.<br><br>
       <b>Cette section obéit à l’interrupteur de périmètre</b> en haut de page.</div></details>
   </section>
+
+  <section id="s-argent" class="repliable">
+    <div class="titre"><h2>Argent</h2>
+      <span class="sous">jamais additionné entre environnements ni entre devises</span></div>
+    <div class="cadre" id="cadre-abonnes"></div>
+    <div class="cadre" id="cadre-argent"></div>
+    <details class="repli"><summary>SANDBOX n'est pas une recette — et rien ne se totalise ici</summary>
+      <div class="corps">Les lignes SANDBOX sont vos essais de paiement, pas de l'argent
+      encaissé. Elles ne s'additionnent ni entre elles, ni avec la production, ni entre
+      euros et dollars. Un montant en dollars sur un « accès offert » est normal :
+      RevenueCat n'a pas de devise de magasin à écrire quand il n'y a aucune transaction,
+      et met USD par défaut.</div></details>
+  </section>
+
+  <section id="s-officine" class="repliable">
+    <div class="titre"><h2>Canal officine</h2><span class="sous">codes et attributions</span></div>
+    <div class="cadre" id="cadre-codes"></div>
+    <div class="cadre" id="cadre-acces"></div>
+    <div class="cadre" id="cadre-attributions"></div>
+    <div class="cadre" id="cadre-officine"></div>
+    <details class="repli"><summary>Aucun identifiant d'installation n'est affiché ici</summary>
+      <div class="corps">Et ce n'est pas une promesse : la console est <b>techniquement
+      incapable</b> d'en lire un. Les vues qu'elle interroge ne contiennent que des agrégats —
+      le pseudonyme d'installation n'y figure dans aucune colonne.<br><br>
+      Les accès offerts sont lus dans <b>notre</b> table d'attributions, écrite au moment de
+      l'octroi, et non dans le journal de RevenueCat : un octroi peut ne jamais produire
+      d'annonce, l'inverse n'arrive pas.</div></details>
+  </section>
+
   <section id="s-scan">
     <div class="titre"><h2>Scan d'ordonnance</h2><span class="sous">compté par le serveur, tentative par tentative</span></div>
     <div class="cadre" id="cadre-scan-jours"></div>
@@ -611,21 +599,6 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       <b>Ni image, ni texte, ni nom de médicament, ni adresse IP, ni identifiant</b> : seulement
       l'issue technique de chaque tentative, comptée par jour. Les anciennes mesures de scan
       (jusqu'au 12/09/2026) sont dans une autre table, figée, et ne sont pas reprises ici.</div></details>
-  </section>
-
-  <section id="s-officine" class="repliable">
-    <div class="titre"><h2>Canal officine</h2><span class="sous">codes et attributions</span></div>
-    <div class="cadre" id="cadre-codes"></div>
-    <div class="cadre" id="cadre-acces"></div>
-    <div class="cadre" id="cadre-attributions"></div>
-    <div class="cadre" id="cadre-officine"></div>
-    <details class="repli"><summary>Aucun identifiant d'installation n'est affiché ici</summary>
-      <div class="corps">Et ce n'est pas une promesse : la console est <b>techniquement
-      incapable</b> d'en lire un. Les vues qu'elle interroge ne contiennent que des agrégats —
-      le pseudonyme d'installation n'y figure dans aucune colonne.<br><br>
-      Les accès offerts sont lus dans <b>notre</b> table d'attributions, écrite au moment de
-      l'octroi, et non dans le journal de RevenueCat : un octroi peut ne jamais produire
-      d'annonce, l'inverse n'arrive pas.</div></details>
   </section>
 
   <section id="s-audience" class="repliable">
@@ -663,6 +636,54 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       pas des personnes. <b>Rien ici ne dit si quelqu'un a enregistré un traitement</b> (voir « Parcours
       d'entrée » : une borne basse, relevée 1 à 5 minutes après l'acceptation des conditions). <b>La prise des
       médicaments, elle, n'est jamais mesurée</b>, par choix : ce serait une donnée de santé.</div></details>
+  </section>
+
+  <!-- ⚠️ SANTÉ TECHNIQUE EN BAS (refonte C1a, 24/09/2026). Le bandeau du haut
+       reste le seul endroit qui compte le rouge et l'orange : il dit OÙ regarder
+       et renvoie ici. Les voyants ne sont JAMAIS repliés : un rouge replié serait
+       un rouge caché. -->
+  <h2 class="grand-titre" id="sante">Santé technique</h2>
+
+  <!-- ⚠️ LES BOUTONS SONT ICI, EN DUR, ET NON RECREES PAR LE RENDU.
+       Les ecouteurs sont poses une fois au chargement : un bouton redessine a
+       chaque rendu perdrait le sien en silence. Le rendu ne remplit que le
+       delai et la phrase, jamais les boutons. -->
+  <div class="afaire" id="afaire">
+    <div class="tache" id="tache-collecte">
+      <div class="tache-tete">
+        <span class="tache-quoi">Collecter l’audience</span>
+        <span class="tache-delai" id="delai-collecte">—</span>
+      </div>
+      <div class="tache-dit" id="dit-collecte"></div>
+      <button type="button" id="btn-collecte">Collecter maintenant</button>
+      <div id="collecte-resultat" role="status"></div>
+    </div>
+    <div class="tache" id="tache-sauvegarde">
+      <div class="tache-tete">
+        <span class="tache-quoi">Sauvegarder la base</span>
+        <span class="tache-delai" id="delai-sauvegarde">—</span>
+      </div>
+      <div class="tache-dit" id="dit-sauvegarde"></div>
+      <button type="button" id="btn-sauvegarde">Générer la sauvegarde</button>
+      <div id="sauvegarde-resultat" role="status"></div>
+    </div>
+  </div>
+
+  <section id="s-alertes">
+    <div class="titre"><h2>Alertes</h2><span class="sous">ce qui doit réveiller la nuit</span></div>
+    <div class="grille" id="grille-alertes"></div>
+  </section>
+
+  <!-- L'ancien rang de tuiles du haut (13/09 → 24/09). L'accueil le remplace ;
+       il reste ici parce qu'il porte des CONTRÔLES (démarrages recalculés par la
+       page contre ceux de la base, détail du scan du jour). ⚠️ JAMAIS REPLIABLE :
+       ses tuiles peuvent être rouges ; elles sont en outre comptées en ORANGE dans
+       le bandeau (revue adverse du 24/09 : un rouge en bas de page, non compté,
+       serait un rouge caché). -->
+  <section id="s-controles">
+    <div class="titre"><h2>Compteurs détaillés</h2><span class="sous">l’ancien résumé, et ses contrôles croisés</span></div>
+    <div class="resume" id="resume"></div>
+    <p class="note" id="resume-note" style="margin:-14px 0 26px"></p>
   </section>
 
   <section id="s-sauvegarde" class="repliable">
@@ -1237,7 +1258,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['s-accueil','afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-mesure','s-scan','s-officine','s-audience','s-sauvegarde'];
+    var ids = ['s-accueil','detail-titre','sante','s-controles','afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-mesure','s-scan','s-officine','s-audience','s-sauvegarde'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
 
@@ -1282,7 +1303,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // ⚠️ Elle rend AUSSI la semaine en cours depuis le 22/09 : la colonne
     // `semaine_en_cours` le dit, et le rendu la grise.
     { cle:'mesure',       vue:'v_admin_mesure',                ordre:{col:'semaine',   asc:false} },
-    // Refonte C1b (25/09/2026) : paiements reels par jour de Paris, pour l'accueil.
+    // Refonte C1b (24/09/2026) : paiements reels par jour de Paris, pour l'accueil.
     // ⚠️ MIGRATION D'ABORD (`console_encaisse_jour`) : tant que la vue n'existe
     // pas, cette ligne fait echouer TOUTE la console, et c'est voulu.
     { cle:'encaisse',     vue:'v_admin_encaisse_jour',         ordre:{col:'jour',      asc:false} }
@@ -1470,8 +1491,11 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // L'accueil AVANT le bandeau, pour la même raison : ses tuiles illisibles
     // sont rouges, et le bandeau doit les compter.
     var accueil = rendreAccueil(d);
-    afficherBandeau(compte, taches, mesure, accueil);
+    // ⚠️ L'ANCIEN RÉSUMÉ EST DESSINÉ AVANT LE BANDEAU, qui compte ses tuiles rouges
+    // (en orange : « à regarder », elles sont en bas de page depuis la refonte C1a).
     rendreResume(d.resume, d.audJours, d.alertes, d.audEtat, d.scan);
+    accueil.controles = document.querySelectorAll('#resume .res.alerte').length;
+    afficherBandeau(compte, taches, mesure, accueil);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent, d.alertes);
     rendreParcours(d.parcours);
@@ -1496,31 +1520,34 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // Chaque nombre annonce doit correspondre a quelque chose de VISIBLE, et
     // la phrase doit dire OU, sinon Gaetan cherche.
     mesure = mesure || { critique:0, attention:0 };
-    accueil = accueil || { critique:0, attention:0 };
-    function ou(g, t, m, a){
+    accueil = accueil || { critique:0, attention:0, controles:0 };
+    var ctl = accueil.controles || 0;
+    function ou(g, t, m, a, c){
       var lieux = [];
       if(a > 0) lieux.push('« En un coup d’œil », en tête de page');
-      if(t > 0) lieux.push('« À faire », sous « En un coup d’œil »');
-      if(g > 0) lieux.push('les voyants ci-dessous');
+      if(c > 0) lieux.push('« Compteurs détaillés », en bas de page');
+      if(t > 0 && g > 0) lieux.push('« Santé technique », en bas de page (« À faire » et voyants)');
+      else if(t > 0) lieux.push('« À faire », dans « Santé technique » en bas de page');
+      else if(g > 0) lieux.push('les voyants de « Santé technique », en bas de page');
       if(m > 0) lieux.push('la section « Parcours dans le temps »');
-      if(!lieux.length) return 'Regardez les voyants ci-dessous.';
+      if(!lieux.length) return 'Regardez les voyants de « Santé technique », en bas de page.';
       if(lieux.length === 1) return 'C’est dans ' + lieux[0] + '.';
       return 'Regardez ' + lieux.slice(0, lieux.length - 1).join(', ')
            + ' et ' + lieux[lieux.length - 1] + '.';
     }
     var cr = grille.critique + taches.critique + mesure.critique + accueil.critique;
-    var at = grille.attention + taches.attention + mesure.attention + accueil.attention;
+    var at = grille.attention + taches.attention + mesure.attention + accueil.attention + ctl;
     if(cr > 0){
       afficherEtat('critique', cr + (cr > 1 ? ' alertes rouges. ' : ' alerte rouge. '),
-        ou(grille.critique, taches.critique, mesure.critique, accueil.critique));
+        ou(grille.critique, taches.critique, mesure.critique, accueil.critique, 0));
     } else if(at > 0){
       // Meme localisation que pour le rouge : c'est la ou il y a le plus a
       // chercher qu'une aide manquait.
       afficherEtat('attention', at + (at > 1 ? ' points à surveiller. ' : ' point à surveiller. '),
-        'Rien de rouge. ' + ou(grille.attention, taches.attention, mesure.attention, accueil.attention));
+        'Rien de rouge. ' + ou(grille.attention, taches.attention, mesure.attention, accueil.attention, ctl));
     } else {
       afficherEtat('ok','Rien à signaler. ',
-        'Les ' + (VUES.length + 1) + ' vues répondent, et rien n’attend en haut de page.');
+        'Les ' + (VUES.length + 1) + ' vues répondent, et rien n’attend dans « Santé technique ».');
     }
   }
 
@@ -2039,7 +2066,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             + (audEtat && audEtat.dernier_passage
                  ? ', faite le <b>' + ech(quandTexte(audEtat.dernier_passage)) + '</b>'
                  : '')
-            + '. Pour le rafraîchir : « Collecter maintenant », en haut de page — '
+            + '. Pour le rafraîchir : « Collecter maintenant », dans « Santé technique » en bas de page — '
             + 'une fois par heure au maximum.<br><br>'
           : '')
         + 'Parmi les personnes ayant <b>ouvert</b> Pilou, celles qui étaient '
@@ -2536,7 +2563,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     liste.push('les voyants d’alertes et la sauvegarde');
     if(etatCodes() === 'sourd') liste.push('les codes pharmacie');
     liste.push('le parcours d’entrée par semaine');
-    liste.push('les tuiles « Clients payants » et « Scans aujourd’hui »');
+    liste.push('les tuiles « Clients payants » et « Scans aujourd’hui » (dans « Compteurs détaillés »)');
     liste.push('l’audience RevenueCat');
     return liste;
   }
@@ -3097,7 +3124,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     }
     var m = mentionPerimetre(toutes, MOT_CODES);
     if(!m) return '';
-    return m + '<div class="rien">Le voyant « Codes à quota épuisé », plus haut, '
+    return m + '<div class="rien">Le voyant « Codes à quota épuisé », dans « Santé technique » en bas de page, '
          + 'compte <b>tous</b> les codes, y compris ceux qui viennent d’être '
          + 'écartés de ce tableau.</div>';
   }
@@ -4311,7 +4338,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     });
   }
 
-  // ══ ACCUEIL « EN UN COUP D'ŒIL » (refonte C1b, 25/09/2026) ════════════════
+  // ══ ACCUEIL « EN UN COUP D'ŒIL » (refonte C1b, 24/09/2026) ════════════════
   //
   // Six tuiles et un sélecteur Aujourd'hui / Hier / Semaine, validés par
   // Gaétan sur maquette le 24/09 (« piloter à la journée, surtout au début »).

@@ -3466,9 +3466,15 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         + 'seulement par les versions 1.4.15 et suivantes, l’autre par le serveur et pour toutes '
         + 'les versions. <b>Ils ne se totalisent jamais.</b>'
         + (MESURE_PREUVE_CABLE
-            ? '<br>« Analyse envoyée » et « liste reçue » ont été <b>prouvés au câble le '
-              + ech(jourTexte(MESURE_PREUVE_CABLE)) + '</b> : un zéro sur ces deux lignes est '
-              + 'désormais un vrai abandon, plus un défaut de mesure.'
+            ? '<br>Les étapes du scan sont bien comptées (prouvé au câble sur Android le '
+              + ech(jourTexte(MESURE_PREUVE_CABLE)) + '), <b>mais souvent en retard</b> : le téléphone '
+              + 'n’envoie qu’une fois par jour, 10 à 30 secondes après sa première utilisation, puis '
+              + '1 à 5 minutes après l’ouverture les jours suivants. Ce qui se passe ensuite attend la '
+              + 'prochaine ouverture, un autre jour, et peut tomber dans une semaine suivante ; rien '
+              + 'n’arrive si la personne ne revient pas. Les étapes tardives (« Analyse envoyée », '
+              + '« Liste reçue ») sont donc sous-comptées : <b>un chiffre bas ne prouve pas un '
+              + 'abandon</b>. Les analyses réellement reçues sont dans la section « Scan d’ordonnance » '
+              + '(serveur, toutes versions, nos essais compris).'
             : '')
         + '</div>';
     }

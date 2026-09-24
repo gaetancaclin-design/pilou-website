@@ -343,6 +343,51 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   border-bottom:1px solid color-mix(in srgb, var(--attention) 28%, transparent)}
 .rien.avert b{color:var(--attention)}
 #filtres-parcours:empty{display:none}
+/* ── Accueil « en un coup d'œil » (refonte C1b, 25/09/2026) ─────────────────
+   Six tuiles et un sélecteur de période. Les couleurs ne disent que l'état ;
+   tout le reste est en encre et en gris. Aucune police externe. */
+#s-accueil{margin:0 0 30px}
+.acc-tete{display:flex; flex-wrap:wrap; gap:14px 24px; align-items:flex-end;
+  justify-content:space-between; margin:0 0 16px}
+.acc-titre{font-size:24px; font-weight:700; letter-spacing:-.02em; margin:0}
+.acc-sous{font-size:14px; color:var(--encre-2); margin-top:3px}
+.acc-periodes{display:flex; gap:4px; padding:4px; background:var(--neutre-fond);
+  border:1px solid var(--trait); border-radius:12px}
+.acc-periodes button.acc-per{width:auto; min-height:44px; padding:0 18px; border-radius:9px;
+  border:0; background:transparent; color:var(--encre-2); font-weight:600; font-size:15px}
+.acc-periodes button.acc-per[aria-pressed="true"]{background:var(--carte); color:var(--encre);
+  box-shadow:0 1px 2px rgba(22,36,28,.14)}
+.acc-tuiles{display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px}
+.acc-tuile{background:var(--carte); border:1px solid var(--trait); border-radius:18px;
+  padding:20px 22px 16px; display:flex; flex-direction:column; gap:8px; box-shadow:var(--ombre);
+  min-width:0}
+.acc-haut{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; min-height:34px}
+.acc-nom{font-size:15px; font-weight:650; color:var(--encre)}
+.acc-badge{font-size:12px; font-weight:650; color:var(--encre-2); background:var(--neutre-fond);
+  padding:4px 9px; border-radius:999px; white-space:nowrap}
+.acc-courbe{flex:0 0 auto; color:var(--accent)}
+.acc-chiffre{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
+.acc-grand{font-size:40px; font-weight:720; letter-spacing:-.03em; line-height:1.05;
+  font-variant-numeric:tabular-nums; color:var(--encre)}
+.acc-tuile.gris .acc-grand{color:var(--encre-2)}
+.acc-tuile.illisible .acc-grand{color:var(--critique)}
+.acc-unite{font-size:16px; color:var(--encre-2)}
+.acc-sous-ligne{font-size:14px; color:var(--encre-2)}
+.acc-sous-ligne.attention{color:var(--attention); font-weight:600}
+.acc-limite{margin-top:auto; padding-top:10px; border-top:1px solid var(--trait);
+  font-size:13px; line-height:1.45; color:var(--encre-2)}
+.acc-attente{grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:6px 18px; align-items:baseline;
+  border:1.5px dashed var(--trait-fort); border-radius:18px; padding:16px 22px; color:var(--encre-2);
+  font-size:14px}
+.acc-attente b{color:var(--encre); font-size:15px}
+@media (max-width:900px){ .acc-tuiles{grid-template-columns:repeat(2, minmax(0, 1fr))} }
+@media (max-width:600px){
+  .acc-tuiles{grid-template-columns:minmax(0, 1fr)}
+  .acc-periodes{width:100%}
+  .acc-periodes button.acc-per{flex:1 1 0; padding:0 8px}
+  .acc-titre{font-size:21px}
+  .acc-grand{font-size:34px}
+}
 </style>
 </head>
 <body>
@@ -377,6 +422,25 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   </header>
 
   <div class="etat" id="etat-console"><span class="pastille"></span><div id="etat-texte"></div></div>
+
+  <!-- ⚠️ ACCUEIL « EN UN COUP D'ŒIL » (refonte C1b, 25/09/2026).
+       Les trois boutons de période sont ICI, EN DUR, comme les boutons de la
+       bande « À faire » : leurs écouteurs sont posés une fois au chargement.
+       Le rendu ne remplit que le titre, le sous-titre et les tuiles. -->
+  <section id="s-accueil" aria-labelledby="accueil-titre">
+    <div class="acc-tete">
+      <div>
+        <h2 class="acc-titre" id="accueil-titre">En un coup d’œil</h2>
+        <div class="acc-sous" id="accueil-sous"></div>
+      </div>
+      <div class="acc-periodes" role="group" aria-label="Période affichée">
+        <button type="button" class="acc-per" data-periode="aujourdhui" aria-pressed="false">Aujourd’hui</button>
+        <button type="button" class="acc-per" data-periode="hier" aria-pressed="true">Hier</button>
+        <button type="button" class="acc-per" data-periode="semaine" aria-pressed="false">Semaine</button>
+      </div>
+    </div>
+    <div class="acc-tuiles" id="accueil-tuiles"></div>
+  </section>
 
   <!-- ⚠️ LES BOUTONS SONT ICI, EN DUR, ET NON RECREES PAR LE RENDU.
        Les ecouteurs sont poses une fois au chargement : un bouton redessine a
@@ -1173,7 +1237,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-mesure','s-scan','s-officine','s-audience','s-sauvegarde'];
+    var ids = ['s-accueil','afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-mesure','s-scan','s-officine','s-audience','s-sauvegarde'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
 
@@ -1217,7 +1281,11 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // pas, cette ligne fait echouer TOUTE la console, et c'est voulu.
     // ⚠️ Elle rend AUSSI la semaine en cours depuis le 22/09 : la colonne
     // `semaine_en_cours` le dit, et le rendu la grise.
-    { cle:'mesure',       vue:'v_admin_mesure',                ordre:{col:'semaine',   asc:false} }
+    { cle:'mesure',       vue:'v_admin_mesure',                ordre:{col:'semaine',   asc:false} },
+    // Refonte C1b (25/09/2026) : paiements reels par jour de Paris, pour l'accueil.
+    // ⚠️ MIGRATION D'ABORD (`console_encaisse_jour`) : tant que la vue n'existe
+    // pas, cette ligne fait echouer TOUTE la console, et c'est voulu.
+    { cle:'encaisse',     vue:'v_admin_encaisse_jour',         ordre:{col:'jour',      asc:false} }
   ];
 
   // ── UN ETAT QUE PLUSIEURS BLOCS PARTAGENT (13/09/2026, lot 2) ─────────────
@@ -1255,7 +1323,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // Leve ou baisse le drapeau, et l'applique aux puces DEJA a l'ecran.
   function verrouillerPuces(verrou){
     chargementEnCours = !!verrou;
-    var p = document.querySelectorAll('button.puce');
+    var p = document.querySelectorAll('button.puce, button.acc-per');
     for(var i=0;i<p.length;i++) p[i].disabled = chargementEnCours;
   }
 
@@ -1346,9 +1414,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       // suivait la consigne, retombait sur le meme ecran noir, et avait perdu
       // au passage un reglage qu'il avait pose expres. On enonce donc ce qu'on
       // a FAIT, et l'on dit ce que chacune des deux suites voudra dire.
-      var reglagePose = !filtreParDefaut();
-      var ditReglage  = reglagePose ? nommerReglage() : '';
-      if(reglagePose) remettreFiltreParDefaut();
+      var filtrePose  = !filtreParDefaut();
+      var ditReglage  = filtrePose ? nommerReglage() : '';
+      if(filtrePose) remettreFiltreParDefaut();
+      // La période de l'accueil est un réglage mémorisé comme les autres.
+      var periodePosee = remettrePeriodeParDefaut();
+      if(periodePosee) ditReglage = (ditReglage ? ditReglage + ' ; ' : '') + 'période de l’accueil';
+      var reglagePose = filtrePose || periodePosee;
       masquerBlocs(true);
       afficherEtat('critique','AFFICHAGE IMPOSSIBLE. ',
         'La base a répondu, mais la page n’a pas su afficher ces données. Ce n’est '
@@ -1395,7 +1467,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // ⚠️ AVANT LE BANDEAU : `rendreMesure` rend { critique, attention }.
     // Un bandeau vert au-dessus d'un bloc rouge, c'est le defaut du 09/09.
     var mesure = rendreMesure(d.mesure);
-    afficherBandeau(compte, taches, mesure);
+    // L'accueil AVANT le bandeau, pour la même raison : ses tuiles illisibles
+    // sont rouges, et le bandeau doit les compter.
+    var accueil = rendreAccueil(d);
+    afficherBandeau(compte, taches, mesure, accueil);
     rendreResume(d.resume, d.audJours, d.alertes, d.audEtat, d.scan);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent, d.alertes);
@@ -1414,16 +1489,18 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
    * bande « À faire ». Chaque nombre annonce doit correspondre a quelque chose
    * qu'on peut effectivement voir a l'ecran.
    */
-  function afficherBandeau(grille, taches, mesure){
+  function afficherBandeau(grille, taches, mesure, accueil){
     // ⚠️ TROISIEME SOURCE (22/09/2026) : la section « Parcours dans le temps ».
     // Elle peut afficher un bloc rouge (charges rejetees) que personne ne
     // comptait : le bandeau annoncait alors « rien a signaler » au-dessus.
     // Chaque nombre annonce doit correspondre a quelque chose de VISIBLE, et
     // la phrase doit dire OU, sinon Gaetan cherche.
     mesure = mesure || { critique:0, attention:0 };
-    function ou(g, t, m){
+    accueil = accueil || { critique:0, attention:0 };
+    function ou(g, t, m, a){
       var lieux = [];
-      if(t > 0) lieux.push('« À faire », en haut de page');
+      if(a > 0) lieux.push('« En un coup d’œil », en tête de page');
+      if(t > 0) lieux.push('« À faire », sous « En un coup d’œil »');
       if(g > 0) lieux.push('les voyants ci-dessous');
       if(m > 0) lieux.push('la section « Parcours dans le temps »');
       if(!lieux.length) return 'Regardez les voyants ci-dessous.';
@@ -1431,16 +1508,16 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       return 'Regardez ' + lieux.slice(0, lieux.length - 1).join(', ')
            + ' et ' + lieux[lieux.length - 1] + '.';
     }
-    var cr = grille.critique + taches.critique + mesure.critique;
-    var at = grille.attention + taches.attention + mesure.attention;
+    var cr = grille.critique + taches.critique + mesure.critique + accueil.critique;
+    var at = grille.attention + taches.attention + mesure.attention + accueil.attention;
     if(cr > 0){
       afficherEtat('critique', cr + (cr > 1 ? ' alertes rouges. ' : ' alerte rouge. '),
-        ou(grille.critique, taches.critique, mesure.critique));
+        ou(grille.critique, taches.critique, mesure.critique, accueil.critique));
     } else if(at > 0){
       // Meme localisation que pour le rouge : c'est la ou il y a le plus a
       // chercher qu'une aide manquait.
       afficherEtat('attention', at + (at > 1 ? ' points à surveiller. ' : ' point à surveiller. '),
-        'Rien de rouge. ' + ou(grille.attention, taches.attention, mesure.attention));
+        'Rien de rouge. ' + ou(grille.attention, taches.attention, mesure.attention, accueil.attention));
     } else {
       afficherEtat('ok','Rien à signaler. ',
         'Les ' + (VUES.length + 1) + ' vues répondent, et rien n’attend en haut de page.');
@@ -4234,6 +4311,460 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     });
   }
 
+  // ══ ACCUEIL « EN UN COUP D'ŒIL » (refonte C1b, 25/09/2026) ════════════════
+  //
+  // Six tuiles et un sélecteur Aujourd'hui / Hier / Semaine, validés par
+  // Gaétan sur maquette le 24/09 (« piloter à la journée, surtout au début »).
+  //
+  // ⚠️ AUCUN CALCUL NOUVEAU QUAND UN CALCUL EXISTE. Les tuiles réutilisent les
+  // fonctions déjà gardées de la page : `ligneRetenue` (interrupteur et puces de
+  // version), `lignesScan` (totaux vérifiés), `agregerMesure` + `retentionMesure`
+  // (plancher, Wilson, semaine absente), `ligneAudience`, `jourServeurValide`.
+  // Recopier une règle, c'est préparer le jour où les deux copies divergent.
+  //
+  // ⚠️ LA DATE DE RÉFÉRENCE VIENT DE LA BASE (`v_admin_resume.jour_serveur`),
+  // JAMAIS DE L'HORLOGE DU POSTE. Sans elle, aucune tuile datée ne s'affiche.
+  //
+  // ⚠️ JAMAIS DE ZÉRO INVENTÉ. Une valeur illisible donne « — » en rouge et la
+  // tuile dit pourquoi ; une donnée pas encore disponible le dit aussi.
+  //
+  // ⚠️ CE QUI RESTE À LA SEMAINE, EXPRÈS :
+  //   - le premier traitement : avec 3 à 5 arrivées par jour, une case à 1
+  //     permettrait de reconnaître quelqu'un (revue adverse du 24/09) ;
+  //   - le taux de retour : la mesure de l'application n'existe que par
+  //     semaine, par choix de confidentialité.
+  // En mode jour, la tuile de retour montre à la place les « déjà vus » de
+  // RevenueCat, et le dit.
+  //
+  // ⚠️ AUCUNE FLÈCHE, AUCUNE COULEUR DE TENDANCE. À 3 à 5 arrivées par jour, un
+  // écart de ±3 est du hasard. Le mode jour compare à la moyenne des 7 derniers
+  // jours CLOS ; les courbes ne portent que des jours (ou semaines) CLOS.
+
+  var CLE_PERIODE = 'pilou.console.accueil.periode';
+  var PERIODES = { aujourdhui:true, hier:true, semaine:true };
+  var periodeAccueil = 'hier';
+  var periodeLue = false;
+
+  function lirePeriode(){
+    try{
+      var v = window.localStorage.getItem(CLE_PERIODE);
+      if(v && PERIODES[v] === true) periodeAccueil = v;
+    } catch(e){ /* stockage indisponible : on garde « Hier » */ }
+  }
+  function ecrirePeriode(){
+    try{ window.localStorage.setItem(CLE_PERIODE, periodeAccueil); } catch(e){}
+  }
+  // Appelée par le filet de `rendre` : revient à « Hier » et oublie le choix.
+  // Rend vrai si une autre période était posée.
+  function remettrePeriodeParDefaut(){
+    var posee = periodeAccueil !== 'hier';
+    periodeAccueil = 'hier'; periodeLue = true;
+    try{ window.localStorage.removeItem(CLE_PERIODE); } catch(e){}
+    return posee;
+  }
+
+  // Un nombre décimal lisible (montants), ou null. Même esprit que
+  // `entierOuNul` : une chaîne vide ou un booléen ne sont pas zéro.
+  function decimalOuNul(v){
+    if(typeof v === 'number') return isFinite(v) ? v : null;
+    if(typeof v !== 'string') return null;
+    var s = v.replace(/^\s+|\s+$/g, '');
+    if(s === '' || !/^-?\d+(\.\d+)?$/.test(s)) return null;
+    return Number(s);
+  }
+
+  var fmtJourLong = new Intl.DateTimeFormat('fr-FR',
+    { timeZone:'UTC', weekday:'long', day:'numeric', month:'long' });
+  function jourValide(j){ return typeof j === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(j) && isFinite(Date.parse(j + 'T00:00:00Z')); }
+  function jourLong(j){ return jourValide(j) ? fmtJourLong.format(new Date(Date.parse(j + 'T00:00:00Z'))) : '(date illisible)'; }
+
+  // L'heure de Paris à laquelle commence le jour UTC `j` (2 h en été, 1 h en
+  // hiver). Calculée, jamais écrite en dur : elle change le 25/10.
+  var fmtHeureParis = new Intl.DateTimeFormat('fr-FR',
+    { timeZone:'Europe/Paris', hour:'numeric', hourCycle:'h23' });
+  function debutJourParis(j){
+    return parseInt(String(fmtHeureParis.format(new Date(Date.parse(j + 'T00:00:00Z')))).replace(/\D/g, ''), 10) + ' h';
+  }
+
+  // Premier jour réellement mesuré. Avant lui, une absence de ligne n'est PAS
+  // un zéro : c'est « pas encore mesuré ». Les courbes et les comparaisons ne
+  // remontent jamais avant ce jour (une courbe plate puis montante, tirée de
+  // semaines non mesurées, ferait croire à un décollage).
+  // Le plus TARDIF des deux débuts : la date déclarée par la base et le premier
+  // jour réellement chargé (la vue ne rend qu'une fenêtre).
+  function premierJour(rows, repli){
+    var p = null;
+    for(var i=0;i<(rows || []).length;i++){
+      var j = rows[i] && rows[i].jour;
+      if(jourValide(j) && (p === null || j < p)) p = j;
+    }
+    if(jourValide(repli) && (p === null || repli > p)) p = repli;
+    return p;
+  }
+  var fmtJourSemaine = new Intl.DateTimeFormat('fr-FR', { timeZone:'UTC', weekday:'long' });
+  function nomJour(j){ return jourValide(j) ? fmtJourSemaine.format(new Date(Date.parse(j + 'T00:00:00Z'))) : '?'; }
+
+  // Lundi (UTC) de la semaine qui contient `j`.
+  function lundiDe(j){
+    var t = Date.parse(j + 'T00:00:00Z'), dow = new Date(t).getUTCDay();
+    return new Date(t - ((dow + 6) % 7) * 86400000).toISOString().slice(0, 10);
+  }
+
+  function montantTexte(m, devise){
+    var s = (Math.round(m * 100) / 100).toFixed(2).replace('.', ',');
+    return devise === 'EUR' ? s + ' €' : s + ' ' + (devise || '');
+  }
+  function unDecimal(x){ return (Math.round(x * 10) / 10).toString().replace('.', ','); }
+
+  // Petite courbe. `v` : nombres, du plus ancien au plus récent. Rien si moins
+  // de deux points ou si un point manque (une courbe qui relie un trou ment).
+  function courbeSvg(v, texte){
+    if(!v || v.length < 2) return '';
+    for(var i=0;i<v.length;i++) if(typeof v[i] !== 'number' || !isFinite(v[i])) return '';
+    var mx = Math.max.apply(null, v), mn = Math.min.apply(null, v), r = (mx - mn) || 1, pts = [];
+    for(var k=0;k<v.length;k++){
+      pts.push((k * 120 / (v.length - 1)).toFixed(1) + ',' + (31 - (v[k] - mn) / r * 28).toFixed(1));
+    }
+    return '<svg class="acc-courbe" width="120" height="34" viewBox="0 0 120 34" role="img" aria-label="'
+      + ech(texte) + '"><polyline points="' + pts.join(' ') + '" fill="none" stroke="currentColor" '
+      + 'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>';
+  }
+
+  // Une tuile. Tous les textes passent par `ech` : aucune donnée n'entre brute.
+  // o = { nom, badge, courbe, courbeTexte, grand, unite, sous, sousAttention,
+  //       limite, gris, illisible }
+  function tuileAccueil(o){
+    var cl = 'acc-tuile' + (o.illisible ? ' illisible' : (o.gris ? ' gris' : ''));
+    var haut = o.courbe ? courbeSvg(o.courbe, o.courbeTexte || '') : '';
+    if(!haut && o.badge) haut = '<span class="acc-badge">' + ech(o.badge) + '</span>';
+    return '<div class="' + cl + '">'
+      + '<div class="acc-haut"><span class="acc-nom">' + ech(o.nom) + '</span>' + haut + '</div>'
+      + '<div class="acc-chiffre"><span class="acc-grand">' + ech(o.grand) + '</span>'
+      + (o.unite ? '<span class="acc-unite">' + ech(o.unite) + '</span>' : '') + '</div>'
+      + (o.sous ? '<span class="acc-sous-ligne' + (o.sousAttention ? ' attention' : '') + '">' + ech(o.sous) + '</span>' : '')
+      + '<span class="acc-limite">' + ech(o.limite) + '</span>'
+      + '</div>';
+  }
+  // ⚠️ UNE TUILE ROUGE EST COMPTÉE DANS LE BANDEAU. Un bandeau « rien à
+  // signaler » au-dessus d'une tuile illisible, c'est le défaut du 09/09.
+  var accueilIllisibles = 0;
+  function tuileIllisible(nom, cause, limite){
+    accueilIllisibles++;
+    return tuileAccueil({ nom:nom, grand:'—', illisible:true,
+      sous:'Non lu : ' + cause + '. N’en concluez rien.', limite:limite });
+  }
+
+  // Les jours d'une fenêtre, du plus ancien au plus récent : [debut, fin].
+  function joursEntre(debut, fin){
+    var out = [], t = Date.parse(debut + 'T00:00:00Z'), tf = Date.parse(fin + 'T00:00:00Z');
+    for(; t <= tf; t += 86400000) out.push(new Date(t).toISOString().slice(0, 10));
+    return out;
+  }
+
+  // ── 1. Arrivées ──────────────────────────────────────────────────────────
+  var LIMITE_ARRIVEES = 'Premiers démarrages signalés par l’application. Pas des téléchargements ; une réinstallation compte à nouveau. Suit le réglage « Compter nos tests » et les puces de version.';
+  function tuileArrivees(auj, per){
+    var nom = 'Arrivées';
+    if(auj === null) return tuileIllisible(nom, 'la date de la base manque', LIMITE_ARRIVEES);
+    if(lignesParcours.length >= 1000) return tuileIllisible(nom, 'la vue a rendu 1000 lignes (tronquée)', LIMITE_ARRIVEES);
+    var parJour = {};
+    for(var i=0;i<lignesParcours.length;i++){
+      var r = lignesParcours[i];
+      if(!r || typeof r.jour !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(r.jour))
+        return tuileIllisible(nom, 'un jour illisible', LIMITE_ARRIVEES);
+      var n = entierOuNul(r.signalements);
+      if(n === null || n < 0) return tuileIllisible(nom, 'un compte illisible le ' + jourTexte(r.jour), LIMITE_ARRIVEES);
+      if(!ligneRetenue(r)) continue;
+      parJour[r.jour] = (parJour[r.jour] || 0) + n;
+    }
+    function du(j){ return parJour[j] || 0; }
+    var debut = premierJour(lignesParcours, donneesCourantes && donneesCourantes.resume
+                            ? donneesCourantes.resume.mesure_depuis : null);
+    if(per === 'semaine'){
+      var lundi = lundiDe(auj), sem = [], w, cette = null, avant = null;
+      for(w = 8; w >= 1; w--){
+        var d0 = jourMoins(lundi, 7 * w);
+        if(debut === null || d0 < debut) continue;      // semaine pas entièrement mesurée
+        var s = 0, js = joursEntre(d0, jourMoins(d0, -6));
+        for(var k=0;k<js.length;k++) s += du(js[k]);
+        sem.push(s);
+        if(w === 1) cette = s; if(w === 2) avant = s;
+      }
+      if(cette === null) return tuileAccueil({ nom:nom, gris:true, grand:'—',
+        sous:'La semaine close n’est pas entièrement mesurée.', limite:LIMITE_ARRIVEES });
+      var ecart = avant === null ? null : cette - avant;
+      return tuileAccueil({ nom:nom, courbe:sem, courbeTexte:'Courbe des dernières semaines closes et mesurées',
+        grand:String(cette),
+        sous: ecart === null ? 'semaine précédente pas entièrement mesurée'
+            : (ecart === 0 ? 'autant que la semaine précédente (' + avant + ')'
+            : (ecart > 0 ? '+' : '−') + Math.abs(ecart) + ' par rapport à la semaine précédente (' + avant + ')'),
+        limite:LIMITE_ARRIVEES });
+    }
+    var jours14 = joursEntre(jourMoins(auj, 14), jourMoins(auj, 1)), c = [], m7 = 0, n7 = 0;
+    var jour = per === 'hier' ? jourMoins(auj, 1) : auj;
+    var precedents = joursEntre(jourMoins(jour, 7), jourMoins(jour, 1));   // les 7 jours qui PRÉCÈDENT
+    for(var q=0;q<jours14.length;q++){
+      if(debut === null || jours14[q] < debut) continue;
+      c.push(du(jours14[q]));
+    }
+    for(var a7=0;a7<precedents.length;a7++){
+      if(debut !== null && precedents[a7] >= debut){ m7 += du(precedents[a7]); n7++; }
+    }
+    return tuileAccueil({ nom:nom, courbe:c, courbeTexte:'Courbe des derniers jours clos et mesurés',
+      grand:String(du(jour)),
+      sous: per === 'hier'
+        ? (n7 === 7 ? 'moyenne des 7 jours précédents : ' + unDecimal(m7 / 7) : 'pas encore 7 jours mesurés pour une moyenne')
+        : 'journée en cours : chiffre partiel',
+      limite:LIMITE_ARRIVEES });
+  }
+
+  // ── 2. Premier traitement (toujours à la semaine) ───────────────────────
+  var LIMITE_PREMIER = 'Relevé 1 à 5 minutes après l’arrivée : ceux qui reviennent plus tard n’y sont pas. À la semaine exprès : trop peu de monde par jour. Ne suit pas le réglage « Compter nos tests ».';
+  function tuilePremierTraitement(rows){
+    var nom = 'Premier traitement enregistré';
+    if(!Array.isArray(rows)) return tuileIllisible(nom, 'la vue n’a rien rendu', LIMITE_PREMIER);
+    var close = null;
+    for(var i=0;i<rows.length;i++){
+      var r = rows[i];
+      if(!r || !jourValide(r.semaine) || typeof r.semaine_en_cours !== 'boolean')
+        return tuileIllisible(nom, 'une semaine illisible', LIMITE_PREMIER);
+      if(!r.semaine_en_cours && (close === null || r.semaine > close.semaine)) close = r;
+    }
+    if(close === null){
+      return tuileAccueil({ nom:nom, badge:'à la semaine', gris:true, grand:'—',
+        sous:'Aucune semaine close pour l’instant.', limite:LIMITE_PREMIER });
+    }
+    var ins = entierOuNul(close.installations), ps = entierOuNul(close.premier_par_scan),
+        pm = entierOuNul(close.premier_a_la_main);
+    if(ins === null || ps === null || pm === null || ps + pm > ins)
+      return tuileIllisible(nom, 'des comptes incohérents, semaine du ' + jourTexte(close.semaine), LIMITE_PREMIER);
+    return tuileAccueil({ nom:nom, badge:'borne basse', gris:true, grand:String(ps + pm),
+      unite:'sur ' + ins + ' arrivée' + (ins > 1 ? 's' : ''),
+      sous:'Semaine du ' + jourLong(close.semaine) + ' · par scan ' + ps + ', à la main ' + pm,
+      limite:LIMITE_PREMIER });
+  }
+
+  // ── 3. Retour ─────────────────────────────────────────────────────────────
+  var LIMITE_RETOUR_SEMAINE = 'Mesure de l’application, 4 dernières semaines closes. Chiffre prudent : les retours remontent avec retard.';
+  var LIMITE_RETOUR_JOUR = 'Selon RevenueCat : un compte, pas un taux. Provisoire tant qu’une collecte n’a pas relu la journée.';
+  function tuileRetour(d, auj, per){
+    if(per === 'semaine'){
+      var nom = 'Reviennent le lendemain';
+      var a = agregerMesure(d.mesure, compterNosTests());
+      if(a.cause) return tuileIllisible(nom, a.cause, LIMITE_RETOUR_SEMAINE);
+      var ret = retentionMesure(a);
+      if(ret.cause) return tuileAccueil({ nom:nom, badge:'mesure Pilou', gris:true, grand:'—',
+        sous:ret.cause + '.', limite:LIMITE_RETOUR_SEMAINE });
+      var L = ret.lignes[0];
+      if(L.manque) return tuileAccueil({ nom:nom, badge:'mesure Pilou', gris:true, grand:'—',
+        sous:'Pas encore calculable : aucune remontée la semaine du ' + jourTexte(L.manque) + '.',
+        limite:LIMITE_RETOUR_SEMAINE });
+      if(L.num > L.den) return tuileAccueil({ nom:nom, badge:'mesure Pilou', gris:true, grand:'—',
+        sous:'Plus de retours (' + L.num + ') que d’accueils (' + L.den + ') : fenêtres décalées, pas de taux.',
+        sousAttention:true, limite:LIMITE_RETOUR_SEMAINE });
+      if(L.den < MESURE_PLANCHER) return tuileAccueil({ nom:nom, badge:'mesure Pilou', gris:true, grand:'—',
+        sous:'Trop peu : ' + L.den + ' accueil' + (L.den > 1 ? 's' : '') + ', plancher à ' + MESURE_PLANCHER + '.',
+        limite:LIMITE_RETOUR_SEMAINE });
+      var f = fourchetteMesure(L.num, L.den);
+      return tuileAccueil({ nom:nom, badge:'mesure Pilou', grand:pctMesure(L.num, L.den),
+        unite:L.num + ' sur ' + L.den + ' accueils',
+        sous: f ? 'fourchette plausible : ' + unDecimal(f.bas) + ' à ' + unDecimal(f.haut) + ' %' : '',
+        limite:LIMITE_RETOUR_SEMAINE });
+    }
+    var nomJ = 'Personnes revenues';
+    if(auj === null) return tuileIllisible(nomJ, 'la date de la base manque', LIMITE_RETOUR_JOUR);
+    var jour = per === 'hier' ? jourMoins(auj, 1) : auj;
+    var jours14 = joursEntre(jourMoins(auj, 14), jourMoins(auj, 1)), c = [];
+    for(var i=0;i<jours14.length;i++){
+      var g = ligneAudience(d.audJours, jours14[i]), v = g ? entierOuNul(g.revenants) : null;
+      if(v !== null && v < 0) v = null;
+      c.push(v === null ? NaN : v);        // un trou efface la courbe : voir courbeSvg
+    }
+    var l = ligneAudience(d.audJours, jour);
+    if(!l) return tuileAccueil({ nom:nomJ, gris:true, grand:'—', courbe:c,
+      courbeTexte:'Courbe des 14 derniers jours clos',
+      sous:'Aucune collecte ne couvre encore ce jour.', limite:LIMITE_RETOUR_JOUR });
+    // Même règle que le tableau d'audience : sans les deux relevés, ou sans
+    // valeur, « — » en gris (pas encore lu), jamais un rouge ni un zéro.
+    // `*_lu` sont des NOMBRES de relevés, pas des dates.
+    var rev = entierOuNul(l.revenants);
+    if(!(entierOuNul(l.actifs_lu) > 0 && entierOuNul(l.nouveaux_lu) > 0) || rev === null)
+      return tuileAccueil({ nom:nomJ, gris:true, grand:'—', courbe:c, courbeTexte:'Courbe des 14 derniers jours clos',
+        sous:'Pas encore relu entièrement par une collecte.', limite:LIMITE_RETOUR_JOUR });
+    if(rev < 0)
+      return tuileAccueil({ nom:nomJ, gris:true, grand:'—', courbe:c, courbeTexte:'Courbe des 14 derniers jours clos',
+        sous:'Valeur négative : la journée n’est pas entièrement relue (provisoire).', limite:LIMITE_RETOUR_JOUR });
+    var provisoire = per === 'aujourdhui' || l.actifs_incomplet === true || l.nouveaux_incomplet === true;
+    return tuileAccueil({ nom:nomJ, courbe:c, courbeTexte:'Courbe des 14 derniers jours clos',
+      grand:String(rev), unite:'déjà vue' + (rev > 1 ? 's' : ''), gris:provisoire,
+      sous: provisoire ? 'Provisoire : la collecte n’a pas encore relu toute la journée.' : 'Ont rouvert Pilou ce jour-là.',
+      limite:LIMITE_RETOUR_JOUR });
+  }
+
+  // ── 4. Abonnés (en ce moment) ─────────────────────────────────────────────
+  var LIMITE_ABONNES = 'Situation actuelle selon RevenueCat, quelle que soit la période choisie.';
+  function tuileAbonnes(r){
+    var nom = 'Abonnés';
+    if(!r) return tuileIllisible(nom, 'le résumé manque', LIMITE_ABONNES);
+    var payants = entierOuNul(r.clients_payants), ao = entierOuNul(r.acces_offerts_en_cours);
+    if(payants === null || ao === null) return tuileIllisible(nom, 'colonne illisible', LIMITE_ABONNES);
+    // Même règle que la tuile du résumé : on ne soustrait nos octrois QUE si
+    // les deux colonnes internes existent (voir `rendreResume`).
+    var marqueInterne = ('acces_offerts_en_cours_internes' in r) && ('acces_offerts_total_internes' in r);
+    var internes = marqueInterne ? entierOuNul(r.acces_offerts_en_cours_internes) : 0;
+    if(internes === null) return tuileIllisible(nom, 'accès offerts internes illisibles', LIMITE_ABONNES);
+    var aoAffiche = (marqueInterne && !compterNosTests()) ? ao - internes : ao;
+    if(aoAffiche < 0) return tuileIllisible(nom, 'plus d’accès internes que d’accès en cours', LIMITE_ABONNES);
+    var test = entierOuNul(r.achats_de_test);
+    var nonSepares = !marqueInterne && !compterNosTests();
+    return tuileAccueil({ nom:nom, badge:'en ce moment', grand:String(payants),
+      unite:'payant' + (payants > 1 ? 's' : ''),
+      sous:'et ' + aoAffiche + ' accès offert' + (aoAffiche > 1 ? 's' : '') + ' en cours'
+        + (test ? ' · ' + test + ' achat' + (test > 1 ? 's' : '') + ' de test à part' : '')
+        + (nonSepares ? ' (nos octrois internes n’ont pas pu être séparés)' : ''),
+      limite:LIMITE_ABONNES });
+  }
+
+  // ── 5. Encaissé ───────────────────────────────────────────────────────────
+  var LIMITE_ENCAISSE = 'Paiements réels, avant la part des magasins et la TVA ; remboursements non déduits.';
+  function tuileEncaisse(rows, auj, per){
+    var nom = 'Encaissé';
+    if(auj === null) return tuileIllisible(nom, 'la date de la base manque', LIMITE_ENCAISSE);
+    if(!Array.isArray(rows)) return tuileIllisible(nom, 'la vue n’a rien rendu', LIMITE_ENCAISSE);
+    if(rows.length >= 1000) return tuileIllisible(nom, 'la vue a rendu 1000 lignes (tronquée)', LIMITE_ENCAISSE);
+    var debut, fin, titre;
+    if(per === 'semaine'){
+      debut = jourMoins(lundiDe(auj), 7); fin = jourMoins(lundiDe(auj), 1); titre = 'Encaissé sur la semaine';
+    } else {
+      debut = fin = (per === 'hier' ? jourMoins(auj, 1) : auj);
+      titre = per === 'hier' ? 'Encaissé hier' : 'Encaissé aujourd’hui';
+    }
+    var moisDe = fin.slice(0, 7), parDevise = {}, moisDevise = {}, paiements = 0;
+    for(var i=0;i<rows.length;i++){
+      var r = rows[i];
+      if(!r || typeof r.jour !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(r.jour))
+        return tuileIllisible(nom, 'un jour illisible', LIMITE_ENCAISSE);
+      var m = decimalOuNul(r.montant), p = entierOuNul(r.paiements);
+      if(m === null || p === null || typeof r.devise !== 'string' || !/^[A-Z]{3}$/.test(r.devise))
+        return tuileIllisible(nom, 'une ligne illisible le ' + jourTexte(r.jour), LIMITE_ENCAISSE);
+      if(r.jour >= debut && r.jour <= fin){
+        parDevise[r.devise] = (parDevise[r.devise] || 0) + m; paiements += p;
+      }
+      if(r.jour.slice(0, 7) === moisDe && r.jour <= fin) moisDevise[r.devise] = (moisDevise[r.devise] || 0) + m;
+    }
+    function texte(o){
+      var ks = Object.keys(o).sort(), t = [];
+      for(var k=0;k<ks.length;k++) t.push(montantTexte(o[ks[k]], ks[k]));
+      return t.length ? t.join(' + ') : montantTexte(0, 'EUR');
+    }
+    return tuileAccueil({ nom:titre, badge: per === 'aujourdhui' ? 'journée en cours' : '',
+      grand:texte(parDevise),
+      unite: paiements ? paiements + ' paiement' + (paiements > 1 ? 's' : '') : '',
+      sous:'Mois de ' + moisTexte(moisDe + '-01') + ', jusqu’au ' + jourLong(fin) + ' inclus : ' + texte(moisDevise),
+      limite:LIMITE_ENCAISSE });
+  }
+
+  // ── 6. Scans ──────────────────────────────────────────────────────────────
+  var LIMITE_SCAN = 'Compté par le serveur, tentative par tentative, nos essais compris.';
+  function tuileScanAccueil(rows, auj, per){
+    var nom = 'Scans d’ordonnance';
+    var lu = lignesScan(rows);
+    if(lu.cause) return tuileIllisible(nom, lu.cause, LIMITE_SCAN);
+    if(auj === null) return tuileIllisible(nom, 'la date de la base manque', LIMITE_SCAN);
+    var parJour = {}, premier = premierJour(lu.lignes, null);
+    for(var i=0;i<lu.lignes.length;i++) parJour[lu.lignes[i].jour] = lu.lignes[i];
+    function somme(debut, fin){
+      var o = { env:0, servis:0, vides:0, echecs:0 }, js = joursEntre(debut, fin);
+      for(var k=0;k<js.length;k++){
+        var r = parJour[js[k]];
+        if(!r) continue;
+        o.env += r.envoyes; o.servis += r.servis_probables; o.vides += r.vides;
+        o.echecs += r.vides + r.echecs + r.perdus_tardifs + r.pannes_avant_google;
+      }
+      return o;
+    }
+    var o, courbe, courbeTexte, partiel = false, partielSemaine = false;
+    if(per === 'semaine'){
+      var lundi = lundiDe(auj); courbe = [];
+      for(var w = 8; w >= 1; w--){
+        var d0 = jourMoins(lundi, 7 * w);
+        if(premier !== null && d0 >= premier) courbe.push(somme(d0, jourMoins(d0, -6)).env);
+      }
+      o = somme(jourMoins(lundi, 7), jourMoins(lundi, 1)); courbeTexte = 'Tentatives, dernières semaines closes et mesurées';
+      if(premier === null || jourMoins(lundi, 7) < premier) partielSemaine = true;
+    } else {
+      var jours14 = joursEntre(jourMoins(auj, 14), jourMoins(auj, 1)); courbe = [];
+      for(var q=0;q<jours14.length;q++){
+        if(premier !== null && jours14[q] >= premier) courbe.push(somme(jours14[q], jours14[q]).env);
+      }
+      var j = per === 'hier' ? jourMoins(auj, 1) : auj; partiel = per === 'aujourdhui';
+      o = somme(j, j); courbeTexte = 'Tentatives, 14 derniers jours clos';
+    }
+    var sous;
+    if(o.env === 0 && o.echecs === 0) sous = partiel ? 'Journée en cours : aucune tentative pour l’instant.' : 'Aucune tentative.';
+    else if(o.echecs === 0) sous = partiel ? 'Aucun échec pour l’instant (journée en cours).' : 'Aucun échec pour le patient.';
+    else sous = o.echecs + ' échec' + (o.echecs > 1 ? 's' : '') + ' pour le patient'
+      + (o.vides ? ', dont ' + o.vides + ' sans aucun médicament trouvé' : '') + (partiel ? ' (journée en cours)' : '');
+    if(partielSemaine) sous += ' Semaine pas entièrement mesurée.';
+    return tuileAccueil({ nom:nom, courbe:courbe, courbeTexte:courbeTexte,
+      grand:String(o.servis), unite:'réussi' + (o.servis > 1 ? 's' : '') + ' sur ' + o.env,
+      sous:sous, sousAttention: o.echecs > 0, limite:LIMITE_SCAN });
+  }
+
+  function rendreAccueil(d){
+    if(!periodeLue){ lirePeriode(); periodeLue = true; }
+    accueilIllisibles = 0;
+    var per = periodeAccueil, auj = jourServeurValide(d.resume);
+    var b = document.querySelectorAll('button.acc-per');
+    for(var i=0;i<b.length;i++) b[i].setAttribute('aria-pressed', b[i].getAttribute('data-periode') === per ? 'true' : 'false');
+    var titre, sous;
+    if(auj === null){
+      titre = 'En un coup d’œil'; sous = 'La date de la base manque : aucune période ne peut être calculée.';
+    } else if(per === 'semaine'){
+      var l = lundiDe(auj);
+      titre = 'Semaine du ' + jourLong(jourMoins(l, 7));
+      sous = 'Du ' + jourLong(jourMoins(l, 7)) + ' au ' + jourLong(jourMoins(l, 1))
+           + ' (semaine close, jours comptés en heure universelle)';
+    } else if(per === 'hier'){
+      titre = 'Hier, en un coup d’œil';
+      sous = jourLong(jourMoins(auj, 1)).replace(/^./, function(c){ return c.toUpperCase(); })
+           + ' · compté en heure universelle, soit de ' + nomJour(jourMoins(auj, 1)) + ' '
+           + debutJourParis(jourMoins(auj, 1)) + ' à ' + nomJour(auj) + ' ' + debutJourParis(auj) + ' (heure de Paris)';
+    } else {
+      titre = 'Aujourd’hui, journée en cours';
+      sous = jourLong(auj).replace(/^./, function(c){ return c.toUpperCase(); })
+           + ' · commencé à ' + debutJourParis(auj) + ', heure de Paris : chiffres partiels';
+    }
+    $('accueil-titre').textContent = titre;
+    $('accueil-sous').textContent = sous;
+    $('accueil-tuiles').innerHTML =
+        tuileArrivees(auj, per)
+      + tuilePremierTraitement(d.parcours)
+      + tuileRetour(d, auj, per)
+      + tuileAbonnes(d.resume)
+      + tuileEncaisse(d.encaisse, auj, per)
+      + tuileScanAccueil(d.scan, auj, per)
+      + '<div class="acc-attente"><b>Publicité</b><span>Dépense et coût par arrivée : dès que la '
+      + 'saisie des dépenses Google Ads et Apple Ads sera en place.</span></div>';
+    return { critique: accueilIllisibles, attention: 0 };
+  }
+
+  // Les boutons de période : écouteurs posés UNE fois. Un clic pendant un
+  // chargement est refusé, comme pour les puces (voir `chargementEnCours`).
+  function preparerPeriodes(){
+    var b = document.querySelectorAll('button.acc-per');
+    for(var i=0;i<b.length;i++){
+      b[i].addEventListener('click', function(ev){
+        var p = ev.currentTarget.getAttribute('data-periode');
+        if(chargementEnCours || !donneesCourantes || PERIODES[p] !== true) return;
+        // ⚠️ MÉMORISÉE SEULEMENT APRÈS UN RENDU RÉUSSI, comme les puces. Sinon un
+        // rendu qui plante sous cette période replanterait à chaque ouverture.
+        periodeAccueil = p; periodeLue = true;
+        if(rendre(donneesCourantes)) ecrirePeriode();
+      });
+    }
+  }
+
   function montrerConsole(oui){
     $('connexion').style.display = oui ? 'none' : 'grid';
     $('console').style.display   = oui ? 'block' : 'none';
@@ -4270,6 +4801,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   $('btn-recharger').addEventListener('click', charger);
   $('btn-sauvegarde').addEventListener('click', sauvegarder);
   preparerReplis();
+  preparerPeriodes();
   $('btn-collecte').addEventListener('click', collecter);
 
   // Repliage : delegue, donc il survit a chaque rechargement des tableaux.

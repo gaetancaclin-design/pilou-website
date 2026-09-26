@@ -262,6 +262,29 @@ tr.cachee{display:none}
 .tache-dit{font-size:12.5px; color:var(--encre-3); margin-top:4px; line-height:1.5}
 .tache button{margin-top:11px}
 
+/* ── Les deux actions à échéance, EN HAUT (lot C1c, 26/09/2026) ──────────
+   Demande de Gaétan : ne plus descendre jusqu'à « Santé technique » pour
+   collecter ou sauvegarder. Les cartes du bas restent, pour le détail et le
+   résultat ; ces boutons-ci ne font que déclencher les boutons du bas. */
+button.haut-tache{display:inline-flex; align-items:baseline; gap:7px}
+/* ⚠️ SANS CETTE REGLE, `hidden` NE CACHE RIEN : `display:inline-flex` ci-dessus
+   l'emporte sur la regle du navigateur (contre-revue du 26/09). */
+button.haut-tache[hidden]{display:none}
+.haut-sep{color:var(--encre-3)}
+.haut-delai{font-weight:500; color:var(--encre-2); font-variant-numeric:tabular-nums}
+button.haut-tache.attention{border-color:var(--attention)}
+button.haut-tache.attention .haut-delai{color:var(--attention); font-weight:650}
+button.haut-tache.critique{border-color:var(--critique)}
+button.haut-tache.critique .haut-delai{color:var(--critique); font-weight:650}
+/* Sur téléphone : deux colonnes égales plutôt que trois rangées bancales. */
+@media (max-width:520px){
+  header.haut .droite{display:grid; grid-template-columns:1fr 1fr; width:100%}
+  header.haut .droite button{width:100%; justify-content:center; text-align:center; padding:8px}
+  button.haut-tache{flex-direction:column; align-items:center; gap:0}
+  .haut-sep{display:none}
+  .haut-delai{white-space:nowrap}
+}
+
 /* ── Sections repliees ─────────────────────────────────────────
    ⚠️ UNE SEULE REGLE, ET ELLE NE S'APPLIQUE QUE FERMEE. Ouverte, chaque
    element retrouve ses propres regles — en particulier `.cadre:empty` et la
@@ -418,6 +441,11 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       <div class="horodatage" id="horodatage"></div>
     </div>
     <div class="droite">
+      <!-- ⚠️ EN DUR, comme les boutons du bas : écouteurs posés une fois. Ils
+           n'exécutent rien eux-mêmes, ils cliquent le bouton du bas. Cachés
+           (`hidden`) tant que `rendreAFaire` ne leur a pas donné un délai. -->
+      <button class="discret haut-tache" id="haut-collecte" type="button" hidden>Collecter<span class="haut-sep">·</span><span class="haut-delai" id="haut-delai-collecte"></span></button>
+      <button class="discret haut-tache" id="haut-sauvegarde" type="button" hidden>Sauvegarder<span class="haut-sep">·</span><span class="haut-delai" id="haut-delai-sauvegarde"></span></button>
       <button class="discret" id="btn-recharger" type="button">Recharger</button>
       <button class="discret" id="btn-deconnexion" type="button">Se déconnecter</button>
     </div>
@@ -639,8 +667,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   </section>
 
   <!-- ⚠️ SANTÉ TECHNIQUE EN BAS (refonte C1a, 24/09/2026). Le bandeau du haut
-       reste le seul endroit qui compte le rouge et l'orange : il dit OÙ regarder
-       et renvoie ici. Les voyants ne sont JAMAIS repliés : un rouge replié serait
+       reste le seul endroit qui compte le rouge et l'orange : il dit OÙ regarder.
+       Depuis le lot C1c (26/09), les deux actions à échéance ont aussi un bouton
+       en haut de page ; le bandeau y renvoie, et renvoie ici pour le détail. Les voyants ne sont JAMAIS repliés : un rouge replié serait
        un rouge caché. -->
   <h2 class="grand-titre" id="sante">Santé technique</h2>
 
@@ -792,7 +821,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   function dureeTexte(h){
     if(!isFinite(h)) return "jamais";
     if(h < 1)  return Math.round(h*60) + " min";
-    if(h < 48) return (Math.round(h*10)/10) + " h";
+    if(h < 48) return unDecimal(h) + " h";
     return Math.round(h/24) + " j";
   }
   function ech(s){
@@ -842,7 +871,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     TEST:"Test",
     INITIAL_PURCHASE:"Premier achat",
     RENEWAL:"Renouvellement",
-    CANCELLATION:"Annulation",
+    CANCELLATION:"Arrêt ou remboursement",
     UNCANCELLATION:"Réactivation",
     NON_RENEWING_PURCHASE:"Achat sans renouvellement",
     SUBSCRIPTION_PAUSED:"Abonnement en pause",
@@ -1055,6 +1084,24 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return 'il reste ' + reste + ' jour' + (reste > 1 ? 's' : '');
   }
 
+  // Le meme delai, en court, pour les boutons du haut. Meme regle `perte` :
+  // une collecte depassee est PERDUE, pas « en retard ».
+  function delaiCourt(reste, perte){
+    if(reste === null) return 'jamais fait';
+    if(reste < 0) return perte ? ('déjà ' + (-reste) + ' j perdu' + (-reste > 1 ? 's' : ''))
+                               : ('en retard de ' + (-reste) + ' j');
+    if(reste === 0) return 'aujourd’hui';
+    return 'dans ' + reste + ' j';
+  }
+  // Le point median (`.haut-sep`, dans le HTML) separe le verbe du delai, a
+  // l'oeil ET au lecteur d'ecran : « Collecter · déjà 12 j perdus », jamais
+  // « Collecter 12 j perdus ». Sur telephone, le delai passe a la ligne.
+  function hautTache(id, etat, texte){
+    $('haut-' + id).className = 'discret haut-tache ' + etat;
+    $('haut-delai-' + id).textContent = texte;
+    $('haut-' + id).hidden = false;
+  }
+
   /**
    * La bande « À faire ». Elle ne cree AUCUN bouton : ils sont dans le HTML,
    * leurs ecouteurs sont poses une fois au chargement. On ne remplit que le
@@ -1081,6 +1128,20 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       : aSouci('jamais')       ? 'jamais collecté'
       : aSouci('archive-vide') ? 'rien d’archivé'
       : delaiTexte(c.reste, c.perte);
+    // ⚠️ LE BOUTON DIT POURQUOI IL EST ROUGE. Un passage en erreur sur une
+    // archive fraiche donnait un bouton rouge « dans 27 j » (revue adverse du
+    // 26/09) : la cause passe avant le compte a rebours, sauf une perte.
+    hautTache('collecte', c.etat,
+        aSouci('illisible')    ? 'état illisible'
+      : aSouci('jamais')       ? 'jamais fait'
+      : aSouci('archive-vide') ? 'rien d’archivé'
+      // Une echeance atteinte ou depassee passe avant la cause : « partielle »
+      // ne doit jamais masquer « aujourd'hui » ni « déjà N j perdus ».
+      : (c.reste !== null && c.reste <= 0) ? delaiCourt(c.reste, c.perte)
+      : aSouci('bloque')       ? 'passage resté ouvert'
+      : aSouci('erreur')       ? 'dernière en échec'
+      : aSouci('partiel')      ? 'dernière partielle'
+      : delaiCourt(c.reste, c.perte));
     // ⚠️ LA PHRASE NOMME LA GRANDEUR QUI MORD. Poser « au-delà de 28 jours les
     // jours non collectés sont perdus » sous un nombre qui mesure autre chose,
     // c'est le défaut que ce dossier corrige depuis six passes.
@@ -1115,6 +1176,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     var s = echeanceSauvegarde(sv);
     $('tache-sauvegarde').className = 'tache ' + s.etat;
     $('delai-sauvegarde').textContent = delaiTexte(s.reste, s.perte);
+    hautTache('sauvegarde', s.etat, delaiCourt(s.reste, s.perte));
     $('dit-sauvegarde').innerHTML =
       (isFinite(s.jours)
         ? 'Dernier fichier généré il y a <b>' + Math.floor(s.jours) + ' j</b>. '
@@ -1122,9 +1184,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + 'Le plan gratuit de Supabase ne fait <b>aucune sauvegarde automatique</b> : '
       + 'sans ce fichier, la base n’a pas de copie.';
 
-    var t = { critique:0, attention:0 };
+    var t = { critique:0, attention:0, noms:{ critique:[], attention:[] } };
     if(c.etat === 'critique') t.critique++; else if(c.etat === 'attention') t.attention++;
     if(s.etat === 'critique') t.critique++; else if(s.etat === 'attention') t.attention++;
+    // Le bandeau nomme SEULEMENT le bouton qui attend (lot C1c).
+    if(t.noms[c.etat]) t.noms[c.etat].push('« Collecter »');
+    if(t.noms[s.etat]) t.noms[s.etat].push('« Sauvegarder »');
     return t;
   }
 
@@ -1258,7 +1323,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['s-accueil','detail-titre','sante','s-controles','afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-mesure','s-scan','s-officine','s-audience','s-sauvegarde'];
+    var ids = ['haut-collecte','haut-sauvegarde','s-accueil','detail-titre','sante','s-controles','afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-mesure','s-scan','s-officine','s-audience','s-sauvegarde'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
 
@@ -1522,16 +1587,20 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     mesure = mesure || { critique:0, attention:0 };
     accueil = accueil || { critique:0, attention:0, controles:0 };
     var ctl = accueil.controles || 0;
-    function ou(g, t, m, a, c){
+    function ou(g, t, m, a, c, niveau){
       var lieux = [];
       if(a > 0) lieux.push('« En un coup d’œil », en tête de page');
       if(c > 0) lieux.push('« Compteurs détaillés », en bas de page');
-      if(t > 0 && g > 0) lieux.push('« Santé technique », en bas de page (« À faire » et voyants)');
-      else if(t > 0) lieux.push('« À faire », dans « Santé technique » en bas de page');
-      else if(g > 0) lieux.push('les voyants de « Santé technique », en bas de page');
+      if(t > 0){
+        var noms = (taches && taches.noms && taches.noms[niveau]) || [];
+        lieux.push((noms.length > 1 ? 'les boutons ' + noms.join(' et ')
+                   : (noms.length ? 'le bouton ' + noms[0] : 'les boutons d’action'))
+          + ' (en haut de page ; le détail est dans « Santé technique »)');
+      }
+      if(g > 0) lieux.push('les voyants de « Santé technique », en bas de page');
       if(m > 0) lieux.push('la section « Parcours dans le temps »');
       if(!lieux.length) return 'Regardez les voyants de « Santé technique », en bas de page.';
-      if(lieux.length === 1) return 'C’est dans ' + lieux[0] + '.';
+      if(lieux.length === 1) return 'Regardez ' + lieux[0] + '.';
       return 'Regardez ' + lieux.slice(0, lieux.length - 1).join(', ')
            + ' et ' + lieux[lieux.length - 1] + '.';
     }
@@ -1539,12 +1608,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     var at = grille.attention + taches.attention + mesure.attention + accueil.attention + ctl;
     if(cr > 0){
       afficherEtat('critique', cr + (cr > 1 ? ' alertes rouges. ' : ' alerte rouge. '),
-        ou(grille.critique, taches.critique, mesure.critique, accueil.critique, 0));
+        ou(grille.critique, taches.critique, mesure.critique, accueil.critique, 0, 'critique'));
     } else if(at > 0){
       // Meme localisation que pour le rouge : c'est la ou il y a le plus a
       // chercher qu'une aide manquait.
       afficherEtat('attention', at + (at > 1 ? ' points à surveiller. ' : ' point à surveiller. '),
-        'Rien de rouge. ' + ou(grille.attention, taches.attention, mesure.attention, accueil.attention, ctl));
+        'Rien de rouge. ' + ou(grille.attention, taches.attention, mesure.attention, accueil.attention, ctl, 'attention'));
     } else {
       afficherEtat('ok','Rien à signaler. ',
         'Les ' + (VUES.length + 1) + ' vues répondent, et rien n’attend dans « Santé technique ».');
@@ -2049,7 +2118,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       var lignesRev = [
         [(surAuj ? 'Ouvertures aujourd’hui' : 'Ouvertures hier'), nb(gRef.actifs)],
         ['dont nouvelles', nb(gRef.nouveaux)],
-        ['Moyenne 7 jours (jours clos)', moy == null ? '—' : (Math.round(moy / 7 * 10) / 10)]
+        ['Moyenne 7 jours (jours clos)', moy == null ? '—' : unDecimal(moy / 7)]
       ];
       if(surAuj && gHier && gHier.revenants != null){
         lignesRev.push(['Hier ' + jourTexte(hier),
@@ -2066,7 +2135,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             + (audEtat && audEtat.dernier_passage
                  ? ', faite le <b>' + ech(quandTexte(audEtat.dernier_passage)) + '</b>'
                  : '')
-            + '. Pour le rafraîchir : « Collecter maintenant », dans « Santé technique » en bas de page — '
+            + '. Pour le rafraîchir : le bouton « Collecter », en haut de page — '
             + 'une fois par heure au maximum.<br><br>'
           : '')
         + 'Parmi les personnes ayant <b>ouvert</b> Pilou, celles qui étaient '
@@ -2257,7 +2326,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     });
     var total = (rows && rows.length) ? rows[0].personnes_tous_env : null;
     $('cadre-abonnes').innerHTML = tableau('Abonnements par environnement',
-      ['Environnement','Actifs','Accès offerts','Ont payé','Annul. 30 j','Expir. 30 j','Personnes'],
+      ['Environnement','Actifs','Accès offerts','Ont payé','Arrêts 30 j','Expir. 30 j','Personnes'],
       lignes, 'aucun événement de facturation')
       // Ici la LIGNE est bien l'unite : une ligne = un environnement. Pas de
       // troisieme argument, il n'y a rien de regroupe a chiffrer.
@@ -2265,7 +2334,18 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + (total != null
           ? '<div class="rien">Personnes distinctes, tous environnements confondus : <b class="num">'
             + ech(total) + '</b> — une même personne peut apparaître dans les deux lignes.</div>'
-          : '');
+          : '')
+      // ⚠️ « ARRETS », PAS « ANNULATIONS » (26/09/2026). RevenueCat range sous
+      // CANCELLATION l'arret du renouvellement automatique (l'acces continue),
+      // mais aussi un remboursement ou un echec de paiement (l'acces peut
+      // cesser). Nos offres pharmacie sur iPhone sont reglees « ne pas
+      // renouveler » : un CANCELLATION est arrive 10 ms apres l'achat le 23/09.
+      + '<div class="rien"><b>Arrêts</b> : ce que RevenueCat appelle « CANCELLATION ». Le plus '
+      + 'souvent, l’arrêt du renouvellement automatique : l’accès continue jusqu’à la fin de la '
+      + 'période. Ce type couvre aussi un remboursement ou un échec de paiement, où l’accès peut '
+      + 's’arrêter plus tôt. Une offre pharmacie sur iPhone en a produit un dès l’échange du code '
+      + '(constaté le 23/09/2026) : l’offre est réglée pour ne pas se renouveler, ce n’est pas une '
+      + 'résiliation de la personne.</div>';
   }
 
   // ⚠️ `alertes` N'EST PAS UN AJOUT DECORATIF. La date du dernier evenement de
@@ -2283,13 +2363,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         {html: traduit(TYPES, r.type)},
         {texte: nb(r.evenements)},
         {texte: (r.montant_total == null) ? '—'
-                : (Number(r.montant_total).toFixed(2) + ' ' + (r.devise || ''))}
+                : montantTexte(Number(r.montant_total), r.devise)}
       ]};
     });
     $('cadre-argent').innerHTML = tableau('Événements de facturation',
       ['Mois','Environnement','Magasin','Produit','Type','Événements','Montant brut'],
       lignes, 'aucun événement enregistré', 12)
       + mentionPerimetre(toutes, MOT_BAC, U_EVENEMENTS)
+      + '<div class="rien"><b>Arrêt ou remboursement</b> : le plus souvent un renouvellement '
+      + 'automatique coupé, l’accès continuant jusqu’à la fin de la période ; parfois un '
+      + 'remboursement (montant négatif) ou un échec de paiement. Voir la note sous « Abonnements '
+      + 'par environnement ».</div>'
       + '<div class="rien">Une ligne par <b>mois</b> et par type d\u2019\u00e9v\u00e9nement \u2014 ce n\u2019est pas un \u00e9v\u00e9nement par ligne. Le webhook RevenueCat est branch\u00e9 depuis le <b>8 septembre 2026</b> : rien d\u2019ant\u00e9rieur ne figure ici.</div>'
       + faitDernierEvenement(alertes);
   }
@@ -3817,8 +3901,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         {texte: r.code || '—'},
         {texte: nb(r.encaissements)},
         {texte: nb(r.abonnes)},
-        {texte: (r.brut == null) ? '—' : Number(r.brut).toFixed(2) + ' ' + (r.devise || '')},
-        {texte: (r.net  == null) ? '—' : Number(r.net).toFixed(2)  + ' ' + (r.devise || '')},
+        {texte: (r.brut == null) ? '—' : montantTexte(Number(r.brut), r.devise)},
+        {texte: (r.net  == null) ? '—' : montantTexte(Number(r.net), r.devise)},
         {texte: nb(r.encaissements_sans_net),
          classe: (Number(r.encaissements_sans_net) > 0) ? 'attention' : 'vide'}
       ]};
@@ -3893,8 +3977,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   function octetsTexte(n){
     if(n == null) return '—';
     if(n < 1024) return n + ' o';
-    if(n < 1048576) return (Math.round(n/102.4)/10) + ' ko';
-    return (Math.round(n/104857.6)/10) + ' Mo';
+    if(n < 1048576) return unDecimal(n/1024) + ' ko';
+    return unDecimal(n/1048576) + ' Mo';
   }
 
   function joursDepuis(v){
@@ -4124,7 +4208,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           '<b>Collecte terminée' + (partiel ? ' — partielle' : '') + '.</b> '
           + ech(nb(o.series_lues)) + ' série(s) lue(s), <b>' + ech(nb(o.lignes_ajoutees))
           + '</b> ligne(s) ajoutée(s), ' + ech(nb(o.revisions_refusees))
-          + ' révision(s) refusée(s), en ' + sec + ' s.'
+          + ' révision(s) refusée(s), en ' + unDecimal(sec) + ' s.'
           + (o.motif ? '<br>Détail : ' + ech(String(o.motif)) : '')
           + (partiel ? '<br>Une série au moins n’a pas été lue. Sans gravité si cela ne se '
                      + 'répète pas — la prochaine collecte rattrapera.' : ''));
@@ -4447,7 +4531,23 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             // `true` : on garde a l'ecran le message qui porte l'empreinte.
             return lire('v_admin_sauvegarde').then(function(s){
               // Le tableau se met a jour ; le message du succes reste a l'ecran.
-              if(!s.error && s.data && s.data.length) rendreSauvegarde(s.data[0]);
+              // ⚠️ ET LE HAUT AUSSI (lot C1c). Sans cela, le bouton du haut et
+              // le bandeau restaient rouges « en retard » juste apres le succes.
+              // `rendre` ne touche pas `#sauvegarde-resultat` : l'empreinte reste.
+              // Pas de `charger()` : une vue en echec eteindrait la page et
+              // cacherait l'empreinte.
+              if(!s.error && s.data && s.data.length){
+                if(donneesCourantes && !chargementEnCours){
+                  donneesCourantes.sauvegarde = s.data[0];
+                  if(!rendre(donneesCourantes)){
+                    // La page s'est eteinte : on ne perd pas pour autant la preuve.
+                    $('etat-texte').innerHTML += ' La sauvegarde, elle, a réussi : empreinte <code>'
+                      + ech(emp) + '</code>.';
+                  }
+                } else {
+                  rendreSauvegarde(s.data[0]);
+                }
+              }
             });
           });
         });
@@ -5015,6 +5115,27 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   preparerReplis();
   preparerPeriodes();
   $('btn-collecte').addEventListener('click', collecter);
+
+  // ⚠️ LES BOUTONS DU HAUT CLIQUENT CEUX DU BAS (lot C1c). Aucune logique
+  // copiee : un bouton du bas desactive (action en cours) ne part pas, et le
+  // resultat (dont l'empreinte SHA-256 de la sauvegarde) s'affiche la ou il
+  // s'affichait. On amene la page jusqu'a ce resultat.
+  function relier(haut, bas, carte){
+    var h = $(haut), b = $(bas);
+    h.addEventListener('click', function(){
+      if(b.disabled) return;
+      b.click();
+      var calme = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      $(carte).scrollIntoView({ behavior: calme ? 'auto' : 'smooth', block: 'center' });
+    });
+    function recopier(){ h.disabled = b.disabled; }
+    recopier();
+    if(window.MutationObserver){
+      new MutationObserver(recopier).observe(b, { attributes: true, attributeFilter: ['disabled'] });
+    }
+  }
+  relier('haut-collecte',   'btn-collecte',   'tache-collecte');
+  relier('haut-sauvegarde', 'btn-sauvegarde', 'tache-sauvegarde');
 
   // Repliage : delegue, donc il survit a chaque rechargement des tableaux.
   document.addEventListener('click', function(ev){

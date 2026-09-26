@@ -581,6 +581,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   <section id="s-argent" class="repliable">
     <div class="titre"><h2>Argent</h2>
       <span class="sous">jamais additionné entre environnements ni entre devises</span></div>
+    <div id="c3-argent"></div>
     <div class="cadre" id="cadre-abonnes"></div>
     <div class="cadre" id="cadre-argent"></div>
     <details class="repli"><summary>SANDBOX n'est pas une recette — et rien ne se totalise ici</summary>
@@ -775,6 +776,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 </main>
 
 <script src="./supabase-js-2.105.4.umd.js"></script>
+<script src="./c3-revenus.js?v=20260926c3b"></script>
 <script>
 (function(){
   "use strict";
@@ -1376,10 +1378,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // ⚠️ Elle rend AUSSI la semaine en cours depuis le 22/09 : la colonne
     // `semaine_en_cours` le dit, et le rendu la grise.
     { cle:'mesure',       vue:'v_admin_mesure',                ordre:{col:'semaine',   asc:false} },
-    // Refonte C1b (24/09/2026) : paiements reels par jour de Paris, pour l'accueil.
-    // ⚠️ MIGRATION D'ABORD (`console_encaisse_jour`) : tant que la vue n'existe
-    // pas, cette ligne fait echouer TOUTE la console, et c'est voulu.
-    { cle:'encaisse',     vue:'v_admin_encaisse_jour',         ordre:{col:'jour',      asc:false} }
+    // Lot C3 (26/09/2026) : revenus nets et commissions, calcules EN BASE, mis en page par
+    // c3-revenus.js ; jours UTC. MIGRATION D'ABORD, sinon toute la console echoue (voulu).
+    { cle:'netJour',      vue:'v_admin_net_jour',              ordre:{col:'jour',      asc:false} },
+    { cle:'netMois',      vue:'v_admin_net_mois',              ordre:{col:'mois',      asc:false} },
+    { cle:'commissions',  vue:'v_admin_commissions_mois',      ordre:{col:'mois',      asc:false} },
+    { cle:'attendus',     vue:'v_admin_paiements_attendus',    unique:true }
   ];
 
   // ── UN ETAT QUE PLUSIEURS BLOCS PARTAGENT (13/09/2026, lot 2) ─────────────
@@ -1568,7 +1572,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // (en orange : « à regarder », elles sont en bas de page depuis la refonte C1a).
     rendreResume(d.resume, d.audJours, d.alertes, d.audEtat, d.scan);
     accueil.controles = document.querySelectorAll('#resume .res.alerte').length;
-    afficherBandeau(compte, taches, mesure, accueil);
+    var argent = rendreC3(d);
+    afficherBandeau(compte, taches, mesure, accueil, argent);
     rendreAbonnes(d.abonnes);
     rendreArgent(d.argent, d.alertes);
     rendreParcours(d.parcours);
@@ -1586,7 +1591,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
    * bande « À faire ». Chaque nombre annonce doit correspondre a quelque chose
    * qu'on peut effectivement voir a l'ecran.
    */
-  function afficherBandeau(grille, taches, mesure, accueil){
+  function afficherBandeau(grille, taches, mesure, accueil, argent){
     // ⚠️ TROISIEME SOURCE (22/09/2026) : la section « Parcours dans le temps ».
     // Elle peut afficher un bloc rouge (charges rejetees) que personne ne
     // comptait : le bandeau annoncait alors « rien a signaler » au-dessus.
@@ -1594,9 +1599,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // la phrase doit dire OU, sinon Gaetan cherche.
     mesure = mesure || { critique:0, attention:0 };
     accueil = accueil || { critique:0, attention:0, controles:0 };
-    var ctl = accueil.controles || 0;
-    function ou(g, t, m, a, c, niveau){
+    var ctl = accueil.controles || 0, ar = argent || { critique:0, attention:0 };
+    function ou(g, t, m, a, c, niveau, x){
       var lieux = [];
+      if(x > 0) lieux.push('la section « Argent »');
       if(a > 0) lieux.push('« En un coup d’œil », en tête de page');
       if(c > 0) lieux.push('« Compteurs détaillés », en bas de page');
       if(t > 0){
@@ -1612,16 +1618,16 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       return 'Regardez ' + lieux.slice(0, lieux.length - 1).join(', ')
            + ' et ' + lieux[lieux.length - 1] + '.';
     }
-    var cr = grille.critique + taches.critique + mesure.critique + accueil.critique;
-    var at = grille.attention + taches.attention + mesure.attention + accueil.attention + ctl;
+    var cr = grille.critique + taches.critique + mesure.critique + accueil.critique + ar.critique;
+    var at = grille.attention + taches.attention + mesure.attention + accueil.attention + ctl + ar.attention;
     if(cr > 0){
       afficherEtat('critique', cr + (cr > 1 ? ' alertes rouges. ' : ' alerte rouge. '),
-        ou(grille.critique, taches.critique, mesure.critique, accueil.critique, 0, 'critique'));
+        ou(grille.critique, taches.critique, mesure.critique, accueil.critique, 0, 'critique', ar.critique));
     } else if(at > 0){
       // Meme localisation que pour le rouge : c'est la ou il y a le plus a
       // chercher qu'une aide manquait.
       afficherEtat('attention', at + (at > 1 ? ' points à surveiller. ' : ' point à surveiller. '),
-        'Rien de rouge. ' + ou(grille.attention, taches.attention, mesure.attention, accueil.attention, ctl, 'attention'));
+        'Rien de rouge. ' + ou(grille.attention, taches.attention, mesure.attention, accueil.attention, ctl, 'attention', ar.attention));
     } else {
       afficherEtat('ok','Rien à signaler. ',
         'Les ' + (VUES.length + 1) + ' vues répondent, et rien n’attend dans « Santé technique ».');
@@ -4952,43 +4958,31 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       limite:LIMITE_ABONNES });
   }
 
-  // ── 5. Encaissé ───────────────────────────────────────────────────────────
-  var LIMITE_ENCAISSE = 'Paiements réels, avant la part des magasins et la TVA ; remboursements non déduits.';
-  function tuileEncaisse(rows, auj, per){
-    var nom = 'Encaissé';
-    if(auj === null) return tuileIllisible(nom, 'la date de la base manque', LIMITE_ENCAISSE);
-    if(!Array.isArray(rows)) return tuileIllisible(nom, 'la vue n’a rien rendu', LIMITE_ENCAISSE);
-    if(rows.length >= 1000) return tuileIllisible(nom, 'la vue a rendu 1000 lignes (tronquée)', LIMITE_ENCAISSE);
-    var debut, fin, titre;
-    if(per === 'semaine'){
-      debut = jourMoins(lundiDe(auj), 7); fin = jourMoins(lundiDe(auj), 1); titre = 'Encaissé sur la semaine';
-    } else {
-      debut = fin = (per === 'hier' ? jourMoins(auj, 1) : auj);
-      titre = per === 'hier' ? 'Encaissé hier' : 'Encaissé aujourd’hui';
+  // ── 5. Net du mois (lot C3, 26/09/2026) : mis en page par c3-revenus.js ──
+  // ⚠️ MODULE ABSENT = TUILE ROUGE, JAMAIS UNE PAGE ENTIERE EN PANNE.
+  function outilsC3(){
+    return { ech:ech, tableau:tableau, tuileAccueil:tuileAccueil, montantTexte:montantTexte,
+      sansNosTests:sansNosTests, mentionPerimetre:mentionPerimetre, MOT_INTERNES:MOT_INTERNES,
+      moisTexte:moisTexte, jourLong:jourLong, jourMoins:jourMoins, lundiDe:lundiDe };
+  }
+  function tuileNet(d, auj, per){
+    if(!window.PilouC3) return tuileIllisible('Net du mois', 'le fichier c3-revenus.js n’a pas été chargé', 'Revenus nets.');
+    // Sans la ligne des paiements attendus, la garde des vues C3 est fermée : 0 € serait faux.
+    if(!d.attendus) return tuileIllisible('Net du mois', 'la garde des vues de revenus est fermée (prive.admins)', 'Revenus nets.');
+    var t = window.PilouC3.tuileNetMois(d.netJour, auj, per, outilsC3());
+    if(t.illisible) accueilIllisibles++;
+    return t.html;
+  }
+  // Section « Argent » : rendue AVANT le bandeau, qui compte ses rouges.
+  function rendreC3(d){
+    if(!window.PilouC3){
+      $('c3-argent').innerHTML = '<div class="rien avert"><b>Revenus nets : non lus.</b> Le fichier c3-revenus.js n’a pas été chargé.</div>';
+      return { critique:1, attention:0 };
     }
-    var moisDe = fin.slice(0, 7), parDevise = {}, moisDevise = {}, paiements = 0;
-    for(var i=0;i<rows.length;i++){
-      var r = rows[i];
-      if(!r || typeof r.jour !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(r.jour))
-        return tuileIllisible(nom, 'un jour illisible', LIMITE_ENCAISSE);
-      var m = decimalOuNul(r.montant), p = entierOuNul(r.paiements);
-      if(m === null || p === null || typeof r.devise !== 'string' || !/^[A-Z]{3}$/.test(r.devise))
-        return tuileIllisible(nom, 'une ligne illisible le ' + jourTexte(r.jour), LIMITE_ENCAISSE);
-      if(r.jour >= debut && r.jour <= fin){
-        parDevise[r.devise] = (parDevise[r.devise] || 0) + m; paiements += p;
-      }
-      if(r.jour.slice(0, 7) === moisDe && r.jour <= fin) moisDevise[r.devise] = (moisDevise[r.devise] || 0) + m;
-    }
-    function texte(o){
-      var ks = Object.keys(o).sort(), t = [];
-      for(var k=0;k<ks.length;k++) t.push(montantTexte(o[ks[k]], ks[k]));
-      return t.length ? t.join(' + ') : montantTexte(0, 'EUR');
-    }
-    return tuileAccueil({ nom:titre, badge: per === 'aujourdhui' ? 'journée en cours' : '',
-      grand:texte(parDevise),
-      unite: paiements ? paiements + ' paiement' + (paiements > 1 ? 's' : '') : '',
-      sous:'Mois de ' + moisTexte(moisDe + '-01') + ', jusqu’au ' + jourLong(fin) + ' inclus : ' + texte(moisDevise),
-      limite:LIMITE_ENCAISSE });
+    var r = window.PilouC3.section({ attendus:d.attendus, netMois:d.netMois, commissions:d.commissions },
+      jourServeurValide(d.resume), outilsC3());
+    $('c3-argent').innerHTML = r.html;
+    return r;
   }
 
   // ── 6. Scans ──────────────────────────────────────────────────────────────
@@ -5069,7 +5063,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + tuilePremierTraitement(d.parcours, d.mesure)
       + tuileRetour(d, auj, per)
       + tuileAbonnes(d.resume)
-      + tuileEncaisse(d.encaisse, auj, per)
+      + tuileNet(d, auj, per)
       + tuileScanAccueil(d.scan, auj, per);
     // L'encart « Publicité » a ete retire le 26/09 : la saisie des depenses est
     // abandonnee (decision de Gaetan, pas de publicite reguliere). Il promettait

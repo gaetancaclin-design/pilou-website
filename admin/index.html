@@ -511,6 +511,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   <section id="s-mesure">
     <div class="titre"><h2>Parcours dans le temps</h2><span class="sous">mesuré par l’application, en cases hebdomadaires</span></div>
     <div class="cadre" id="cadre-mesure-avert"></div>
+    <!-- « Semaine par semaine » (accueils, retours J1, J2-7, J8-30) remonté en
+         tête de section le 26/09 à la demande de Gaétan : c'est le tableau qu'il
+         lit en premier. Les avertissements restent AVANT les chiffres. -->
+    <div class="cadre" id="cadre-mesure-semaines"></div>
     <div class="cadre" id="cadre-mesure-retention"></div>
     <div class="cadre" id="cadre-mesure-scan"></div>
     <div class="cadre" id="cadre-mesure-ecrans"></div>
@@ -3555,8 +3559,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   function rendreMesure(rows){
     var cR = $('cadre-mesure-retention'), cE = $('cadre-mesure-scan'),
         cS = $('cadre-mesure-ecrans'), cV = $('cadre-mesure-ventilation'),
-        cA = $('cadre-mesure-avert');
-    function vider(){ cR.innerHTML=''; cE.innerHTML=''; cS.innerHTML=''; cV.innerHTML=''; }
+        cA = $('cadre-mesure-avert'), cW = $('cadre-mesure-semaines');
+    function vider(){ cR.innerHTML=''; cE.innerHTML=''; cS.innerHTML=''; cV.innerHTML=''; cW.innerHTML=''; }
     var compte = { critique:0, attention:0 };
 
     var a = agregerMesure(rows, compterNosTests());
@@ -3818,7 +3822,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + '<div class="rien" style="padding-top:0">Un écran ouvert dix fois par la même personne '
       + 'compte dix fois. <b>Ce tableau dit où l’on va, jamais combien de gens y vont.</b></div>';
 
-    // ── 4. Semaine par semaine, plateforme, ancienneté, version ─────────────
+    // ── 4. Semaine par semaine (affiché en tête de section), plateforme, ancienneté, version
     var lv = [];
     for(var w2=0;w2<a.semaines.length;w2++){
       var sw = a.semaines[w2], enCours = a.parSemaine[sw]._enCours;
@@ -3831,10 +3835,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         { texte: String(caseMesure(a, sw, 'scan_lance')) }
       ]});
     }
-    var hv = tableau('Semaine par semaine'
+    // Ce tableau-ci s'affiche en tete de section (cW), le reste en bas (cV).
+    cW.innerHTML = tableau('Semaine par semaine'
         + (a.semaineEnCours ? ' — la semaine du ' + jourTexte(a.semaineEnCours)
             + ' est en cours, donc grisée et incomplète' : ' — aucune semaine en cours rendue'),
       ['Semaine','Accueils','Retour J1','Retour J2-7','Retour J8-30','Scans lancés'], lv, '', 0);
+    var hv = '';
 
     var lp = [], pk = Object.keys(a.parPlateforme).sort();
     for(var p2=0;p2<pk.length;p2++){

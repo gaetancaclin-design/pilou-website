@@ -123,7 +123,10 @@ header.haut .droite{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
   border-radius:var(--r); margin-bottom:22px; font-size:14px;
   border:1px solid transparent;
 }
-.etat b{display:block; margin-bottom:2px}
+.etat b{display:inline}
+.etat > div > b:first-child{display:block; margin-bottom:2px}
+.etat > div{min-width:0}
+.etat code{overflow-wrap:anywhere; word-break:break-all}
 .etat.ok{background:var(--carte); color:var(--encre-2); border-color:var(--trait)}
 .etat.ok .pastille{background:var(--ok)}
 .etat.attention{background:var(--attention-fond); color:var(--attention);
@@ -260,12 +263,11 @@ tr.cachee{display:none}
 .tache.attention .tache-delai{color:var(--attention)}
 .tache.critique  .tache-delai{color:var(--critique)}
 .tache-dit{font-size:12.5px; color:var(--encre-3); margin-top:4px; line-height:1.5}
-.tache button{margin-top:11px}
 
 /* ── Les deux actions à échéance, EN HAUT (lot C1c, 26/09/2026) ──────────
    Demande de Gaétan : ne plus descendre jusqu'à « Santé technique » pour
-   collecter ou sauvegarder. Les cartes du bas restent, pour le détail et le
-   résultat ; ces boutons-ci ne font que déclencher les boutons du bas. */
+   collecter ou sauvegarder. Ce sont les seuls boutons d'action ; les cartes du
+   bas ne gardent que le détail. Le résultat s'affiche sous le bandeau. */
 button.haut-tache{display:inline-flex; align-items:baseline; gap:7px}
 /* ⚠️ SANS CETTE REGLE, `hidden` NE CACHE RIEN : `display:inline-flex` ci-dessus
    l'emporte sur la regle du navigateur (contre-revue du 26/09). */
@@ -401,10 +403,6 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 .acc-sous-ligne.attention{color:var(--attention); font-weight:600}
 .acc-limite{margin-top:auto; padding-top:10px; border-top:1px solid var(--trait);
   font-size:13px; line-height:1.45; color:var(--encre-2)}
-.acc-attente{grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:6px 18px; align-items:baseline;
-  border:1.5px dashed var(--trait-fort); border-radius:18px; padding:16px 22px; color:var(--encre-2);
-  font-size:14px}
-.acc-attente b{color:var(--encre); font-size:15px}
 @media (max-width:900px){ .acc-tuiles{grid-template-columns:repeat(2, minmax(0, 1fr))} }
 @media (max-width:600px){
   .acc-tuiles{grid-template-columns:minmax(0, 1fr)}
@@ -421,9 +419,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 <div id="connexion">
   <form class="boite" id="form-connexion" autocomplete="on">
     <div class="marque"><b>Pilou</b><span>Console</span></div>
-    <p class="intro">Espace de pilotage. Un seul bouton écrit dans la base — celui
-    qui génère la sauvegarde, et il n'écrit qu'une ligne de journal. Aucune autre action de cette
-      page ne peut modifier quoi que ce soit.</p>
+    <p class="intro">Espace de pilotage. Deux boutons seulement agissent :
+    « Sauvegarder », qui n'écrit qu'une ligne de journal, et « Collecter », qui
+    archive les chiffres de RevenueCat. Rien d'autre sur cette page ne modifie la base.</p>
     <div id="erreur-connexion" role="alert"></div>
     <label for="email">Adresse e-mail</label>
     <input id="email" type="email" autocomplete="username" required>
@@ -441,11 +439,14 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       <div class="horodatage" id="horodatage"></div>
     </div>
     <div class="droite">
-      <!-- ⚠️ EN DUR, comme les boutons du bas : écouteurs posés une fois. Ils
-           n'exécutent rien eux-mêmes, ils cliquent le bouton du bas. Cachés
-           (`hidden`) tant que `rendreAFaire` ne leur a pas donné un délai. -->
-      <button class="discret haut-tache" id="haut-collecte" type="button" hidden>Collecter<span class="haut-sep">·</span><span class="haut-delai" id="haut-delai-collecte"></span></button>
-      <button class="discret haut-tache" id="haut-sauvegarde" type="button" hidden>Sauvegarder<span class="haut-sep">·</span><span class="haut-delai" id="haut-delai-sauvegarde"></span></button>
+      <!-- ⚠️ LES DEUX SEULS BOUTONS D'ACTION DE LA PAGE, EN DUR : écouteurs posés
+           une fois au chargement (un bouton recréé au rendu perdrait le sien).
+           Le rendu ne remplit que le délai et la couleur. Cachés (`hidden`)
+           tant que `rendreAFaire` ne leur a pas donné un délai. Depuis le
+           26/09 (demande de Gaétan), il n'y a plus de bouton en bas : le
+           résultat s'affiche juste sous l'en-tête, sans faire défiler. -->
+      <button class="discret haut-tache" id="btn-collecte" type="button" hidden>Collecter<span class="haut-sep">·</span><span class="haut-delai" id="haut-delai-collecte"></span></button>
+      <button class="discret haut-tache" id="btn-sauvegarde" type="button" hidden>Sauvegarder<span class="haut-sep">·</span><span class="haut-delai" id="haut-delai-sauvegarde"></span></button>
       <button class="discret" id="btn-recharger" type="button">Recharger</button>
       <button class="discret" id="btn-deconnexion" type="button">Se déconnecter</button>
     </div>
@@ -453,9 +454,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   <div class="etat" id="etat-console"><span class="pastille"></span><div id="etat-texte"></div></div>
 
+  <!-- Le résultat d'une collecte ou d'une sauvegarde (empreinte SHA-256
+       comprise), en haut de page, sans défilement. Vide tant qu'on n'a rien
+       lancé. ⚠️ APRÈS le bandeau (revue adverse du 26/09) : si la page s'éteint
+       après une collecte, le rouge du bandeau doit passer devant un vert.
+       Hors de `masquerBlocs` exprès : l'empreinte doit rester lisible. -->
+  <div id="collecte-resultat" role="status"></div>
+  <div id="sauvegarde-resultat" role="status"></div>
+
   <!-- ⚠️ ACCUEIL « EN UN COUP D'ŒIL » (refonte C1b, 24/09/2026).
-       Les trois boutons de période sont ICI, EN DUR, comme les boutons de la
-       bande « À faire » : leurs écouteurs sont posés une fois au chargement.
+       Les trois boutons de période sont ICI, EN DUR, comme « Collecter » et
+       « Sauvegarder » : leurs écouteurs sont posés une fois au chargement.
        Le rendu ne remplit que le titre, le sous-titre et les tuiles. -->
   <section id="s-accueil" aria-labelledby="accueil-titre">
     <div class="acc-tete">
@@ -668,15 +677,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   <!-- ⚠️ SANTÉ TECHNIQUE EN BAS (refonte C1a, 24/09/2026). Le bandeau du haut
        reste le seul endroit qui compte le rouge et l'orange : il dit OÙ regarder.
-       Depuis le lot C1c (26/09), les deux actions à échéance ont aussi un bouton
-       en haut de page ; le bandeau y renvoie, et renvoie ici pour le détail. Les voyants ne sont JAMAIS repliés : un rouge replié serait
+       Depuis le 26/09, les deux actions à échéance n'ont de bouton qu'en haut
+       de page ; le bandeau y renvoie, et renvoie ici pour le détail. Les voyants ne sont JAMAIS repliés : un rouge replié serait
        un rouge caché. -->
   <h2 class="grand-titre" id="sante">Santé technique</h2>
 
-  <!-- ⚠️ LES BOUTONS SONT ICI, EN DUR, ET NON RECREES PAR LE RENDU.
-       Les ecouteurs sont poses une fois au chargement : un bouton redessine a
-       chaque rendu perdrait le sien en silence. Le rendu ne remplit que le
-       delai et la phrase, jamais les boutons. -->
+  <!-- Le détail des deux échéances. Les boutons sont en haut de page
+       (« Collecter », « Sauvegarder ») depuis le 26/09. -->
   <div class="afaire" id="afaire">
     <div class="tache" id="tache-collecte">
       <div class="tache-tete">
@@ -684,8 +691,6 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         <span class="tache-delai" id="delai-collecte">—</span>
       </div>
       <div class="tache-dit" id="dit-collecte"></div>
-      <button type="button" id="btn-collecte">Collecter maintenant</button>
-      <div id="collecte-resultat" role="status"></div>
     </div>
     <div class="tache" id="tache-sauvegarde">
       <div class="tache-tete">
@@ -693,8 +698,6 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         <span class="tache-delai" id="delai-sauvegarde">—</span>
       </div>
       <div class="tache-dit" id="dit-sauvegarde"></div>
-      <button type="button" id="btn-sauvegarde">Générer la sauvegarde</button>
-      <div id="sauvegarde-resultat" role="status"></div>
     </div>
   </div>
 
@@ -718,7 +721,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   <section id="s-sauvegarde" class="repliable">
     <div class="titre"><h2>Sauvegarde de la base</h2><span class="sous">le plan gratuit n’en fait aucune</span></div>
     <p class="note">Le plan gratuit de Supabase n'effectue <b>aucune sauvegarde
-    automatique</b>. Ce bouton produit un fichier <code>.sql</code> qui contient
+    automatique</b>. Le bouton « Sauvegarder », en haut de page, produit un fichier <code>.sql</code> qui contient
     l'intégralité des onze tables à conserver. Gardez-le ailleurs que sur cette
     machine.</p>
     <div class="cadre" id="cadre-sauvegarde"></div>
@@ -744,8 +747,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       est le carnet de bord du dispositif, pas une donnée. Les quatre autres, ajoutées depuis le
       21/09 : les <b>compteurs du scan</b> et la <b>mesure de l'usage</b>
       (des cases par jour ou par semaine, sans identifiant — <b>perdues si l'on restaure</b>,
-      à revoir), les <b>dépenses publicitaires</b> (vides tant que l'écran de saisie n'existe
-      pas) et les <b>offres Apple</b> (reconstructibles depuis les migrations).<br><br>
+      à revoir), les <b>dépenses publicitaires</b> (table vide : la saisie a été
+      abandonnée le 26/09) et les <b>offres Apple</b> (reconstructibles depuis les migrations).<br><br>
       <b>Le fichier ne fusionne pas, il restaure.</b> Chaque table y forme une
       section qui <b>refuse de s'exécuter</b> si la table n'est pas vide, vérifie
       que la structure n'a pas changé, puis recompte et re-empreinte ce qu'elle a
@@ -758,9 +761,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   <footer>
     Les vues interrogées ne contiennent que des agrégats : ni pseudonyme,
     ni identifiant de transaction, ni adresse IP, ni commune, ni modèle
-    d'appareil. <b>Un seul bouton de cette page écrit dans la base</b> : « Générer
-    la sauvegarde », et il n'écrit qu'une ligne de journal — date, taille, nombre
-    de lignes, empreinte. Rien d'autre. Le fichier produit, lui, contient bien
+    d'appareil. <b>Un seul bouton de cette page écrit directement dans la base</b> :
+    « Sauvegarder », et il n'écrit qu'une ligne de journal — date, taille, nombre
+    de lignes, empreinte. Rien d'autre. (« Collecter » demande à une fonction du
+    serveur d'archiver les chiffres de RevenueCat.) Le fichier produit, lui, contient bien
     des données personnelles : il ne passe jamais par la base.
     <span id="pied-version"></span>
   </footer>
@@ -1097,15 +1101,15 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // l'oeil ET au lecteur d'ecran : « Collecter · déjà 12 j perdus », jamais
   // « Collecter 12 j perdus ». Sur telephone, le delai passe a la ligne.
   function hautTache(id, etat, texte){
-    $('haut-' + id).className = 'discret haut-tache ' + etat;
+    $('btn-' + id).className = 'discret haut-tache ' + etat;
     $('haut-delai-' + id).textContent = texte;
-    $('haut-' + id).hidden = false;
+    $('btn-' + id).hidden = false;
   }
 
   /**
-   * La bande « À faire ». Elle ne cree AUCUN bouton : ils sont dans le HTML,
-   * leurs ecouteurs sont poses une fois au chargement. On ne remplit que le
-   * delai, la phrase, et la couleur du liseré.
+   * La bande « À faire ». Elle ne cree AUCUN bouton : ils sont dans l'en-tete,
+   * en dur, leurs ecouteurs poses une fois au chargement. On ne remplit que le
+   * delai, la phrase, la couleur du liseré, et le delai court des boutons.
    */
   /**
    * ⚠️ ELLE REND SES TOTAUX. Les deux echeances ne sont plus des voyants de la
@@ -1323,7 +1327,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function masquerBlocs(masquer){
-    var ids = ['haut-collecte','haut-sauvegarde','s-accueil','detail-titre','sante','s-controles','afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-mesure','s-scan','s-officine','s-audience','s-sauvegarde'];
+    var ids = ['btn-collecte','btn-sauvegarde','s-accueil','detail-titre','sante','s-controles','afaire','bandeau-perimetre','resume','resume-note','s-alertes','s-argent','s-parcours','s-mesure','s-scan','s-officine','s-audience','s-sauvegarde'];
     for(var i=0;i<ids.length;i++) $(ids[i]).style.display = masquer ? 'none' : '';
   }
 
@@ -4120,7 +4124,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   function direSauvegarde(classe, texte){
     $('sauvegarde-resultat').className = 'etat ' + classe;
     $('sauvegarde-resultat').innerHTML = '<span class="pastille"></span><div>' + texte + '</div>';
-    $('sauvegarde-resultat').style.marginTop = '14px';
+    $('sauvegarde-resultat').style.margin = '0 0 14px';
   }
 
   // ⚠️ SCINDE APRES LE BANC DU 10/09. La version d'avant rappelait
@@ -4168,7 +4172,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   function direCollecte(classe, texte){
     $('collecte-resultat').className = 'etat ' + classe;
     $('collecte-resultat').innerHTML = '<span class="pastille"></span><div>' + texte + '</div>';
-    $('collecte-resultat').style.marginTop = '14px';
+    $('collecte-resultat').style.margin = '0 0 14px';
   }
 
   // ⚠️ ON N'EMPLOIE PAS `sb.functions.invoke` : il ajoute ses propres en-tetes
@@ -4442,6 +4446,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   function sauvegarder(){
     var b = $('btn-sauvegarde');
+    if(b.disabled) return;
     b.disabled = true;
     direSauvegarde('ok', '<b>Lecture de la base…</b>');
 
@@ -4534,8 +4539,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
               // ⚠️ ET LE HAUT AUSSI (lot C1c). Sans cela, le bouton du haut et
               // le bandeau restaient rouges « en retard » juste apres le succes.
               // `rendre` ne touche pas `#sauvegarde-resultat` : l'empreinte reste.
-              // Pas de `charger()` : une vue en echec eteindrait la page et
-              // cacherait l'empreinte.
+              // Pas de `charger()` : une vue en echec eteindrait la page pour
+              // rien, juste apres un succes.
               if(!s.error && s.data && s.data.length){
                 if(donneesCourantes && !chargementEnCours){
                   donneesCourantes.sauvegarde = s.data[0];
@@ -4767,7 +4772,11 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   // ── 2. Premier traitement (toujours à la semaine) ───────────────────────
-  var LIMITE_PREMIER = 'Relevé 1 à 5 minutes après l’arrivée : ceux qui reviennent plus tard n’y sont pas. À la semaine exprès : trop peu de monde par jour. Ne suit pas le réglage « Compter nos tests ».';
+  // ⚠️ ANCIENNE MESURE (26/09, remarque de Gaetan : « on les suit plus que 5
+  // minutes maintenant »). Ce texte ne vaut que pour les versions d'avant la
+  // 1.4.19 ; la tuile passe d'elle-meme a la mesure v2 des qu'une semaine close
+  // compte des installations 1.4.19 (voir `premierTraitementMesure`).
+  var LIMITE_PREMIER = 'Ancienne mesure, versions d’avant la 1.4.19 : relevé 1 à 5 minutes après l’arrivée, ceux qui enregistrent plus tard n’y sont pas. Dès qu’une semaine close comptera des accueils 1.4.19 (hors appareils de test, sauf si « Compter nos tests » est activé), la tuile passera à la nouvelle mesure, qui suit aussi les jours suivants. À la semaine exprès : trop peu de monde par jour. Cette ancienne mesure ne suit pas le réglage « Compter nos tests ».';
   var LIMITE_PREMIER_V2 = 'Mesure Pilou, installations 1.4.19 et plus, 4 dernières semaines closes. À lire comme une tendance : accueils et premiers traitements d’une même période ne concernent pas exactement les mêmes personnes. Suit le réglage « Compter nos tests ».';
   // MESURE v2 (26/09/2026). ORDRE, ET IL COMPTE (revue adverse du 26/09) :
   //  1. le parcours d'entrée est VALIDÉ D'ABORD : une ligne illisible met la
@@ -4848,7 +4857,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           + 'plus enregistrée. La mesure 1.4.19 prendra le relais, semaines closes seulement.',
         limite:LIMITE_PREMIER });
     }
-    return tuileAccueil({ nom:nom, badge:'borne basse', gris:true, grand:String(ps + pm),
+    return tuileAccueil({ nom:nom, badge:'avant 1.4.19 · borne basse', gris:true, grand:String(ps + pm),
       unite:'sur ' + connus + ' arrivée' + (connus > 1 ? 's' : ''),
       sous:'Semaine du ' + jourLong(close.semaine) + ' · par scan ' + ps + ', à la main ' + pm
         + (sansOrigine ? ' · ' + sansOrigine + ' arrivée' + (sansOrigine > 1 ? 's' : '')
@@ -5055,9 +5064,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + tuileRetour(d, auj, per)
       + tuileAbonnes(d.resume)
       + tuileEncaisse(d.encaisse, auj, per)
-      + tuileScanAccueil(d.scan, auj, per)
-      + '<div class="acc-attente"><b>Publicité</b><span>Dépense et coût par arrivée : dès que la '
-      + 'saisie des dépenses Google Ads et Apple Ads sera en place.</span></div>';
+      + tuileScanAccueil(d.scan, auj, per);
+    // L'encart « Publicité » a ete retire le 26/09 : la saisie des depenses est
+    // abandonnee (decision de Gaetan, pas de publicite reguliere). Il promettait
+    // un ecran qui ne viendra pas.
     return { critique: accueilIllisibles, attention: 0 };
   }
 
@@ -5108,7 +5118,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   });
 
   $('btn-deconnexion').addEventListener('click', function(){
-    sb.auth.signOut().then(function(){ montrerConsole(false); });
+    sb.auth.signOut().then(function(){
+      // Un resultat d'action ne survit pas a la session qui l'a produit.
+      $('collecte-resultat').className = ''; $('collecte-resultat').innerHTML = '';
+      $('sauvegarde-resultat').className = ''; $('sauvegarde-resultat').innerHTML = '';
+      montrerConsole(false);
+    });
   });
   $('btn-recharger').addEventListener('click', charger);
   $('btn-sauvegarde').addEventListener('click', sauvegarder);
@@ -5116,26 +5131,6 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   preparerPeriodes();
   $('btn-collecte').addEventListener('click', collecter);
 
-  // ⚠️ LES BOUTONS DU HAUT CLIQUENT CEUX DU BAS (lot C1c). Aucune logique
-  // copiee : un bouton du bas desactive (action en cours) ne part pas, et le
-  // resultat (dont l'empreinte SHA-256 de la sauvegarde) s'affiche la ou il
-  // s'affichait. On amene la page jusqu'a ce resultat.
-  function relier(haut, bas, carte){
-    var h = $(haut), b = $(bas);
-    h.addEventListener('click', function(){
-      if(b.disabled) return;
-      b.click();
-      var calme = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      $(carte).scrollIntoView({ behavior: calme ? 'auto' : 'smooth', block: 'center' });
-    });
-    function recopier(){ h.disabled = b.disabled; }
-    recopier();
-    if(window.MutationObserver){
-      new MutationObserver(recopier).observe(b, { attributes: true, attributeFilter: ['disabled'] });
-    }
-  }
-  relier('haut-collecte',   'btn-collecte',   'tache-collecte');
-  relier('haut-sauvegarde', 'btn-sauvegarde', 'tache-sauvegarde');
 
   // Repliage : delegue, donc il survit a chaque rechargement des tableaux.
   document.addEventListener('click', function(ev){

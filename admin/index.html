@@ -2319,15 +2319,22 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   function rendreParcours(rows){
+    // MESURE v2 : la colonne `origine_non_enregistree` n'existe qu'après la
+    // migration `mesure_v2`. Avant, ni la colonne ni la note ne s'affichent.
+    var apresMigration = (rows||[]).some(function(r){
+      return r && aPropriete(r, 'origine_non_enregistree');
+    });
     var lignes = (rows||[]).map(function(r){
-      return { grisee: !!r.semaine_en_cours, cases:[
+      var cases = [
         {texte: 'sem. du ' + jourTexte(r.semaine) + (r.semaine_en_cours ? ' (en cours)' : '')},
         {texte: nb(r.installations)},
         {texte: nb(r.ont_tente_un_scan)},
         {texte: nb(r.premier_par_scan)},
         {texte: nb(r.premier_a_la_main)},
         {texte: nb(r.aucun_traitement)}
-      ]};
+      ];
+      if(apresMigration) cases.push({texte: nb(r.origine_non_enregistree)});
+      return { grisee: !!r.semaine_en_cours, cases: cases };
     });
     // ⚠️ CE TABLEAU N'OBEIT PAS A L'INTERRUPTEUR, ET IL DOIT LE DIRE (13/09).
     // `v_admin_parcours_semaine` ecarte `appareil_de_test = true` DANS LA BASE :
@@ -2339,8 +2346,16 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // cette phrase devra changer avec elle — contrairement a celle des codes
     // pharmacie, qui, elle, se verifie toute seule a chaque rendu.
     $('cadre-parcours').innerHTML = tableau('Parcours d’entrée',
-      ['Semaine','Installations','Ont tenté un scan','1er par scan','1er à la main','Aucun traitement'],
+      ['Semaine','Installations','Ont tenté un scan','1er par scan','1er à la main','Aucun traitement']
+        .concat(apresMigration ? ['Origine non enregistrée'] : []),
       lignes, 'aucun parcours enregistré', 12)
+      + (apresMigration
+          ? '<div class="rien"><b>Origine du premier traitement</b> : le serveur ne l’enregistre '
+            + 'plus, quelle que soit la version de l’application. Ces arrivées sont comptées dans '
+            + 'la dernière colonne, et dans aucune des colonnes « 1er … » ni « Aucun traitement ». '
+            + 'Le premier traitement se lit dans « Parcours dans le temps », pour les '
+            + 'installations 1.4.19 et plus.</div>'
+          : '')
       + '<div class="rien"><b>Ce tableau n’obéit pas à l’interrupteur de périmètre.</b> '
       + 'L’exclusion des appareils de test y est faite dans la base, avant l’envoi. '
       + 'Et ce marquage ne reconnaît pas une version signée pour le test interne : '
@@ -3183,9 +3198,14 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // illisible et la section ne montre AUCUN chiffre, en disant pourquoi.
 
   // Les 29 clés que la base accepte (contrainte CHECK de `mesure_agregats`,
-  // relue en base le 22/09/2026). Une clé que la base apprendrait avant cette
-  // page apparaîtrait dans « clés inconnues » — jamais ignorée en silence.
-  var MESURE_JALONS = ['jalon_accueil','jalon_revenu_j1','jalon_revenu_j2_7','jalon_revenu_j8_30'];
+  // relue en base le 22/09/2026), plus les 3 de la MESURE v2 (1.4.19), que la
+  // migration `mesure_v2` du dépôt de l'application ajoute à la contrainte :
+  // jalon_accueil_v2, jalon_creation_jour_essai, jalon_creation_plus_tard.
+  // Tant que cette migration n'est pas appliquée, la base ne peut pas les
+  // rendre. Une clé que la base apprendrait avant cette page apparaîtrait dans
+  // « clés inconnues » — jamais ignorée en silence.
+  var MESURE_JALONS = ['jalon_accueil','jalon_revenu_j1','jalon_revenu_j2_7','jalon_revenu_j8_30',
+    'jalon_accueil_v2','jalon_creation_jour_essai','jalon_creation_plus_tard'];
   var MESURE_ECRANS = ['ecran_pilulier','ecran_traitements','ecran_historique','ecran_horaires',
     'ecran_reglages','ecran_abonnement','ecran_aide','ecran_confidentialite','ecran_validation',
     'ecran_prise','ecran_config_horaires'];
@@ -3196,6 +3216,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   var MESURE_LIBELLES = {
     jalon_accueil:'Accueil accepté', jalon_revenu_j1:'Revenu le lendemain',
     jalon_revenu_j2_7:'Revenu du 2ᵉ au 7ᵉ jour', jalon_revenu_j8_30:'Revenu du 8ᵉ au 30ᵉ jour',
+    jalon_accueil_v2:'Accueil accepté en 1.4.19 ou plus',
+    jalon_creation_jour_essai:'1ᵉʳ traitement le jour du 1ᵉʳ essai',
+    jalon_creation_plus_tard:'1ᵉʳ traitement plus tard (30 jours au plus)',
     ecran_pilulier:'Pilulier', ecran_traitements:'Traitements', ecran_historique:'Historique',
     ecran_horaires:'Horaires', ecran_reglages:'Réglages', ecran_abonnement:'Abonnement',
     ecran_aide:'Aide', ecran_confidentialite:'Confidentialité', ecran_validation:'Validation',
@@ -3240,7 +3263,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   // PostgREST plafonne les réponses et TRONQUE EN SILENCE. La page garde déjà
   // à ce seuil ailleurs (parcours jour par jour). Pire cas calculé pour cette
-  // vue : 29 clés x 3 plateformes x 2 anciennetés x 2 test x 26 semaines par
+  // vue : 32 clés (29 + 3 de la mesure v2) x 3 plateformes x 2 anciennetés x 2 test x 26 semaines par
   // version = plusieurs milliers de lignes. Le risque est réel, pas théorique,
   // et une troncature au milieu d'une semaine ancienne amputerait un
   // dénominateur de rétention sans qu'aucune garde ne s'en aperçoive.
@@ -3314,6 +3337,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       if(!aPropriete(parPlateforme, r.plateforme)) parPlateforme[r.plateforme] = { _tot:0, _cases:{} };
       var pc = parPlateforme[r.plateforme];
       pc._cases[r.cle] = (aPropriete(pc._cases, r.cle) ? pc._cases[r.cle] : 0) + n;
+      // `jalon_accueil_v2` DOUBLE `jalon_accueil` (même geste, installations
+      // 1.4.19+) : il ne gonfle pas les « événements comptés ».
+      if(r.cle === 'jalon_accueil_v2') continue;
       pc._tot += n;
       parAnciennete[r.anciennete] = (aPropriete(parAnciennete, r.anciennete) ? parAnciennete[r.anciennete] : 0) + n;
       versions[r.version] = (aPropriete(versions, r.version) ? versions[r.version] : 0) + n;
@@ -3389,8 +3415,47 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return { lignes:out, fin:fin, fenetre:fenetre };
   }
 
+  /**
+   * MESURE v2 (1.4.19) : le PREMIER TRAITEMENT, sur les 4 dernières semaines
+   * CLOSES — les mêmes que la rétention.
+   * Numérateur : jalon_creation_jour_essai + jalon_creation_plus_tard.
+   * Dénominateur : jalon_accueil_v2 (accueils des installations 1.4.19+ ; pas
+   * jalon_accueil, qui mélange 1.4.18 et 1.4.19 sous la même version « 01.04 »).
+   * ⚠️ UN FLUX, PAS UNE COHORTE, ET SANS DÉCALAGE : un jalon est compté la
+   * semaine où il remonte, jusqu'à 30 jours après l'accueil. La base ne rend ces
+   * trois clés que pour les semaines CLOSES (vue `v_admin_mesure`).
+   * Une semaine absente interdit le calcul, comme pour la rétention.
+   */
+  function premierTraitementMesure(a){
+    var closes = [];
+    for(var i=0;i<a.semaines.length;i++){
+      if(!a.parSemaine[a.semaines[i]]._enCours) closes.push(a.semaines[i]);
+    }
+    if(!closes.length) return { cause:'aucune semaine close' };
+    var fin = closes[0], fenetre = 4, jour = 0, tard = 0, den = 0, manque = null, debut = fin;
+    for(var w=0; w<fenetre; w++){
+      var s = semaineMoins(fin, w);
+      debut = s;
+      if(!aPropriete(a.parSemaine, s) && manque === null) manque = s;
+      jour += caseMesure(a, s, 'jalon_creation_jour_essai');
+      tard += caseMesure(a, s, 'jalon_creation_plus_tard');
+      den += caseMesure(a, s, 'jalon_accueil_v2');
+    }
+    return { jour:jour, tard:tard, num:jour + tard, den:den, debut:debut, fin:fin,
+             fenetre:fenetre, manque:manque };
+  }
+
+  // Les accueils TOUTES VERSIONS sur la même fenêtre : dit quelle part des
+  // arrivées la mesure 1.4.19 représente pendant la montée en charge.
+  function accueilsToutesVersions(a, pt){
+    var t = 0;
+    for(var w=0; w<pt.fenetre; w++) t += caseMesure(a, semaineMoins(pt.fin, w), 'jalon_accueil');
+    return t;
+  }
+
   function pctMesure(n, sur){
-    return sur > 0 ? Math.round(1000 * n / sur) / 10 + ' %' : '—';
+    // Virgule décimale, à la française (26/09/2026).
+    return sur > 0 ? String(Math.round(1000 * n / sur) / 10).replace('.', ',') + ' %' : '—';
   }
 
   /**
@@ -3492,7 +3557,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           valeur = pctMesure(L.num, L.den);
           classe = '';
           var f = fourchetteMesure(L.num, L.den);
-          fourchette = f ? ('de ' + f.bas + ' % à ' + f.haut + ' %') : '—';
+          fourchette = f ? ('de ' + unDecimal(f.bas) + ' % à ' + unDecimal(f.haut) + ' %') : '—';
         }
         lr.push({ cases:[
           { texte: MESURE_LIBELLES[L.jalon] },
@@ -3508,6 +3573,62 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
           + ' · la semaine en cours est écartée',
         ['Jalon','Retours comptés','Accueils au dénominateur','Taux','Fourchette à 95 %','Décalage appliqué'],
         lr, 'aucune semaine close', 0) + noteRet;
+    }
+
+    // ── 1 bis. Premier traitement (mesure v2, 1.4.19 et plus) ───────────────
+    // Sous le plancher de confidentialité, AUCUN numérateur n'est affiché (ni
+    // « le jour du 1er essai », ni « plus tard ») : jalon sensible, AIPD n° 5.
+    var notePt = '<div class="rien" style="padding-top:0">'
+      + '<b>À lire comme une tendance, sur plusieurs semaines</b> : un premier traitement est '
+      + 'compté la semaine où l’application l’envoie (il a été enregistré au plus 30 jours après '
+      + 'l’accueil), un accueil la semaine où il arrive. Les deux ne concernent donc pas '
+      + 'exactement les mêmes personnes. « Le jour du 1ᵉʳ essai » : le jour du premier scan '
+      + 'lancé ou de la première saisie à la main. Seules les installations acceptées en '
+      + '<b>1.4.19 ou plus</b> portent ces cases. Un envoi perdu (hors ligne, application jamais '
+      + 'rouverte) est un jalon perdu : chiffre prudent. La base ne rend ces cases qu’une fois la '
+      + 'semaine terminée.</div>';
+    var pt = premierTraitementMesure(a);
+    if(pt.cause){
+      cR.innerHTML += '<div class="rien"><b>Premier traitement (1.4.19 et plus)</b> — '
+        + ech(pt.cause) + '.</div>';
+    } else if(!pt.den && !pt.num){
+      cR.innerHTML += '<div class="rien"><b>Premier traitement (1.4.19 et plus)</b> — aucune '
+        + 'remontée sur les ' + pt.fenetre + ' dernières semaines closes'
+        + (a.ecartees && !compterNosTests()
+            ? ' dans le périmètre affiché (des événements de nos appareils de test sont écartés ; '
+              + 'l’interrupteur en haut de page les réintègre)' : '')
+        + '.</div>';
+    } else {
+      var vPt = '—', fPt = '', cPt = 'attention', jPt = String(pt.jour), tPt = String(pt.tard);
+      if(pt.den < MESURE_PLANCHER){
+        fPt = 'trop peu : ' + pt.den + ' accueil(s), plancher à ' + MESURE_PLANCHER;
+        jPt = '—'; tPt = '—';
+      } else if(pt.manque){
+        fPt = 'semaine du ' + jourTexte(pt.manque) + ' sans aucune remontée : '
+            + 'une semaine absente n’est pas une semaine à zéro';
+        compte.attention++;
+      } else if(pt.num > pt.den){
+        fPt = 'plus de premiers traitements (' + pt.num + ') que d’accueils (' + pt.den
+            + ') : des accueils plus anciens que la fenêtre y contribuent';
+        compte.attention++;
+      } else {
+        vPt = pctMesure(pt.num, pt.den);
+        cPt = '';
+        var fp = fourchetteMesure(pt.num, pt.den);
+        fPt = fp ? ('de ' + unDecimal(fp.bas) + ' % à ' + unDecimal(fp.haut) + ' %') : '—';
+      }
+      var tousPt = accueilsToutesVersions(a, pt);
+      cR.innerHTML += tableau(
+        'Premier traitement — installations 1.4.19 et plus, ' + pt.fenetre
+          + ' semaines closes (semaines du ' + jourTexte(pt.debut) + ' au ' + jourTexte(pt.fin) + ')',
+        ['Taux','Fourchette à 95 %','Accueils 1.4.19+','Le jour du 1ᵉʳ essai','Plus tard'],
+        [{ cases:[
+          { texte: vPt, classe: cPt },
+          { texte: fPt, classe: cPt },
+          { texte: String(pt.den) + (tousPt > pt.den ? ' sur ' + tousPt + ' toutes versions' : '') },
+          { texte: jPt },
+          { texte: tPt }
+        ]}], '', 0) + notePt;
     }
 
     // ── 2. Entonnoir du scan, vu du téléphone ───────────────────────────────
@@ -4547,27 +4668,91 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   // ── 2. Premier traitement (toujours à la semaine) ───────────────────────
   var LIMITE_PREMIER = 'Relevé 1 à 5 minutes après l’arrivée : ceux qui reviennent plus tard n’y sont pas. À la semaine exprès : trop peu de monde par jour. Ne suit pas le réglage « Compter nos tests ».';
-  function tuilePremierTraitement(rows){
+  var LIMITE_PREMIER_V2 = 'Mesure Pilou, installations 1.4.19 et plus, 4 dernières semaines closes. À lire comme une tendance : accueils et premiers traitements d’une même période ne concernent pas exactement les mêmes personnes. Suit le réglage « Compter nos tests ».';
+  // MESURE v2 (26/09/2026). ORDRE, ET IL COMPTE (revue adverse du 26/09) :
+  //  1. le parcours d'entrée est VALIDÉ D'ABORD : une ligne illisible met la
+  //     tuile en rouge, quelle que soit la source affichée ensuite ;
+  //  2. dès que la mesure 1.4.19 a remonté quelque chose sur la fenêtre, C'EST
+  //     ELLE QUI DÉCIDE — même calcul et mêmes garde-fous que la section
+  //     « Parcours dans le temps » (`premierTraitementMesure`) : semaine absente,
+  //     plus de créations que d'accueils, plancher de confidentialité (sous le
+  //     plancher, AUCUN numérateur n'est affiché) ;
+  //  3. sinon, repli sur le parcours d'entrée des versions antérieures, dont
+  //     l'origine n'est plus enregistrée après la migration `mesure_v2`.
+  function tuilePremierTraitement(rows, mesure){
     var nom = 'Premier traitement enregistré';
     if(!Array.isArray(rows)) return tuileIllisible(nom, 'la vue n’a rien rendu', LIMITE_PREMIER);
-    var close = null;
+    var close = null, apresMigration = false;
     for(var i=0;i<rows.length;i++){
       var r = rows[i];
       if(!r || !jourValide(r.semaine) || typeof r.semaine_en_cours !== 'boolean')
         return tuileIllisible(nom, 'une semaine illisible', LIMITE_PREMIER);
+      if(aPropriete(r, 'origine_non_enregistree')) apresMigration = true;
       if(!r.semaine_en_cours && (close === null || r.semaine > close.semaine)) close = r;
     }
+    var ins = null, ps = null, pm = null, sansOrigine = 0;
+    if(close !== null){
+      ins = entierOuNul(close.installations); ps = entierOuNul(close.premier_par_scan);
+      pm = entierOuNul(close.premier_a_la_main);
+      // `origine_non_enregistree` : colonne ajoutée par la migration `mesure_v2`.
+      // ABSENTE, c'est la vue d'avant la migration, où la colonne d'origine
+      // était obligatoire : aucune ligne sans origine, par construction.
+      if(aPropriete(close, 'origine_non_enregistree')) sansOrigine = entierOuNul(close.origine_non_enregistree);
+      if(ins === null || ps === null || pm === null || sansOrigine === null || sansOrigine < 0
+         || sansOrigine > ins || ps + pm > ins - sansOrigine)
+        return tuileIllisible(nom, 'des comptes incohérents, semaine du ' + jourTexte(close.semaine), LIMITE_PREMIER);
+    }
+
+    var am = agregerMesure(mesure, compterNosTests());
+    if(am.cause){
+      // Après la migration, le parcours n'a plus d'origine : un repli
+      // silencieux montrerait « — » en gris alors que la mesure est en panne.
+      if(apresMigration) return tuileIllisible(nom, am.cause, LIMITE_PREMIER_V2);
+    } else {
+      var pt = premierTraitementMesure(am);
+      if(!pt.cause && (pt.den > 0 || pt.num > 0)){
+        var base = { nom:nom, badge:'1.4.19+ · 4 sem.', gris:true, grand:'—', limite:LIMITE_PREMIER_V2 };
+        if(pt.manque){
+          base.sous = 'Pas encore calculable : aucune remontée la semaine du ' + jourTexte(pt.manque) + '.';
+          return tuileAccueil(base);
+        }
+        if(pt.den < MESURE_PLANCHER){
+          base.sous = 'Trop peu : ' + pt.den + ' accueil' + (pt.den > 1 ? 's' : '')
+            + ' 1.4.19+, plancher à ' + MESURE_PLANCHER + '.';
+          return tuileAccueil(base);
+        }
+        if(pt.num > pt.den){
+          base.sous = 'Plus de premiers traitements que d’accueils sur la fenêtre (' + pt.den
+            + ' accueils) : des accueils plus anciens y contribuent, pas de taux.';
+          base.sousAttention = true;
+          return tuileAccueil(base);
+        }
+        var fp = fourchetteMesure(pt.num, pt.den), tous = accueilsToutesVersions(am, pt);
+        return tuileAccueil({ nom:nom, badge:'1.4.19+ · 4 sem.', grand:pctMesure(pt.num, pt.den),
+          unite:pt.num + ' sur ' + pt.den + ' accueils',
+          sous:'le jour du 1ᵉʳ essai ' + pt.jour + ', plus tard ' + pt.tard
+            + (fp ? ' · fourchette ' + unDecimal(fp.bas) + ' à ' + unDecimal(fp.haut) + ' %' : '')
+            + (tous > pt.den ? ' · ' + pt.den + ' accueils 1.4.19+ sur ' + tous + ' toutes versions' : ''),
+          limite:LIMITE_PREMIER_V2 });
+      }
+    }
+
     if(close === null){
       return tuileAccueil({ nom:nom, badge:'à la semaine', gris:true, grand:'—',
         sous:'Aucune semaine close pour l’instant.', limite:LIMITE_PREMIER });
     }
-    var ins = entierOuNul(close.installations), ps = entierOuNul(close.premier_par_scan),
-        pm = entierOuNul(close.premier_a_la_main);
-    if(ins === null || ps === null || pm === null || ps + pm > ins)
-      return tuileIllisible(nom, 'des comptes incohérents, semaine du ' + jourTexte(close.semaine), LIMITE_PREMIER);
+    var connus = ins - sansOrigine;
+    if(connus === 0){
+      return tuileAccueil({ nom:nom, badge:'à la semaine', gris:true, grand:'—',
+        sous:'Semaine du ' + jourLong(close.semaine) + ' : l’origine du premier traitement n’est '
+          + 'plus enregistrée. La mesure 1.4.19 prendra le relais, semaines closes seulement.',
+        limite:LIMITE_PREMIER });
+    }
     return tuileAccueil({ nom:nom, badge:'borne basse', gris:true, grand:String(ps + pm),
-      unite:'sur ' + ins + ' arrivée' + (ins > 1 ? 's' : ''),
-      sous:'Semaine du ' + jourLong(close.semaine) + ' · par scan ' + ps + ', à la main ' + pm,
+      unite:'sur ' + connus + ' arrivée' + (connus > 1 ? 's' : ''),
+      sous:'Semaine du ' + jourLong(close.semaine) + ' · par scan ' + ps + ', à la main ' + pm
+        + (sansOrigine ? ' · ' + sansOrigine + ' arrivée' + (sansOrigine > 1 ? 's' : '')
+            + ' sans origine enregistrée, écartée' + (sansOrigine > 1 ? 's' : '') : ''),
       limite:LIMITE_PREMIER });
   }
 
@@ -4766,7 +4951,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     $('accueil-sous').textContent = sous;
     $('accueil-tuiles').innerHTML =
         tuileArrivees(auj, per)
-      + tuilePremierTraitement(d.parcours)
+      + tuilePremierTraitement(d.parcours, d.mesure)
       + tuileRetour(d, auj, per)
       + tuileAbonnes(d.resume)
       + tuileEncaisse(d.encaisse, auj, per)

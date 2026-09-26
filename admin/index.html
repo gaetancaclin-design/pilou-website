@@ -2411,9 +2411,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + ' ⚠️ <b>Ce n’est pas une date de vente</b> : les annulations, les '
       + 'expirations, les accès offerts à 0 € et les achats de test comptent '
       + 'aussi. Et ce n’est pas un signe de bonne santé : sans activité, cette '
-      + 'date vieillit sans qu’il y ait la moindre panne. <b>Aucune détection '
-      + 'automatique d’une panne du webhook n’existe</b> — la référence reste le '
-      + 'tableau de bord RevenueCat.</div>';
+      + 'date vieillit sans qu’il y ait la moindre panne. Le voyant « Paiements attendus », '
+      + 'en tête de cette section, repère un renouvellement ou une fin qui n’est pas arrivé ; '
+      + '<b>un tout premier achat perdu ne se voit pas</b> — la référence reste le tableau de bord RevenueCat.</div>';
   }
 
   function rendreParcours(rows){
@@ -3963,9 +3963,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       'aucun encaissement rattaché à un code', 12)
       + mentionPerimetre(toutes, MOT_INTERNES, U_ENCAISSE)
       + faitVide
-      + '<div class="rien"><b>Ce tableau ne calcule aucune commission</b> : ni taux ni '
-      + 'plafond ne sont enregistrés, et la règle n’est pas arrêtée. Il montre l’assiette — '
-      + 'l’argent réel entré par un code.<br><br>Le <b>net</b> est le brut moins la TVA et '
+      + '<div class="rien"><b>Ce tableau ne calcule aucune commission</b> : elles sont dans '
+      + '« À verser aux apporteurs », section Argent. Il montre l’assiette — l’argent réel '
+      + 'entré par un code, rattaché par installation seulement et en mois de Paris : il peut différer des commissions.<br><br>Le <b>net</b> est le brut moins la TVA et '
       + 'moins la part du magasin, aux taux que RevenueCat envoie <b>avec chaque paiement</b> '
       + '— rien n’est figé dans la page. La colonne « sans net » compte les encaissements '
       + 'dont un taux manquait : ils ne sont pas perdus, ils ne sont simplement pas '

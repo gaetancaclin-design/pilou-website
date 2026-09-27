@@ -28,25 +28,25 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--surface);color:var(--ink);font:400 18px/1.55 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.page{max-width:520px;margin:0 auto;padding:28px 20px 36px;min-height:100vh;display:flex;flex-direction:column}
-header{margin-bottom:28px}
+.page{max-width:520px;margin:0 auto;padding:20px 20px 36px;min-height:100vh;display:flex;flex-direction:column}
+header{margin-bottom:18px}
 .marque{display:inline-flex;align-items:center;gap:10px;text-decoration:none}
 .site{display:block;margin:0 auto 18px;text-align:center;font-size:17px;font-weight:600;color:var(--brand-darker)}
 header img{width:44px;height:44px;border-radius:12px}
 header span{font:800 24px/1 Nunito,Inter,sans-serif;color:var(--brand-darker)}
-h1{font:800 34px/1.15 Nunito,Inter,sans-serif;margin:0 0 10px;letter-spacing:-.01em}
+h1{font:800 32px/1.12 Nunito,Inter,sans-serif;margin:0 0 16px;letter-spacing:-.01em}
 .sous-titre{margin:0 0 28px;color:var(--muted);font-size:19px}
-.action{background:var(--white);border:1px solid var(--border);border-radius:24px;padding:22px 20px;margin:0 0 16px;box-shadow:0 1px 3px rgba(16,24,20,.05)}
+.action{background:var(--white);border:1px solid var(--border);border-radius:24px;padding:18px 18px;margin:0 0 16px;box-shadow:0 1px 3px rgba(16,24,20,.05)}
 .action h2{font:700 15px/1.3 Inter,sans-serif;margin:0 0 12px;color:var(--brand-dark);text-transform:uppercase;letter-spacing:.06em}
 .bouton{display:flex;align-items:center;justify-content:center;width:100%;min-height:64px;padding:14px 18px;border-radius:18px;background:var(--brand-darker);color:#fff;font-weight:700;font-size:21px;text-decoration:none;box-shadow:0 6px 16px rgba(48,90,64,.22)}
 .bouton:focus-visible,summary:focus-visible,.bascule:focus-visible{outline:3px solid var(--brand-darker);outline-offset:3px}
 .rassure{margin:14px 0 0;text-align:center;color:var(--muted);font-size:16px}
-.garantie{display:flex;gap:14px;align-items:flex-start;background:var(--brand-light);border:1px solid #cfe6d6;border-radius:20px;padding:18px 18px;margin:0 0 18px}
-.garantie svg{flex:0 0 auto;width:30px;height:30px;margin-top:2px}
+.garantie{display:flex;gap:12px;align-items:flex-start;background:var(--brand-light);border:1px solid #cfe6d6;border-radius:18px;padding:14px 16px;margin:0 0 16px}
+.garantie svg{flex:0 0 auto;width:26px;height:26px;margin-top:1px}
 .garantie p{margin:0}
-.garantie .fort{font:800 21px/1.25 Nunito,Inter,sans-serif;color:var(--brand-darker);margin-bottom:6px}
-.garantie .doux{font-size:17px;color:#2f4a38}
-.etapes{list-style:none;margin:0 0 18px;padding:0;counter-reset:e}
+.garantie .fort{font:800 19px/1.25 Nunito,Inter,sans-serif;color:var(--brand-darker);margin-bottom:4px}
+.garantie .doux{font-size:16px;line-height:1.45;color:#2f4a38}
+.etapes{list-style:none;margin:18px 0 0;padding:0;counter-reset:e}
 .etapes li{position:relative;padding:0 0 10px 46px;font-size:17px;line-height:1.45}
 .etapes li::before{counter-increment:e;content:counter(e);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--brand-darker);color:#fff;font:700 16px/32px Inter,sans-serif;text-align:center}
 .etapes li strong{color:var(--ink)}
@@ -75,23 +75,22 @@ footer a,details a{color:var(--brand-darker)}
 <header><a class="marque" href="/"><img src="/logo-mark.png" alt="" width="44" height="44"><span>Pilou</span></a></header>
 
 <h1>Vos 3 mois de Pilou+ offerts</h1>
-<p class="sous-titre">Le pilulier dans votre téléphone.</p>
-
 <div class="garantie" role="note">
 <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#305a40" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3z"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/></svg>
 <div><p class="fort">Offre gratuite, sans renouvellement.</p>
-<p class="doux">Au bout des 3 mois, elle s’arrête d’elle-même, sans prélèvement. Vous ne payez que si vous choisissez vous-même Pilou+.</p></div>
+<p class="doux">Au bout des 3 mois, elle s’arrête d’elle-même, sans prélèvement.</p></div>
 </div>
 
 <section class="action" id="iphone" aria-labelledby="t-iphone">
 <h2 id="t-iphone">Sur iPhone</h2>
+<a class="bouton" href="https://apps.apple.com/redeem?ctx=offercodes&amp;id=6806332290&amp;code=61293407">Activer mes 3 mois offerts</a>
+<p class="pour">Avec le compte Apple de la personne qui utilisera Pilou.</p>
 <ol class="etapes" role="list">
-<li>Touchez <strong>Activer mes 3 mois offerts</strong>.</li>
 <li>Apple vous demande de confirmer (Face ID ou mot de passe).</li>
 <li>Installez ou ouvrez Pilou&#8239;: Pilou+ est activé.</li>
+<li>Vous ne payez que si vous choisissez vous-même Pilou+ après les 3 mois.</li>
 </ol>
-<a class="bouton" href="https://apps.apple.com/redeem?ctx=offercodes&amp;id=6806332290&amp;code=61293407">Activer mes 3 mois offerts</a>
-<p class="pour">Avec le compte Apple de la personne qui utilisera Pilou. Réservé aux comptes jamais abonnés à Pilou+ sur iPhone.</p>
+<p class="pour">Réservé aux comptes Apple jamais abonnés à Pilou+ sur iPhone.</p>
 </section>
 
 <section class="action" id="android" aria-labelledby="t-android">
@@ -106,7 +105,7 @@ footer a,details a{color:var(--brand-darker)}
 <p class="lecteur" id="copie-etat" role="status" aria-live="polite"></p>
 <p class="conditions">Après les 3 mois, Pilou reste gratuit&#8239;: vos traitements sont conservés et vos rappels de prise continuent. Si vous le souhaitez, Pilou+ est à 2,99&#8239;€/mois ou 26,99&#8239;€/an, sans engagement.</p>
 <a class="bascule cache" id="bascule" href="#"></a>
-<a class="site" href="/">Découvrir Pilou sur pilou-app.fr</a>
+<a class="site" href="/">Pilou, le pilulier dans votre téléphone&#8239;: découvrir sur pilou-app.fr</a>
 
 <details>
 <summary>Besoin d’aide&#8239;?</summary>

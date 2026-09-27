@@ -133,6 +133,13 @@ header.haut .droite{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
   border-color:color-mix(in srgb, var(--attention) 30%, transparent)}
 .etat.critique{background:var(--critique-fond); color:var(--critique);
   border-color:color-mix(in srgb, var(--critique) 34%, transparent)}
+.etat.bref{padding:0; border:0; background:none; margin:0 0 14px; font-size:13px;
+  align-items:center; gap:8px; color:var(--encre-2)}
+.etat.bref .pastille{margin-top:0}
+.etat.bref > div > b:first-child{display:inline; margin:0; font-weight:600}
+.lecteur-seul{position:absolute; width:1px; height:1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap}
+.etat.charge .pastille{background:var(--encre-3)}
 .pastille{width:9px; height:9px; border-radius:50%; background:currentColor;
   flex:0 0 auto; margin-top:7px}
 
@@ -210,7 +217,12 @@ details.repli .corps{
   padding:11px 13px; font-size:12px; font-weight:400; line-height:1.55;
   text-transform:none; letter-spacing:0; white-space:normal;
 }
-.aide:hover>.bulle, .aide:focus-within>.bulle{display:block}
+/* Le survol n'ouvre la bulle QUE sur un appareil qui survole vraiment (souris).
+   Au doigt, un appui laisse un « survol collant » sur le « ? » : la bulle ne
+   pouvait plus se refermer par un second appui (vu au banc, 27/09). Au doigt,
+   c'est le focus, donné par le script des « ? », qui ouvre et referme. */
+.aide:focus-within>.bulle{display:block}
+@media (hover:hover){ .aide:hover>.bulle{display:block} }
 .res.alerte{border-color:color-mix(in srgb, var(--critique) 35%, transparent)}
 .res.alerte .valeur{color:var(--critique)}
 .res.attention{border-color:color-mix(in srgb, var(--attention) 35%, transparent)}
@@ -370,6 +382,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   border-bottom:1px solid color-mix(in srgb, var(--attention) 28%, transparent)}
 .rien.avert b{color:var(--attention)}
 #filtres-parcours:empty{display:none}
+.filtre-alerte{color:var(--attention); font-weight:600}
+.filtre-versions .puces{margin:0 0 10px}
 /* ── Accueil « en un coup d'œil » (refonte C1b, 24/09/2026) ─────────────────
    Six tuiles et un sélecteur de période. Les couleurs ne disent que l'état ;
    tout le reste est en encre et en gris. Aucune police externe. */
@@ -401,8 +415,25 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 .acc-unite{font-size:16px; color:var(--encre-2)}
 .acc-sous-ligne{font-size:14px; color:var(--encre-2)}
 .acc-sous-ligne.attention{color:var(--attention); font-weight:600}
-.acc-limite{margin-top:auto; padding-top:10px; border-top:1px solid var(--trait);
-  font-size:13px; line-height:1.45; color:var(--encre-2)}
+/* Explication d'une tuile derrière un « ? » (demande de Gaétan, 27/09/2026 :
+   des tuiles plus courtes, plus visuelles). Même mécanique que `.aide`
+   (survol ET appui via `:focus-within`), avec deux différences :
+   - cible au doigt de 44 px (le rond visible fait 20 px, `::after` agrandit
+     la zone cliquable) — 14 px ne se touchent pas au pouce ;
+   - la bulle s'accroche à l'EN-TÊTE DE LA TUILE, pas au « ? » : elle prend la
+     largeur de la tuile et ne peut donc pas déborder de l'écran à 390 px. */
+.acc-haut{position:relative}
+.acc-nom .insecable{white-space:nowrap}
+.aide.aide-tuile{position:static; margin-left:6px; vertical-align:-4px}
+.aide.aide-tuile>button{position:relative; width:20px; height:20px; font-size:12px}
+.aide.aide-tuile>button::after{content:""; position:absolute; inset:-12px}
+.aide.aide-tuile>.bulle{left:0; right:0; top:calc(100% + 6px); width:auto; max-width:none;
+  font-size:13px; color:var(--encre-2)}
+/* Pont invisible sur les 6 px entre l'en-tête et la bulle : la souris peut
+   y descendre sans que la bulle se ferme (revue adverse du 27/09).
+   ⚠️ 8 px, PAS PLUS : un pont plus haut recouvrait le « ? » lui-même, et au
+   doigt l'appui tombait sur la bulle au lieu du bouton (vu au banc). */
+.aide.aide-tuile>.bulle::before{content:""; position:absolute; left:0; right:0; bottom:100%; height:8px}
 @media (max-width:900px){ .acc-tuiles{grid-template-columns:repeat(2, minmax(0, 1fr))} }
 @media (max-width:600px){
   .acc-tuiles{grid-template-columns:minmax(0, 1fr)}
@@ -485,29 +516,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
   <h2 class="grand-titre" id="detail-titre">Dans le détail</h2>
 
-  <section id="s-parcours">
-    <div class="titre"><h2>Parcours d'entrée</h2><span class="sous">par semaine, puis jour par jour</span></div>
-    <div class="cadre" id="cadre-parcours"></div>
-    <div class="cadre" id="filtres-parcours"></div>
-    <div class="cadre" id="cadre-inst-jour"></div>
-    <details class="repli"><summary>⚠️ Ces colonnes gonflent l'abandon apparent — à lire avant de les interpréter</summary>
-      <div class="corps"><b>Elles disent ce que la personne avait déjà fait au moment où sa
-      ligne est partie, pas ce qu'elle a fini par faire.</b> Le message part une à cinq minutes
-      après le premier lancement : quelqu'un qui saisit son traitement à la septième minute est
-      compté « aucun traitement ». Le biais va toujours dans ce sens. Ne lisez jamais ces
-      chiffres comme un bilan de parcours.<br><br>
-      <b>Par semaine, et c'est volontaire.</b> Au jour, plusieurs cases ne contiendraient qu'une
-      seule personne — ce n'est plus une statistique, c'est un individu. Le tableau du dessous ne
-      donne qu'un <b>compte</b> par jour, ce qui ne décrit le comportement de personne.<br><br>
-      La semaine en cours est grisée : incomplète, elle ne se compare à aucune autre. Appareils
-      de test exclus de ce tableau hebdomadaire.<br><br>
-      <b>Le tableau du dessous, lui, se filtre</b> — et il le faut. Le marquage
-      « appareil de test » ne reconnaît PAS une version signée pour le test interne :
-      c'est exactement le fichier qui ira en production, il ne porte donc aucune
-      marque. Nos propres essais y comptent comme de vrais nouveaux venus tant que
-      leur numéro de version n'a pas été décoché.</div></details>
-  </section>
-
+  <!-- Ordre : « Parcours dans le temps » EN TÊTE du détail (demande de Gaétan,
+       27/09/2026) : la lecture semaine par semaine d'abord, le parcours
+       d'entrée ensuite. Aucun code ne dépend de l'ordre des sections. -->
   <section id="s-mesure">
     <div class="titre"><h2>Parcours dans le temps</h2><span class="sous">mesuré par l’application, en cases hebdomadaires</span></div>
     <div class="cadre" id="cadre-mesure-avert"></div>
@@ -568,7 +579,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       <b>La version ne porte que majeur.mineur</b> (« 01.04 ») : <b>1.4.15 et 1.4.16 sont
       indiscernables</b> dans ces chiffres, alors que le sens de « accueil accepté » change
       entre les deux — en 1.4.16 l’acceptation passe au premier geste. Pour la même raison, les
-      <b>puces de version</b> du bandeau « Parcours d’entrée » <b>n’agissent pas ici</b>.<br><br>
+      <b>le filtre par version</b> de « Parcours d’entrée » <b>n’agit pas ici</b>.<br><br>
       <b>N’importe qui peut appeler la fonction de mesure.</b> Des appels fabriqués gonfleraient
       ces compteurs, et <b>rien ne les distingue</b> : la colonne « test » est fiable pour nos
       propres appareils, puisque c’est notre application qui la pose — mais un appel fabriqué la
@@ -576,6 +587,34 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       <b>ne passe pas par l’interrupteur de périmètre</b>. Seul un saut anormal trahirait le
       reste.<br><br>
       <b>Cette section obéit à l’interrupteur de périmètre</b> en haut de page.</div></details>
+  </section>
+
+  <section id="s-parcours">
+    <div class="titre"><h2>Parcours d'entrée</h2><span class="sous">par semaine, puis jour par jour</span></div>
+    <div class="cadre" id="cadre-parcours"></div>
+    <div class="cadre" id="cadre-inst-jour"></div>
+    <!-- Filtre par version : replié SOUS le tableau jour par jour (demande de
+         Gaétan du 27/09 : « ça prend de la place pour rien »). Gardé, et non
+         retiré (revue adverse du 27/09) : c'est le SEUL moyen d'écarter une
+         version signée pour le test interne, qui ne porte pas la marque
+         « appareil de test ». Une version masquée se voit sans ouvrir. -->
+    <div id="filtres-parcours"></div>
+    <details class="repli"><summary>⚠️ Ces colonnes gonflent l'abandon apparent — à lire avant de les interpréter</summary>
+      <div class="corps"><b>Elles disent ce que la personne avait déjà fait au moment où sa
+      ligne est partie, pas ce qu'elle a fini par faire.</b> Le message part une à cinq minutes
+      après le premier lancement : quelqu'un qui saisit son traitement à la septième minute est
+      compté « aucun traitement ». Le biais va toujours dans ce sens. Ne lisez jamais ces
+      chiffres comme un bilan de parcours.<br><br>
+      <b>Par semaine, et c'est volontaire.</b> Au jour, plusieurs cases ne contiendraient qu'une
+      seule personne — ce n'est plus une statistique, c'est un individu. Le tableau du dessous ne
+      donne qu'un <b>compte</b> par jour, ce qui ne décrit le comportement de personne.<br><br>
+      La semaine en cours est grisée : incomplète, elle ne se compare à aucune autre. Appareils
+      de test exclus de ce tableau hebdomadaire.<br><br>
+      <b>Le tableau du dessous, lui, se filtre</b> — et il le faut. Le marquage
+      « appareil de test » ne reconnaît PAS une version signée pour le test interne :
+      c'est exactement le fichier qui ira en production, il ne porte donc aucune
+      marque. Nos propres essais y comptent comme de vrais nouveaux venus tant que
+      leur numéro de version n'a pas été décoché.</div></details>
   </section>
 
   <section id="s-argent" class="repliable">
@@ -1326,10 +1365,22 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return q;
   }
 
+  // ⚠️ VERT = UNE LIGNE (demande de Gaétan du 27/09 : « Rien à signaler » en
+  // grand bloc prenait la place du haut de page pour ne rien dire). Vert et
+  // « chargement » : pastille + titre, sans cadre ; le détail reste lisible au
+  // survol (`title`). Orange et rouge : bloc complet INCHANGÉ, avec « où
+  // regarder » — ce sont eux qui demandent une action.
   function afficherEtat(classe, titre, texte){
     var e = $('etat-console');
-    e.className = 'etat ' + classe;
-    $('etat-texte').innerHTML = '<b>'+ech(titre)+'</b>'+ech(texte);
+    var bref = (classe === 'ok' || classe === 'charge');
+    e.className = 'etat ' + classe + (bref ? ' bref' : '');
+    if(bref){
+      e.title = String(titre) + String(texte);
+      $('etat-texte').innerHTML = '<b>'+ech(titre)+'</b>';
+    } else {
+      e.removeAttribute('title');
+      $('etat-texte').innerHTML = '<b>'+ech(titre)+'</b>'+ech(texte);
+    }
   }
 
   function masquerBlocs(masquer){
@@ -1450,8 +1501,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       }
       masquerBlocs(false);
 
-      afficherEtat('ok','Console ouverte. ',
-        'Les ' + (VUES.length + 1) + ' vues répondent. Les chiffres ci-dessous sont ceux de la base.');
+      // Gris, pas vert (revue adverse du 27/09) : rien n'est encore lu, sauf le
+      // compte administrateur. Le vert ne vient qu'après le rendu complet.
+      afficherEtat('charge','Lecture des vues… ',
+        'Le compte administrateur est reconnu ; les ' + VUES.length + ' vues sont en cours de lecture.');
       return Promise.all(VUES.map(function(v){ return lire(v.vue, v.ordre); }));
     }).then(function(res){
       if(jeton !== jetonCharge) return;        // reponse perimee : on ne rend rien,
@@ -1472,6 +1525,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       // et un plantage y laissait la page a moitie repeinte sous un bandeau vert.
       if(rendre(d)){
         $('horodatage').textContent = 'relevé le ' + fmtDate.format(new Date()) + ' (heure de Paris)';
+        effacerSuccesEnAttente();
       }
       $('btn-recharger').disabled = false;
     }).catch(function(e){
@@ -2825,14 +2879,26 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return liste.sort();
   }
 
+  // Ouvert ou fermé : retenu d'un rendu à l'autre, sinon le repli se
+  // refermerait sous le doigt à chaque clic sur une puce (chaque clic redessine).
+  var filtresVersionsOuverts = false;
+
   function dessinerFiltresParcours(){
-    var versions = versionsVues(), i;
+    var versions = versionsVues(), i, masquees = 0;
     // La puce « nos appareils de test » a demenage en haut de page le 13/09 :
     // elle ne pilotait plus seulement ce tableau, mais aussi les acces offerts,
     // le bac a sable et les octrois internes. Un reglage qui agit partout ne
     // peut pas vivre dans le coin d'un tableau.
-    var h = '<div class="cap">Versions — ce que le tableau ci-dessous affiche</div>'
-          + '<div class="puces">'
+    for(i=0;i<versions.length;i++) if(filtreParcours.versionsExclues[versions[i]] === true) masquees++;
+    // ⚠️ REPLIÉ, MAIS JAMAIS MUET (revue adverse du 27/09) : une version masquée
+    // change la tuile « Arrivées » et ce tableau. Le titre du repli le dit donc
+    // en orange, sans qu'il faille l'ouvrir.
+    var h = '<details class="repli filtre-versions"' + (filtresVersionsOuverts ? ' open' : '') + '>'
+          + '<summary>' + (masquees
+              ? '<span class="filtre-alerte">⚠️ ' + masquees + (masquees > 1 ? ' versions masquées' : ' version masquée')
+                + '</span> — filtrer le tableau jour par jour par version'
+              : 'Filtrer le tableau jour par jour par version (toutes affichées)')
+          + '</summary><div class="corps"><div class="puces">'
           + (versions.length ? '' : '<span class="puces-sep">aucune version à filtrer</span>');
     for(i=0;i<versions.length;i++){
       var v = versions[i], actif = (filtreParcours.versionsExclues[v] !== true);
@@ -2840,8 +2906,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
          + '" data-role="version" data-version="' + ech(v) + '" aria-pressed="'
          + (actif ? 'true' : 'false') + '">' + (actif ? '✓ ' : '') + ech(v) + '</button>';
     }
-    h += '</div>';
+    h += '</div>Une version signée pour le test interne n’a pas la marque « appareil de test » : '
+       + 'décochez-la ici pour écarter nos propres essais de la tuile « Arrivées » et de ce tableau.'
+       + '</div></details>';
     $('filtres-parcours').innerHTML = h;
+
+    var repli = $('filtres-parcours').querySelector('details');
+    if(repli) repli.addEventListener('toggle', function(){ filtresVersionsOuverts = this.open; });
 
     // Les anciens boutons sont detruits avec l'innerHTML : aucun ecouteur ne
     // survit, donc aucune fuite. On rebranche les nouveaux.
@@ -3874,7 +3945,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
        + ' — la mesure ne porte que <b>majeur.mineur</b> (« 01.04 » = 1.4.x, « 00.00 » = version '
        + 'inconnue, nos essais au navigateur) : <b>1.4.15 et 1.4.16 sont indiscernables ici</b>, '
        + 'alors que le sens de « accueil accepté » change entre les deux.'
-       + '<br><b>Les puces de version du bandeau « Parcours d’entrée » n’agissent pas sur cette '
+       + '<br><b>Le filtre par version de « Parcours d’entrée » n’agit pas sur cette '
        + 'section</b> : la mesure ne porte pas le numéro de correctif. Seul l’interrupteur de '
        + 'périmètre agit ici.'
        // ⚠️ LE CADRAGE SE DIT D'APRES L'INTERRUPTEUR, PAS D'APRES LE COMPTE.
@@ -4133,17 +4204,18 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return { texte: e.join('\n') + '\n' + corps.join('\n\n') + '\n', lignes: total };
   }
 
-  function direSauvegarde(classe, texte){
-    $('sauvegarde-resultat').className = 'etat ' + classe;
+  function direSauvegarde(classe, texte, bref){
+    $('sauvegarde-resultat').className = 'etat ' + classe + (bref ? ' bref' : '');
     $('sauvegarde-resultat').innerHTML = '<span class="pastille"></span><div>' + texte + '</div>';
     $('sauvegarde-resultat').style.margin = '0 0 14px';
   }
 
   // ⚠️ SCINDE APRES LE BANC DU 10/09. La version d'avant rappelait
   // rendreSauvegarde() apres un export reussi : elle ECRASAIT le message qui
-  // portait l'empreinte SHA-256 — celle que l'exploitant doit comparer avec
-  // certutil — et la remplacait par l'etat general. Le seul chiffre qui compte
-  // disparaissait deux secondes apres etre apparu.
+  // portait l'empreinte SHA-256 et la remplacait par l'etat general.
+  // Depuis le 27/09 : une sauvegarde au succès NET n'affiche qu'une ligne,
+  // effacée quand la section « Sauvegarde de la base » montre CETTE empreinte ;
+  // sinon le message complet (empreinte, commande certutil) reste affiché.
   // ── AUDIENCE ──────────────────────────────────────────────────────────────
   // ⚠️ L'INDEX 0 EST CODE EN DUR DANS `v_admin_audience_jours`. Si RevenueCat
   // reindexait ses mesures, les colonnes « Nouveaux », « Actifs » et « Essais »
@@ -4181,10 +4253,39 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     return (v == null) ? 'vide' : String(v);
   }
 
-  function direCollecte(classe, texte){
-    $('collecte-resultat').className = 'etat ' + classe;
+  function direCollecte(classe, texte, bref){
+    $('collecte-resultat').className = 'etat ' + classe + (bref ? ' bref' : '');
     $('collecte-resultat').innerHTML = '<span class="pastille"></span><div>' + texte + '</div>';
     $('collecte-resultat').style.margin = '0 0 14px';
+  }
+
+  // ⚠️ SUCCÈS NET = RIEN À L'ÉCRAN (demande de Gaétan du 27/09 : « Collecte
+  // terminée », « sauvegarde faite », il n'en a pas besoin — le bouton affiche
+  // déjà le nouveau délai). Mais on n'efface qu'APRÈS un rendu réussi de la
+  // page (revue adverse du 27/09) : si la page s'éteint juste après, le message
+  // reste la seule trace de ce qui a été fait.
+  // Tout ce qui n'est pas un succès net (partiel, révision refusée, motif,
+  // journal non écrit, refus) garde son message complet.
+  var succesAEffacer = { collecte: false };
+  // ⚠️ UNE SAUVEGARDE NE PARLE QUE SI ELLE EST LA DERNIÈRE (revue adverse du
+  // 27/09). Sa vérification finale arrive APRÈS la réactivation du bouton : sans
+  // ce numéro, elle pouvait effacer — ou repeindre en vert — le refus rouge
+  // d'une sauvegarde lancée entre-temps. La déconnexion l'incrémente aussi :
+  // rien d'une session fermée ne s'écrit plus à l'écran.
+  var generationSauvegarde = 0;
+  // Vidé SANS nouvelle annonce : la ligne courte (zone `role="status"`) a déjà
+  // été lue par le lecteur d'écran ; une seconde annonce ferait doublon.
+  function effacerSucces(id){
+    var z = $(id);
+    z.className = '';
+    z.style.margin = '';
+    z.innerHTML = '';
+  }
+  function effacerSuccesEnAttente(){
+    if(succesAEffacer.collecte){
+      effacerSucces('collecte-resultat');
+      succesAEffacer.collecte = false;
+    }
   }
 
   // ⚠️ ON N'EMPLOIE PAS `sb.functions.invoke` : il ajoute ses propres en-tetes
@@ -4197,8 +4298,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     var b = $('btn-collecte');
     if(b.disabled) return;
     b.disabled = true;
-    direCollecte('ok', '<b>Collecte en cours…</b> Onze séries à lire chez RevenueCat, '
-      + 'puis l’écriture. Comptez une dizaine de secondes. Ne fermez pas la page.');
+    succesAEffacer.collecte = false;
+    direCollecte('charge', '<b>Collecte en cours… ne fermez pas la page.</b>', true);
 
     var debut = Date.now();
     sb.auth.getSession().then(function(s){
@@ -4220,7 +4321,16 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       var o = x.corps || {};
       if(x.code === 200){
         var partiel = (o.etat === 'partiel');
-        direCollecte(partiel ? 'attention' : 'ok',
+        // Succès NET, au sens strict : une réponse 200 illisible (`o = {}`),
+        // une révision refusée ou un motif ne le sont pas (revue adverse).
+        var net = (o.etat === 'ok' && Number(o.revisions_refusees) === 0 && !o.motif);
+        if(net){
+          // En une ligne, avec ce qui a été écrit : si la page s'éteint au
+          // rechargement, cette ligne reste la trace de la collecte.
+          direCollecte('ok', '<b>Collecte terminée : ' + ech(nb(o.lignes_ajoutees))
+            + ' ligne(s) ajoutée(s).</b>', true);
+          succesAEffacer.collecte = true;
+        } else direCollecte(partiel ? 'attention' : 'ok',
           '<b>Collecte terminée' + (partiel ? ' — partielle' : '') + '.</b> '
           + ech(nb(o.series_lues)) + ' série(s) lue(s), <b>' + ech(nb(o.lignes_ajoutees))
           + '</b> ligne(s) ajoutée(s), ' + ech(nb(o.revisions_refusees))
@@ -4236,8 +4346,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
         // grise empecherait d'utiliser ce qu'on vient justement d'ouvrir.
         b.disabled = false;
         // On recharge la console pour que les tableaux montrent les nouvelles
-        // lignes. Le message ci-dessus, lui, n'est PAS reecrit : c'est la
-        // lecon du banc du 10/09 sur l'empreinte de sauvegarde effacee.
+        // lignes. Un succès NET est effacé après ce rechargement, s'il réussit
+        // (`effacerSuccesEnAttente`) ; tout autre message reste à l'écran.
         charger();
       } else if(x.code === 409){
         // ⚠️ LE 409 RECOUVRE DEUX SITUATIONS, et l'index les confond : il porte
@@ -4460,7 +4570,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     var b = $('btn-sauvegarde');
     if(b.disabled) return;
     b.disabled = true;
-    direSauvegarde('ok', '<b>Lecture de la base…</b>');
+    var gen = ++generationSauvegarde;
+    function courante(){ return gen === generationSauvegarde; }
+    function dire(classe, texte, bref){ if(courante()) direSauvegarde(classe, texte, bref); }
+    direSauvegarde('charge', '<b>Sauvegarde en cours…</b>', true);
 
     sb.rpc('exporter_sauvegarde').then(function(r){
       if(r.error) throw r.error;
@@ -4534,19 +4647,26 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
             p_octets: blob.size, p_lignes: f.lignes, p_empreinte: emp
           }).then(function(j){
             if(j.error){
-              direSauvegarde('attention',
+              dire('attention',
                 '<b>Fichier téléchargé, mais le journal n’a pas été écrit.</b>'
                 + ech(j.error.message) + ' — le voyant restera rouge. '
                 + 'Empreinte du fichier, à conserver : <code>' + ech(emp) + '</code>');
             } else {
-              direSauvegarde('ok',
-                '<b>' + ech(nom) + ' — ' + f.lignes + ' lignes, ' + octetsTexte(blob.size)
-                + '.</b>Vérifiez le fichier reçu : <code>certutil -hashfile "' + ech(nom)
-                + '" SHA256</code> doit rendre <code>' + ech(emp) + '</code>');
+              // Une ligne d'abord (revue adverse du 27/09 : afficher le bloc
+              // complet pour l'effacer aussitôt faisait sauter le haut de page).
+              dire('ok', '<b>Sauvegarde enregistrée — vérification…</b>', true);
             }
-            b.disabled = false;
+            var complet = '<b>' + ech(nom) + ' — ' + f.lignes + ' lignes, ' + octetsTexte(blob.size)
+              + '.</b>Vérifiez le fichier reçu : <code>certutil -hashfile "' + ech(nom)
+              + '" SHA256</code> doit rendre <code>' + ech(emp) + '</code>';
+            // Tout ce qui n'est pas un succès net montre le message complet.
+            function nonNet(){ if(!j.error) dire('ok', complet); }
+            if(courante()) b.disabled = false;
             // `true` : on garde a l'ecran le message qui porte l'empreinte.
             return lire('v_admin_sauvegarde').then(function(s){
+              // Une sauvegarde plus récente (ou une déconnexion) a pris la main :
+              // c'est elle qui mettra le tableau et le message à jour.
+              if(!courante()) return;
               // Le tableau se met a jour ; le message du succes reste a l'ecran.
               // ⚠️ ET LE HAUT AUSSI (lot C1c). Sans cela, le bouton du haut et
               // le bandeau restaient rouges « en retard » juste apres le succes.
@@ -4557,19 +4677,34 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
                 if(donneesCourantes && !chargementEnCours){
                   donneesCourantes.sauvegarde = s.data[0];
                   if(!rendre(donneesCourantes)){
+                    nonNet();
                     // La page s'est eteinte : on ne perd pas pour autant la preuve.
                     $('etat-texte').innerHTML += ' La sauvegarde, elle, a réussi : empreinte <code>'
                       + ech(emp) + '</code>.';
+                  } else if(j.error){
+                    // Le message « journal non écrit » reste tel quel.
+                  } else if(s.data[0].empreinte === emp){
+                    // Succès net, page rendue, et la section « Sauvegarde de la
+                    // base » montre CETTE empreinte : le message peut partir.
+                    effacerSucces('sauvegarde-resultat');
+                  } else {
+                    // Revue adverse du 27/09 : ce n'est pas un vert.
+                    dire('attention', complet + '<br>⚠️ Le tableau « Sauvegarde de la base » '
+                      + 'affiche une autre empreinte : le journal ne correspond pas à ce fichier.');
                   }
                 } else {
+                  nonNet();
                   rendreSauvegarde(s.data[0]);
                 }
+              } else {
+                nonNet();
               }
             });
           });
         });
       });
     }).catch(function(e){
+      if(!courante()) return;          // la déconnexion a déjà réactivé le bouton
       direSauvegarde('critique', '<b>Sauvegarde refusée.</b>'
         + ech(e && e.message ? e.message : String(e)));
       b.disabled = false;
@@ -4698,16 +4833,33 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // Une tuile. Tous les textes passent par `ech` : aucune donnée n'entre brute.
   // o = { nom, badge, courbe, courbeTexte, grand, unite, sous, sousAttention,
   //       limite, gris, illisible }
+  // `limite` (l'explication) vit derrière le « ? » à côté du nom depuis le
+  // 27/09/2026 ; le chiffre, `sous` et les alertes restent visibles.
+  var numeroBulleTuile = 0;
+  // Le « ? » reste collé au DERNIER MOT du nom : jamais seul sur sa ligne.
+  function nomEtAide(nom, aide){
+    var t = String(nom == null ? '' : nom);
+    if(!aide) return ech(t);
+    var i = t.lastIndexOf(' ');
+    return ech(t.slice(0, i + 1)) + '<span class="insecable">' + ech(t.slice(i + 1)) + aide + '</span>';
+  }
   function tuileAccueil(o){
     var cl = 'acc-tuile' + (o.illisible ? ' illisible' : (o.gris ? ' gris' : ''));
     var haut = o.courbe ? courbeSvg(o.courbe, o.courbeTexte || '') : '';
     if(!haut && o.badge) haut = '<span class="acc-badge">' + ech(o.badge) + '</span>';
+    var aide = '';
+    if(o.limite){
+      numeroBulleTuile++;
+      var idB = 'bulle-tuile-' + numeroBulleTuile;
+      aide = '<span class="aide aide-tuile"><button type="button" aria-label="Explication : ' + ech(o.nom)
+        + '" aria-describedby="' + idB + '">?</button>'
+        + '<span class="bulle" role="tooltip" id="' + idB + '">' + ech(o.limite) + '</span></span>';
+    }
     return '<div class="' + cl + '">'
-      + '<div class="acc-haut"><span class="acc-nom">' + ech(o.nom) + '</span>' + haut + '</div>'
+      + '<div class="acc-haut"><span class="acc-nom">' + nomEtAide(o.nom, aide) + '</span>' + haut + '</div>'
       + '<div class="acc-chiffre"><span class="acc-grand">' + ech(o.grand) + '</span>'
       + (o.unite ? '<span class="acc-unite">' + ech(o.unite) + '</span>' : '') + '</div>'
       + (o.sous ? '<span class="acc-sous-ligne' + (o.sousAttention ? ' attention' : '') + '">' + ech(o.sous) + '</span>' : '')
-      + '<span class="acc-limite">' + ech(o.limite) + '</span>'
       + '</div>';
   }
   // ⚠️ UNE TUILE ROUGE EST COMPTÉE DANS LE BANDEAU. Un bandeau « rien à
@@ -4727,7 +4879,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   }
 
   // ── 1. Arrivées ──────────────────────────────────────────────────────────
-  var LIMITE_ARRIVEES = 'Premiers démarrages signalés par l’application. Pas des téléchargements ; une réinstallation compte à nouveau. Suit le réglage « Compter nos tests » et les puces de version.';
+  var LIMITE_ARRIVEES = 'Premiers démarrages signalés par l’application. Pas des téléchargements ; une réinstallation compte à nouveau. Suit le réglage « Compter nos tests » et le filtre par version de « Parcours d’entrée ».';
   function tuileArrivees(auj, per){
     var nom = 'Arrivées';
     if(auj === null) return tuileIllisible(nom, 'la date de la base manque', LIMITE_ARRIVEES);
@@ -4788,93 +4940,76 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // minutes maintenant »). Ce texte ne vaut que pour les versions d'avant la
   // 1.4.19 ; la tuile passe d'elle-meme a la mesure v2 des qu'une semaine close
   // compte des installations 1.4.19 (voir `premierTraitementMesure`).
-  var LIMITE_PREMIER = 'Ancienne mesure, versions d’avant la 1.4.19 : relevé 1 à 5 minutes après l’arrivée, ceux qui enregistrent plus tard n’y sont pas. Dès qu’une semaine close comptera des accueils 1.4.19 (hors appareils de test, sauf si « Compter nos tests » est activé), la tuile passera à la nouvelle mesure, qui suit aussi les jours suivants. À la semaine exprès : trop peu de monde par jour. Cette ancienne mesure ne suit pas le réglage « Compter nos tests ».';
   var LIMITE_PREMIER_V2 = 'Mesure Pilou, installations 1.4.19 et plus, 4 dernières semaines closes. À lire comme une tendance : accueils et premiers traitements d’une même période ne concernent pas exactement les mêmes personnes. Suit le réglage « Compter nos tests ».';
-  // MESURE v2 (26/09/2026). ORDRE, ET IL COMPTE (revue adverse du 26/09) :
+  // MESURE v2 (26/09/2026), SEULE SOURCE depuis le 27/09 (demande de Gaétan :
+  // l'ancienne mesure « avant 1.4.19 · borne basse » ne sert plus — le serveur
+  // n'enregistre plus l'origine du premier traitement). ORDRE, ET IL COMPTE :
   //  1. le parcours d'entrée est VALIDÉ D'ABORD : une ligne illisible met la
-  //     tuile en rouge, quelle que soit la source affichée ensuite ;
-  //  2. dès que la mesure 1.4.19 a remonté quelque chose sur la fenêtre, C'EST
-  //     ELLE QUI DÉCIDE — même calcul et mêmes garde-fous que la section
-  //     « Parcours dans le temps » (`premierTraitementMesure`) : semaine absente,
-  //     plus de créations que d'accueils, plancher de confidentialité (sous le
-  //     plancher, AUCUN numérateur n'est affiché) ;
-  //  3. sinon, repli sur le parcours d'entrée des versions antérieures, dont
-  //     l'origine n'est plus enregistrée après la migration `mesure_v2`.
+  //     tuile en rouge. Gardé exprès (revue adverse du 27/09) : c'est le seul
+  //     endroit qui signale une vue `v_admin_parcours_semaine` cassée ;
+  //  2. la mesure 1.4.19 décide seule — même calcul et mêmes garde-fous que la
+  //     section « Parcours dans le temps » (`premierTraitementMesure`) : semaine
+  //     absente, plus de créations que d'accueils, plancher de confidentialité
+  //     (sous le plancher, AUCUN numérateur n'est affiché) ; illisible → rouge ;
+  //  3. rien encore → gris, et la tuile dit ce qu'il faut pour avoir un taux.
   function tuilePremierTraitement(rows, mesure){
     var nom = 'Premier traitement enregistré';
-    if(!Array.isArray(rows)) return tuileIllisible(nom, 'la vue n’a rien rendu', LIMITE_PREMIER);
-    var close = null, apresMigration = false;
+    if(!Array.isArray(rows)) return tuileIllisible(nom, 'la vue du parcours d’entrée n’a rien rendu', LIMITE_PREMIER_V2);
+    // Même contrôle qu'avant le 27/09, à l'identique : toutes les semaines
+    // lisibles, et des comptes cohérents pour la dernière semaine close.
+    var close = null;
     for(var i=0;i<rows.length;i++){
       var r = rows[i];
       if(!r || !jourValide(r.semaine) || typeof r.semaine_en_cours !== 'boolean')
-        return tuileIllisible(nom, 'une semaine illisible', LIMITE_PREMIER);
-      if(aPropriete(r, 'origine_non_enregistree')) apresMigration = true;
+        return tuileIllisible(nom, 'une semaine illisible dans le parcours d’entrée', LIMITE_PREMIER_V2);
       if(!r.semaine_en_cours && (close === null || r.semaine > close.semaine)) close = r;
     }
-    var ins = null, ps = null, pm = null, sansOrigine = 0;
     if(close !== null){
-      ins = entierOuNul(close.installations); ps = entierOuNul(close.premier_par_scan);
-      pm = entierOuNul(close.premier_a_la_main);
-      // `origine_non_enregistree` : colonne ajoutée par la migration `mesure_v2`.
-      // ABSENTE, c'est la vue d'avant la migration, où la colonne d'origine
-      // était obligatoire : aucune ligne sans origine, par construction.
+      var ins = entierOuNul(close.installations), ps = entierOuNul(close.premier_par_scan),
+          pm = entierOuNul(close.premier_a_la_main), sansOrigine = 0;
       if(aPropriete(close, 'origine_non_enregistree')) sansOrigine = entierOuNul(close.origine_non_enregistree);
       if(ins === null || ps === null || pm === null || sansOrigine === null || sansOrigine < 0
          || sansOrigine > ins || ps + pm > ins - sansOrigine)
-        return tuileIllisible(nom, 'des comptes incohérents, semaine du ' + jourTexte(close.semaine), LIMITE_PREMIER);
+        return tuileIllisible(nom, 'des comptes incohérents dans le parcours d’entrée, semaine du '
+          + jourTexte(close.semaine), LIMITE_PREMIER_V2);
     }
 
     var am = agregerMesure(mesure, compterNosTests());
-    if(am.cause){
-      // Après la migration, le parcours n'a plus d'origine : un repli
-      // silencieux montrerait « — » en gris alors que la mesure est en panne.
-      if(apresMigration) return tuileIllisible(nom, am.cause, LIMITE_PREMIER_V2);
-    } else {
-      var pt = premierTraitementMesure(am);
-      if(!pt.cause && (pt.den > 0 || pt.num > 0)){
-        var base = { nom:nom, badge:'1.4.19+ · 4 sem.', gris:true, grand:'—', limite:LIMITE_PREMIER_V2 };
-        if(pt.manque){
-          base.sous = 'Pas encore calculable : aucune remontée la semaine du ' + jourTexte(pt.manque) + '.';
-          return tuileAccueil(base);
-        }
-        if(pt.den < MESURE_PLANCHER){
-          base.sous = 'Trop peu : ' + pt.den + ' accueil' + (pt.den > 1 ? 's' : '')
-            + ' 1.4.19+, plancher à ' + MESURE_PLANCHER + '.';
-          return tuileAccueil(base);
-        }
-        if(pt.num > pt.den){
-          base.sous = 'Plus de premiers traitements que d’accueils sur la fenêtre (' + pt.den
-            + ' accueils) : des accueils plus anciens y contribuent, pas de taux.';
-          base.sousAttention = true;
-          return tuileAccueil(base);
-        }
-        var fp = fourchetteMesure(pt.num, pt.den), tous = accueilsToutesVersions(am, pt);
-        return tuileAccueil({ nom:nom, badge:'1.4.19+ · 4 sem.', grand:pctMesure(pt.num, pt.den),
-          unite:pt.num + ' sur ' + pt.den + ' accueils',
-          sous:'le jour du 1ᵉʳ essai ' + pt.jour + ', plus tard ' + pt.tard
-            + (fp ? ' · fourchette ' + unDecimal(fp.bas) + ' à ' + unDecimal(fp.haut) + ' %' : '')
-            + (tous > pt.den ? ' · ' + pt.den + ' accueils 1.4.19+ sur ' + tous + ' toutes versions' : ''),
-          limite:LIMITE_PREMIER_V2 });
-      }
+    if(am.cause) return tuileIllisible(nom, am.cause, LIMITE_PREMIER_V2);
+    var pt = premierTraitementMesure(am);
+    var base = { nom:nom, badge:'1.4.19+ · 4 sem.', gris:true, grand:'—', limite:LIMITE_PREMIER_V2 };
+    // Semaine absente AVANT « aucun accueil » (revue adverse du 27/09) : avec une
+    // semaine inconnue, « aucun accueil » serait une affirmation non vérifiée.
+    if(!pt.cause && pt.manque){
+      base.sous = 'Pas encore calculable : aucune remontée la semaine du ' + jourTexte(pt.manque) + '.';
+      return tuileAccueil(base);
     }
-
-    if(close === null){
-      return tuileAccueil({ nom:nom, badge:'à la semaine', gris:true, grand:'—',
-        sous:'Aucune semaine close pour l’instant.', limite:LIMITE_PREMIER });
+    if(pt.cause || !(pt.den > 0 || pt.num > 0)){
+      base.sous = (pt.cause
+          ? 'Pas encore de semaine close dans la mesure. '
+          : 'Aucun accueil 1.4.19 et plus sur les 4 dernières semaines closes. ')
+        + 'Un taux s’affichera dès qu’elles en compteront au moins ' + MESURE_PLANCHER
+        + (compterNosTests() ? ' (appareils de test compris).' : ' (hors appareils de test).');
+      return tuileAccueil(base);
     }
-    var connus = ins - sansOrigine;
-    if(connus === 0){
-      return tuileAccueil({ nom:nom, badge:'à la semaine', gris:true, grand:'—',
-        sous:'Semaine du ' + jourLong(close.semaine) + ' : l’origine du premier traitement n’est '
-          + 'plus enregistrée. La mesure 1.4.19 prendra le relais, semaines closes seulement.',
-        limite:LIMITE_PREMIER });
+    if(pt.den < MESURE_PLANCHER){
+      base.sous = 'Pas encore de taux : ' + pt.den + ' accueil' + (pt.den > 1 ? 's' : '')
+        + ' 1.4.19 et plus sur les 4 dernières semaines closes, il en faut au moins ' + MESURE_PLANCHER + '.';
+      return tuileAccueil(base);
     }
-    return tuileAccueil({ nom:nom, badge:'avant 1.4.19 · borne basse', gris:true, grand:String(ps + pm),
-      unite:'sur ' + connus + ' arrivée' + (connus > 1 ? 's' : ''),
-      sous:'Semaine du ' + jourLong(close.semaine) + ' · par scan ' + ps + ', à la main ' + pm
-        + (sansOrigine ? ' · ' + sansOrigine + ' arrivée' + (sansOrigine > 1 ? 's' : '')
-            + ' sans origine enregistrée, écartée' + (sansOrigine > 1 ? 's' : '') : ''),
-      limite:LIMITE_PREMIER });
+    if(pt.num > pt.den){
+      base.sous = 'Plus de premiers traitements que d’accueils sur la fenêtre (' + pt.den
+        + ' accueils) : des accueils plus anciens y contribuent, pas de taux.';
+      base.sousAttention = true;
+      return tuileAccueil(base);
+    }
+    var fp = fourchetteMesure(pt.num, pt.den), tous = accueilsToutesVersions(am, pt);
+    return tuileAccueil({ nom:nom, badge:'1.4.19+ · 4 sem.', grand:pctMesure(pt.num, pt.den),
+      unite:pt.num + ' sur ' + pt.den + ' accueils',
+      sous:'le jour du 1ᵉʳ essai ' + pt.jour + ', plus tard ' + pt.tard
+        + (fp ? ' · fourchette ' + unDecimal(fp.bas) + ' à ' + unDecimal(fp.haut) + ' %' : ''),
+      limite:LIMITE_PREMIER_V2
+        + (tous > pt.den ? ' Sur ces 4 semaines : ' + pt.den + ' accueils 1.4.19 et plus, sur ' + tous + ' toutes versions.' : '') });
   }
 
   // ── 3. Retour ─────────────────────────────────────────────────────────────
@@ -5028,7 +5163,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + (o.vides ? ', dont ' + o.vides + ' sans aucun médicament trouvé' : '') + (partiel ? ' (journée en cours)' : '');
     if(partielSemaine) sous += ' Semaine pas entièrement mesurée.';
     return tuileAccueil({ nom:nom, courbe:courbe, courbeTexte:courbeTexte,
-      grand:String(o.servis), unite:'réussi' + (o.servis > 1 ? 's' : '') + ' sur ' + o.env,
+      // « essais compris » reste VISIBLE (revue adverse du 27/09) : cette tuile
+      // n'obéit pas à « Compter nos tests » ; derrière le « ? », le chiffre
+      // tromperait sans que rien à l'écran ne le signale.
+      grand:String(o.servis), unite:'réussi' + (o.servis > 1 ? 's' : '') + ' sur ' + o.env + ' · essais compris',
       sous:sous, sousAttention: o.echecs > 0, limite:LIMITE_SCAN });
   }
 
@@ -5121,11 +5259,39 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     sb.auth.signOut().then(function(){
       // Un resultat d'action ne survit pas a la session qui l'a produit.
       $('collecte-resultat').className = ''; $('collecte-resultat').innerHTML = '';
+      succesAEffacer.collecte = false;
       $('sauvegarde-resultat').className = ''; $('sauvegarde-resultat').innerHTML = '';
+      generationSauvegarde++;
+      $('btn-sauvegarde').disabled = false;
       montrerConsole(false);
     });
   });
   $('btn-recharger').addEventListener('click', charger);
+  // ── Les « ? » : ouverture et fermeture explicites (revue adverse du 27/09) ──
+  // La bulle s'ouvre par `:focus-within`. Chrome Android donne le focus au
+  // bouton touché ; Safari iOS NE LE FAIT PAS : on le donne donc nous-mêmes.
+  // Un second appui sur le même « ? » referme ; un appui ailleurs aussi ; Échap
+  // aussi. Rien d'autre ne change : le survol à la souris marche comme avant.
+  (function(){
+    var ouvertAvant = null;
+    function boutonAide(t){ return t && t.closest ? t.closest('.aide>button') : null; }
+    document.addEventListener('pointerdown', function(e){
+      var bt = boutonAide(e.target), actif = document.activeElement;
+      ouvertAvant = (bt && actif === bt) ? bt : null;
+      var aideActive = actif && actif.closest ? actif.closest('.aide') : null;
+      if(aideActive && !aideActive.contains(e.target) && actif.blur) actif.blur();
+    }, true);
+    document.addEventListener('click', function(e){
+      var bt = boutonAide(e.target);
+      if(!bt) return;
+      if(ouvertAvant === bt) bt.blur(); else bt.focus();
+      ouvertAvant = null;
+    });
+    document.addEventListener('keydown', function(e){
+      var actif = document.activeElement;
+      if(e.key === 'Escape' && actif && actif.closest && actif.closest('.aide') && actif.blur) actif.blur();
+    });
+  })();
   $('btn-sauvegarde').addEventListener('click', sauvegarder);
   preparerReplis();
   preparerPeriodes();

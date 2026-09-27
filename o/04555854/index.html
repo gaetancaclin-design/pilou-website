@@ -41,6 +41,15 @@ h1{font:800 34px/1.15 Nunito,Inter,sans-serif;margin:0 0 10px;letter-spacing:-.0
 .bouton{display:flex;align-items:center;justify-content:center;width:100%;min-height:64px;padding:14px 18px;border-radius:18px;background:var(--brand-darker);color:#fff;font-weight:700;font-size:21px;text-decoration:none;box-shadow:0 6px 16px rgba(48,90,64,.22)}
 .bouton:focus-visible,summary:focus-visible,.bascule:focus-visible{outline:3px solid var(--brand-darker);outline-offset:3px}
 .rassure{margin:14px 0 0;text-align:center;color:var(--muted);font-size:16px}
+.garantie{display:flex;gap:14px;align-items:flex-start;background:var(--brand-light);border:1px solid #cfe6d6;border-radius:20px;padding:18px 18px;margin:0 0 18px}
+.garantie svg{flex:0 0 auto;width:30px;height:30px;margin-top:2px}
+.garantie p{margin:0}
+.garantie .fort{font:800 21px/1.25 Nunito,Inter,sans-serif;color:var(--brand-darker);margin-bottom:6px}
+.garantie .doux{font-size:17px;color:#2f4a38}
+.etapes{list-style:none;margin:0 0 18px;padding:0;counter-reset:e}
+.etapes li{position:relative;padding:0 0 10px 46px;font-size:17px;line-height:1.45}
+.etapes li::before{counter-increment:e;content:counter(e);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--brand-darker);color:#fff;font:700 16px/32px Inter,sans-serif;text-align:center}
+.etapes li strong{color:var(--ink)}
 .puis{margin:18px 0 6px;font-size:17px}
 .code{margin:6px 0 0;text-align:center;font:800 42px/1.1 Nunito,Inter,sans-serif;letter-spacing:.1em;font-variant-numeric:tabular-nums}
 .code span+span{margin-left:.35em}
@@ -48,7 +57,8 @@ h1{font:800 34px/1.15 Nunito,Inter,sans-serif;margin:0 0 10px;letter-spacing:-.0
 .copier.fait{background:var(--brand-light)}
 .copier:focus-visible{outline:3px solid var(--brand-darker);outline-offset:3px}
 .memo{margin:10px 0 0;text-align:center;font-size:15px;color:var(--muted)}
-.conditions{margin:6px 0 18px;font-size:15px;color:var(--muted);text-align:center}
+.conditions{margin:6px 0 18px;font-size:17px;color:var(--muted);text-align:center}
+.pour{margin:12px 0 0;font-size:16px;color:var(--muted);text-align:center}
 .bascule{display:block;margin:0 auto 18px;font-size:16px;color:var(--brand-darker);text-align:center}
 details{margin-top:auto;border-top:1px solid var(--border);padding-top:14px;font-size:16px}
 summary{cursor:pointer;font-weight:600;color:var(--brand-darker);padding:6px 0}
@@ -67,10 +77,21 @@ footer a,details a{color:var(--brand-darker)}
 <h1>Vos 3 mois de Pilou+ offerts</h1>
 <p class="sous-titre">Le pilulier dans votre téléphone.</p>
 
+<div class="garantie" role="note">
+<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#305a40" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3z"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/></svg>
+<div><p class="fort">Offre gratuite, sans renouvellement.</p>
+<p class="doux">Au bout des 3 mois, elle s’arrête d’elle-même, sans prélèvement. Vous ne payez que si vous choisissez vous-même Pilou+.</p></div>
+</div>
+
 <section class="action" id="iphone" aria-labelledby="t-iphone">
 <h2 id="t-iphone">Sur iPhone</h2>
-<a class="bouton" href="https://apps.apple.com/redeem?ctx=offercodes&amp;id=6806332290&amp;code=04555854">Activer mes 3 mois</a>
-<p class="rassure">Apple vous demande de confirmer.<br>Rien ne vous sera prélevé.</p>
+<ol class="etapes" role="list">
+<li>Touchez <strong>Activer mes 3 mois offerts</strong>.</li>
+<li>Apple vous demande de confirmer (Face ID ou mot de passe).</li>
+<li>Installez ou ouvrez Pilou&#8239;: Pilou+ est activé.</li>
+</ol>
+<a class="bouton" href="https://apps.apple.com/redeem?ctx=offercodes&amp;id=6806332290&amp;code=04555854">Activer mes 3 mois offerts</a>
+<p class="pour">Avec le compte Apple de la personne qui utilisera Pilou. Réservé aux comptes jamais abonnés à Pilou+ sur iPhone.</p>
 </section>
 
 <section class="action" id="android" aria-labelledby="t-android">
@@ -83,15 +104,15 @@ footer a,details a{color:var(--brand-darker)}
 </section>
 
 <p class="lecteur" id="copie-etat" role="status" aria-live="polite"></p>
-<p class="conditions">Sans engagement. Ensuite, Pilou reste gratuit, ou Pilou+ à 2,99&#8239;€/mois ou 26,99&#8239;€/an.</p>
+<p class="conditions">Après les 3 mois, Pilou reste gratuit&#8239;: vos traitements sont conservés et vos rappels de prise continuent. Si vous le souhaitez, Pilou+ est à 2,99&#8239;€/mois ou 26,99&#8239;€/an, sans engagement.</p>
 <a class="bascule cache" id="bascule" href="#"></a>
 <a class="site" href="/">Découvrir Pilou sur pilou-app.fr</a>
 
 <details>
 <summary>Besoin d’aide&#8239;?</summary>
-<p><strong>Sur iPhone.</strong> Faites-le sur l’iPhone de la personne qui utilisera Pilou. Apple peut demander le mot de passe du compte Apple ou Face ID. Son texte parle de renouvellement&#8239;: cette offre-ci ne se renouvelle pas. Ensuite, ouvrez Pilou.</p>
+<p><strong>Sur iPhone.</strong> Faites-le sur l’iPhone de la personne qui utilisera Pilou, avec son compte Apple. Apple peut demander le mot de passe du compte Apple ou Face ID. Ensuite, ouvrez Pilou.</p>
 <p>Le bouton ne s’ouvre pas&#8239;? Dans l’App Store, touchez votre photo en haut à droite, choisissez l’option pour utiliser un code, et saisissez <strong>04555854</strong>.</p>
-<p>Apple refuse le code&#8239;? Sur iPhone, l’offre est réservée aux personnes qui n’ont jamais été abonnées à Pilou+, avec un compte Apple France.</p>
+<p>Apple refuse le code&#8239;? Sur iPhone, l’offre est réservée aux comptes Apple France qui n’ont jamais été abonnés à Pilou+ sur iPhone.</p>
 <p><strong>Sur Android.</strong> À la première ouverture, Pilou vous demande d’accepter ses conditions. Une connexion Internet est nécessaire. La ligne «&#8239;J’ai un code partenaire&#8239;» n’apparaît que si Pilou+ n’est pas déjà actif. Aucune carte bancaire n’est demandée.</p>
 <p><strong>Ensuite.</strong> Si vous choisissez Pilou+ après les 3 mois, l’abonnement se renouvelle automatiquement et se résilie à tout moment. Pilou aide à s’organiser&#8239;; il ne remplace pas l’avis de votre médecin ou de votre pharmacien.</p>
 <p>Une question&#8239;: <a href="mailto:contact@pilou-app.fr">contact@pilou-app.fr</a></p>

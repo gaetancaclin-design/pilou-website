@@ -818,6 +818,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 <script src="./c3-revenus.js?v=20260926c3b"></script>
 <script src="./alertes.js?v=20260928v0"></script>
 <script src="./apporteurs.js?v=20260928v3"></script>
+<script src="./lecture.js?v=20260928v1"></script>
 <script>
 (function(){
   "use strict";
@@ -1401,9 +1402,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // Une fausse alerte rouge est aussi grave qu'une alerte cachee. Desormais,
   // ajouter ou retirer une vue ne touche QUE cette liste.
   //
-  // ⚠️ ON NE LIT PAS `v_admin_audience` : elle rend deja plus de mille lignes et
-  // PostgREST plafonne a 1000. Elle serait TRONQUEE EN SILENCE. Les trois vues
-  // d'audience ci-dessous sont bornees par construction : 1, 56 et 27 lignes.
+  // ⚠️ ON NE LIT PAS `v_admin_audience` (plus de 1 000 lignes : elle serait COUPÉE EN SILENCE).
+  // Les trois vues d'audience lues sont bornées par construction : 1, 180 et 27 lignes.
   //
   // `unique` : la vue rend UNE ligne (ou zero) ; on garde la premiere.
   var VUES = [
@@ -1426,11 +1426,11 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // echouer TOUTE la console (« lecture impossible »), et c'est voulu.
     { cle:'scan',         vue:'v_admin_scan',                  ordre:{col:'jour',      asc:false} },
     // Lot vert 2 (22/09/2026) : mesure embarquee, agregee par semaine.
-    // ⚠️ MIGRATION D'ABORD, comme pour le scan : tant que la vue n'existe
-    // pas, cette ligne fait echouer TOUTE la console, et c'est voulu.
+    // ⚠️ MIGRATION D'ABORD, comme pour le scan (sinon toute la console échoue : voulu).
     // ⚠️ Elle rend AUSSI la semaine en cours depuis le 22/09 : la colonne
     // `semaine_en_cours` le dit, et le rendu la grise.
-    { cle:'mesure',       vue:'v_admin_mesure',                ordre:{col:'semaine',   asc:false} },
+    { cle:'mesure',       vue:'v_admin_mesure',                ordre:{col:'semaine',   asc:false},
+      pages:['semaine','cle','plateforme','version','anciennete','test'] },   // V1 : lue en entier (lecture.js)
     // Lot C3 (26/09/2026) : revenus nets et commissions, calcules EN BASE, mis en page par
     // c3-revenus.js ; jours UTC. MIGRATION D'ABORD, sinon toute la console echoue (voulu).
     { cle:'netJour',      vue:'v_admin_net_jour',              ordre:{col:'jour',      asc:false} },
@@ -1509,11 +1509,14 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       // compte administrateur. Le vert ne vient qu'après le rendu complet.
       afficherEtat('charge','Lecture des vues… ',
         'Le compte administrateur est reconnu ; les ' + VUES.length + ' vues sont en cours de lecture.');
-      return Promise.all(VUES.map(function(v){ return lire(v.vue, v.ordre); }));
+      return Promise.all(VUES.map(function(v){ return (v.pages && window.PilouLecture)   // sinon : garde des 1000
+        ? window.PilouLecture.toutes(sb, v.vue, v.pages) : lire(v.vue, v.ordre); }));
     }).then(function(res){
       if(jeton !== jetonCharge) return;        // reponse perimee : on ne rend rien,
       if(!res) return;                         // et surtout on ne deverrouille pas.
-      for(var i=0;i<res.length;i++) if(res[i].error) throw res[i].error;
+      // ⚠️ JAMAIS UNE LISTE COUPÉE EN SILENCE (V1) : le serveur rend 1 000 lignes au plus (mesuré le 28/09).
+      for(var i=0;i<res.length;i++){ if(res[i].error) throw res[i].error; var li = VUES[i], dd = res[i].data || [];
+        if(!li.unique && !li.pages && li.cle !== 'parcoursJour' && dd.length >= 1000) throw { message: li.vue + ' a rendu 1 000 lignes : la liste est probablement coupée' }; }
       var d = {};
       for(var j=0;j<VUES.length;j++){
         var v = VUES[j], data = res[j].data || [];
@@ -3273,7 +3276,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
    */
   function agregerMesure(rows, avecTest){
     if(!Array.isArray(rows)) return { cause:'la vue n’a rien rendu' };
-    if(rows.length >= MESURE_PLAFOND)
+    if(rows.length >= MESURE_PLAFOND && rows.lectureComplete !== true)   // lecture.js a tout lu (ne pas copier `rows` avant ce test)
       return { cause:'la vue a rendu ' + rows.length + ' lignes, soit le plafond de la base ('
                    + MESURE_PLAFOND + ') : la liste est probablement TRONQUÉE, et une semaine '
                    + 'amputée fausserait la rétention sans prévenir' };
@@ -4970,9 +4973,6 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + tuileNet(d, auj, per)
       + tuileScanAccueil(d.scan, auj, per)
       + tuilesApporteurs(d.cohorte);
-    // L'encart « Publicité » a ete retire le 26/09 : la saisie des depenses est
-    // abandonnee (decision de Gaetan, pas de publicite reguliere). Il promettait
-    // un ecran qui ne viendra pas.
     return { critique: accueilIllisibles, attention: 0 };
   }
 

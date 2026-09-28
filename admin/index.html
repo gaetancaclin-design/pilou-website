@@ -1704,6 +1704,16 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       return { critique:1, attention:0 };
     }
     var h = '', compte = { critique:0, attention:0 };
+    // ⚠️ UN COMPTE, OU « ILLISIBLE » — JAMAIS UN VERT PAR DEFAUT (lot C5, 28/09/2026).
+    // `null > 0` est FAUX en JavaScript : un voyant ecrit `x > 0 ? rouge : vert`
+    // passe au VERT quand la base ne rend rien. L'audit du 28/09 en a trouve
+    // quatre dans cette grille (quarantaine, octrois, comptes, codes epuises).
+    // Tous passent desormais par `compteLu` : ce qui n'est pas un entier >= 0
+    // allume le voyant « illisible », de la couleur de l'alerte qu'il remplace.
+    function compteLu(v){
+      var n = (typeof v === 'number') ? v : (typeof v === 'string' && /^[0-9]+$/.test(v) ? Number(v) : NaN);
+      return (isFinite(n) && n >= 0 && Math.floor(n) === n) ? n : null;
+    }
     function ind(quoi, valeur, etat, detail){
       if(etat === 'critique') compte.critique++;
       else if(etat === 'attention') compte.attention++;
@@ -1711,19 +1721,33 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     }
 
     // 1. Quarantaine — de l'argent annonce que la chaine n'a pas su enregistrer.
-    h += ind('Quarantaine non rejouée', nb(a.quarantaine_non_rejouee),
-          a.quarantaine_non_rejouee > 0 ? 'critique' : 'ok',
-          a.quarantaine_non_rejouee > 0
-            ? 'Des événements de paiement attendent d’être rejoués.'
-            : 'Aucun paiement en attente.');
+    var quar = compteLu(a.quarantaine_non_rejouee);
+    h += ind('Quarantaine non rejouée', quar === null ? 'illisible' : String(quar),
+          (quar === null || quar > 0) ? 'critique' : 'ok',
+          quar === null
+            ? 'La base n’a pas rendu un compte. Impossible de dire si des paiements attendent : '
+              + 'l’absence de chiffre n’est pas une absence de problème.'
+            : (quar > 0
+                ? 'Des événements de paiement attendent d’être rejoués.'
+                : 'Aucun paiement en attente.'));
 
     // 2. L'alarme est-elle vivante ? Une alarme morte affiche du vert.
     var hAlarme = heuresDepuis(a.alarme_derniere_mesure);
-    h += ind('Alarme quarantaine', dureeTexte(hAlarme),
-          hAlarme > 26 ? 'critique' : 'ok',
-          hAlarme > 26
-            ? 'L’alarme ne mesure plus. Le « 0 » ci-contre ne prouve rien.'
-            : 'Dernière mesure : ' + quandTexte(a.alarme_derniere_mesure));
+    // ⚠️ LOT C5 (28/09/2026) : une date que la page ne sait pas lire donne NaN.
+    // Avant, `NaN > 26` etant FAUX, le voyant passait au vert — et la bulle
+    // appelait alors `quandTexte` sur cette date, ce qui faisait tomber TOUTE la
+    // page (constate au banc). Et ce n'est pas « jamais » : c'est « illisible ».
+    if(isNaN(hAlarme)){
+      h += ind('Alarme quarantaine', 'illisible', 'critique',
+            'La base a rendu une date que la page ne sait pas lire. Impossible de dire si '
+            + 'l’alarme mesure encore : le « 0 » ci-contre ne prouve rien.');
+    } else {
+      h += ind('Alarme quarantaine', dureeTexte(hAlarme),
+            hAlarme > 26 ? 'critique' : 'ok',
+            hAlarme > 26
+              ? 'L’alarme ne mesure plus. Le « 0 » ci-contre ne prouve rien.'
+              : 'Dernière mesure : ' + quandTexte(a.alarme_derniere_mesure));
+    }
 
     // 3. ⚠️ QUATRE VOYANTS ONT ETE RETIRES ICI. IL FAUT SAVOIR POURQUOI,
     //    SINON QUELQU'UN LES REMETTRA.
@@ -1761,9 +1785,17 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
 
     // 4. Comptes. Le reglage « inscription fermee » n'est PAS lisible en base :
     //    on mesure son EFFET a la place.
-    if('comptes_auth' in a && a.comptes_auth != null){
-      var c = a.comptes_auth;
-      h += ind('Comptes sur le projet', nb(c),
+    // ⚠️ UNE VALEUR NULLE — OU UNE COLONNE ABSENTE — FAISAIT DISPARAITRE CE
+    // VOYANT EN SILENCE (lot C5, 28/09/2026) : c'est celui qui dit si
+    // l'inscription publique s'est rouverte. La colonne existe depuis le 09/09 ;
+    // son absence ne peut plus venir que d'une vue redeployee sans elle — une panne.
+    if(compteLu(a.comptes_auth) === null){
+      h += ind('Comptes sur le projet', 'illisible', 'critique',
+            'La base n’a pas rendu un compte. Impossible de dire si l’inscription publique '
+            + 'est restée fermée.');
+    } else {
+      var c = compteLu(a.comptes_auth);
+      h += ind('Comptes sur le projet', String(c),
             c === 1 ? 'ok' : 'critique',
             c === 1
               ? 'Le vôtre, et lui seul.'
@@ -1775,8 +1807,18 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // Ce qui doit reveiller la nuit, ce n'est pas un desaccord de comptage avec
     // RevenueCat : c'est qu'une personne ait saisi son code en pharmacie et
     // n'ait RIEN RECU. Cela se lit dans `attributions.etat`.
-    if('octrois_bloques' in a && a.octrois_bloques != null){
-      var bloques = a.octrois_bloques, rates = a.octrois_echoues_7j;
+    // ⚠️ LOT C5 (28/09/2026) : les DEUX comptes doivent etre lisibles. Avant,
+    // `rates` nul donnait `bloques + null` = le nombre seul, et `null > 0` faux :
+    // une colonne d'echecs illisible s'affichait « aucun incident », en vert.
+    // Et `bloques` nul — ou absent de la vue — faisait disparaitre le voyant,
+    // sans rien dire. Les deux colonnes existent depuis le 10/09 : une colonne
+    // absente est desormais « illisible », comme une colonne nulle.
+    var bloques = compteLu(a.octrois_bloques), rates = compteLu(a.octrois_echoues_7j);
+    if(bloques === null || rates === null){
+      h += ind('Octrois de code', 'illisible', 'critique',
+            'La base n’a pas rendu les deux comptes d’octrois. Impossible de dire si quelqu’un '
+            + 'attend le mois offert de son code.');
+    } else {
       h += ind('Octrois de code',
             (bloques + rates) > 0 ? (bloques + rates) + ' à voir' : 'aucun incident',
             bloques > 0 ? 'critique' : (rates > 0 ? 'attention' : 'ok'),
@@ -1809,10 +1851,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // comme un zero : elle rend le voyant « illisible ».
     // ⚠️ LE DEMI-DEPLOIEMENT SE VOIT, comme le 13/09 : sans les colonnes, la
     // grille perdrait ce voyant EN SILENCE.
-    function compteLu(v){
-      var n = (typeof v === 'number') ? v : (typeof v === 'string' && /^[0-9]+$/.test(v) ? Number(v) : NaN);
-      return (isFinite(n) && n >= 0 && Math.floor(n) === n) ? n : null;
-    }
+    // (`compteLu` est definie en tete de `rendreAlertes` : elle sert a tous les voyants.)
     if(!('offres_apple_inconnues' in a) || !('officine_ios_non_attribuees' in a)){
       h += ind('Migration du 23/09', 'incomplète', 'attention',
             'La vue des alertes ne porte pas les deux compteurs des codes officine sur iPhone '
@@ -1857,9 +1896,12 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     }
 
     // 5. Information, pas alerte.
-    h += ind('Codes à quota épuisé', nb(a.codes_epuises),
-          a.codes_epuises > 0 ? 'attention' : 'ok',
-          a.codes_epuises > 0 ? 'Ces codes ne donnent plus rien en pharmacie.' : 'Aucun code bloqué.');
+    var epuises = compteLu(a.codes_epuises);
+    h += ind('Codes à quota épuisé', epuises === null ? 'illisible' : String(epuises),
+          (epuises === null || epuises > 0) ? 'attention' : 'ok',
+          epuises === null
+            ? 'La base n’a pas rendu un compte. Impossible de dire si des codes sont bloqués.'
+            : (epuises > 0 ? 'Ces codes ne donnent plus rien en pharmacie.' : 'Aucun code bloqué.'));
 
 
     // ⚠️ LE VOYANT « SAUVEGARDE » A ETE RETIRE ICI, POUR LA MEME RAISON QUE
@@ -1975,16 +2017,33 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   // Somme d'une colonne d'audience sur les N derniers jours REVOLUS (le jour en
   // cours est incomplet : l'inclure ferait baisser tous les totaux chaque matin).
   // Rend null si aucun jour n'est exploitable — un total sur rien n'est pas zero.
-  function sommeAudience(jours, colonne, n){
+  //
+  // ⚠️ LOT C5 (28/09/2026) : RETOURNE AUSSI LE NOMBRE DE JOURS REELLEMENT LUS.
+  // Avant, un jour a valeur nulle comptait « vu » pour zero, et la moyenne
+  // divisait toujours par 7 : une collecte manquee faisait baisser la moyenne
+  // sans rien dire. Et la fenetre se comptait en LIGNES : un jour absent de
+  // l'archive faisait remonter la somme au 8e jour. La fenetre se compte
+  // desormais en jours du CALENDRIER (UTC, comme l'archive), et seuls les jours
+  // dont la valeur est un entier lisible sont additionnes et comptes.
+  // `positif` : un negatif est une donnee fausse (vrai pour `nouveaux`), pas une
+  // valeur — il n'est ni additionne ni compte. `revenants`, lui, peut etre
+  // negatif sur un jour mal collecte, et ce negatif garde son sens (voir la bulle).
+  function sommeAudience(jours, colonne, n, positif){
     if(!jours || !jours.length) return null;
-    var auj = new Date().toISOString().slice(0, 10), t = 0, vus = 0;
-    for(var i = 0; i < jours.length && vus < n; i++){
+    var maintenant = Date.now();
+    var auj   = new Date(maintenant).toISOString().slice(0, 10);
+    var debut = new Date(maintenant - n * 86400000).toISOString().slice(0, 10);
+    var t = 0, lus = 0;
+    for(var i = 0; i < jours.length; i++){
       var g = jours[i];
-      if(g.jour >= auj) continue;              // jour en cours : ecarte
-      if(g[colonne] == null) { vus++; continue; }
-      t += Number(g[colonne]); vus++;
+      if(!g || typeof g.jour !== 'string') continue;
+      var j = g.jour.slice(0, 10);
+      if(j >= auj || j < debut) continue;      // jour en cours, ou hors fenetre
+      var v = entierOuNul(g[colonne]);
+      if(v === null || (positif && v < 0)) continue;   // illisible : ni additionne ni compte
+      t += v; lus++;
     }
-    return vus ? t : null;
+    return lus ? { somme:t, jours:lus, sur:n } : null;
   }
 
   function ligneAudience(jours, quand){
@@ -2009,7 +2068,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // jour archive est encore hier, et la tuile ne trouverait aucune ligne.
     var auj   = new Date().toISOString().slice(0, 10);
     var gAuj  = ligneAudience(audJours, auj);
-    var rcNouveaux30 = sommeAudience(audJours, 'nouveaux', 30);
+    var rcNouveaux30 = sommeAudience(audJours, 'nouveaux', 30, true);   // { somme, jours, sur } ou null
 
     // ⚠️ LE GRAND CHIFFRE EST CELUI DES 30 DERNIERS JOURS, PAS LE CUMUL.
     // Un cumul ne fait que monter, il compte des installations depuis longtemps
@@ -2097,7 +2156,15 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
       + 'jours</b> chargés par cette page.'
       + (rcNouveaux30 != null
           ? '<br><br>🔴 <b>Notre compteur ne voit qu’une partie des arrivées.</b> Sur les '
-            + '30 derniers jours, RevenueCat en a vu <b>' + rcNouveaux30 + '</b>. L’écart '
+            + (rcNouveaux30.jours < rcNouveaux30.sur
+                 ? rcNouveaux30.jours + ' jours lisibles des 30 derniers'
+                 : '30 derniers jours')
+            + ', RevenueCat en a vu <b>' + rcNouveaux30.somme + '</b>'
+            + (rcNouveaux30.jours < rcNouveaux30.sur
+                 ? ' (des jours manquent dans l’archive : les deux chiffres ne couvrent pas la même '
+                   + 'période, et leur écart ne se compare pas)'
+                 : '')
+            + '. L’écart '
             + 'vient des versions antérieures à la 1.4.3, des oppositions à la mesure, et '
             + 'des signalements qui ne sont jamais arrivés. <b>Notre mesure n’a rien vu '
             + 'avant le ' + ech(jourTexte(r.mesure_depuis)) + '.</b>'
@@ -2182,11 +2249,14 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     var surAuj = (gRef === gAuj);
     if(gRef && gRef.revenants != null){
       var rev = Number(gRef.revenants);
-      var moy = sommeAudience(audJours, 'revenants', 7);
+      var sAud = sommeAudience(audJours, 'revenants', 7);
       var lignesRev = [
         [(surAuj ? 'Ouvertures aujourd’hui' : 'Ouvertures hier'), nb(gRef.actifs)],
         ['dont nouvelles', nb(gRef.nouveaux)],
-        ['Moyenne 7 jours (jours clos)', moy == null ? '—' : unDecimal(moy / 7)]
+        [(sAud && sAud.jours < sAud.sur)
+           ? 'Moyenne sur ' + sAud.jours + ' des 7 jours clos'
+           : 'Moyenne 7 jours (jours clos)',
+         sAud == null ? '—' : unDecimal(sAud.somme / sAud.jours)]
       ];
       if(surAuj && gHier && gHier.revenants != null){
         lignesRev.push(['Hier ' + jourTexte(hier),
@@ -2269,13 +2339,21 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // sous une coche verte « nos octrois sont ecartes ».
     var marqueInterne  = !!r && ('acces_offerts_en_cours_internes' in r)
                              && ('acces_offerts_total_internes' in r);
-    var aoInternes     = marqueInterne ? (Number(r.acces_offerts_en_cours_internes) || 0) : 0;
-    var aoTousInternes = marqueInterne ? (Number(r.acces_offerts_total_internes)    || 0) : 0;
-    var aoTous         = Number(r.acces_offerts_en_cours) || 0;
-    var aoTotal        = Number(r.acces_offerts_total)    || 0;
+    // ⚠️ LOT C5 (28/09/2026) : PLUS DE `Number(x) || 0`. Une colonne nulle
+    // s'affichait « 0 accès offert » — un zero invente, sur le chiffre meme que
+    // l'on compare a RevenueCat. Meme regle que la tuile « Abonnes » de
+    // l'accueil (`tuileAbonnes`) : un compte illisible rend la tuile illisible.
+    var aoInternes     = marqueInterne ? entierOuNul(r.acces_offerts_en_cours_internes) : 0;
+    var aoTousInternes = marqueInterne ? entierOuNul(r.acces_offerts_total_internes)    : 0;
+    var aoTous         = entierOuNul(r.acces_offerts_en_cours);
+    var aoTotal        = entierOuNul(r.acces_offerts_total);
     var aoEcarte       = marqueInterne && !compterNosTests();
-    var aoAffiche      = aoEcarte ? (aoTous  - aoInternes)     : aoTous;
-    var aoTotalAffiche = aoEcarte ? (aoTotal - aoTousInternes) : aoTotal;
+    // Le grand chiffre ne depend que des acces EN COURS : ce sont eux qui
+    // decident si la tuile est lisible. Les totaux « en tout » ne servent qu'a la
+    // bulle, ou un total illisible s'affiche « — » sans eteindre la tuile.
+    var aoLisible      = aoInternes !== null && aoTous !== null;
+    var aoAffiche      = !aoLisible ? null : (aoEcarte ? (aoTous  - aoInternes)     : aoTous);
+    if(aoAffiche !== null && aoAffiche < 0) aoLisible = false;   // meme garde que `tuileAbonnes`
     var vus            = r.acces_offerts_vus_par_revenuecat;
 
     // ⚠️ CHAQUE LIGNE PORTE SA FENETRE ET SON UNITE DANS SON LIBELLE.
@@ -2308,45 +2386,56 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // Il reste deux voisinages, et les deux se soustraient juste :
     //   retires 2  /  non filtres 5   → 5 - 2 = 3, le grand chiffre ;
     //   non filtres 5  /  RevenueCat 3 → le seul ecart qui veut dire quelque chose.
-    var detailAcces = [];
-    if(aoEcarte) detailAcces.push(['Nos octrois retirés', nb(aoInternes)]);
-    detailAcces.push(['Nos octrois, non filtrés', nb(aoTous)]);
-    detailAcces.push(['RevenueCat, personnes en cours', nb(vus)]);
+    if(!aoLisible){
+      h += res('Accès offerts en cours', '—',
+        [['Nos octrois, non filtrés', nb(aoTous)], ['RevenueCat, personnes en cours', nb(vus)]],
+        '⚠️ <b>La base n’a pas rendu un compte lisible</b> pour les accès offerts '
+        + '(en cours, ou la part de nos propres octrois en cours), ou nos octrois '
+        + 'dépassent les accès en cours. Aucun chiffre n’est affiché plutôt qu’un zéro inventé.',
+        'attention');
+    } else {
+      var detailAcces = [];
+      if(aoEcarte) detailAcces.push(['Nos octrois retirés', nb(aoInternes)]);
+      detailAcces.push(['Nos octrois, non filtrés', nb(aoTous)]);
+      detailAcces.push(['RevenueCat, personnes en cours', nb(vus)]);
 
-    h += res('Accès offerts en cours', nb(aoAffiche), detailAcces,
-      'Source : <b>notre</b> table d’attributions, écrite au moment de l’octroi — pas le '
-      + 'journal de RevenueCat.'
-      + (!marqueInterne
-          ? '<br><br>🔶 <b>La vue ne porte pas la marque « apporteur interne »</b> : '
-            + 'rien n’est écarté ici, quel que soit l’interrupteur.'
-          : (compterNosTests()
-              ? '<br><br>🔶 <b>Nos propres octrois sont comptés.</b> ' + aoInternes
-                + ' des ' + aoTous + ' accès en cours viennent d’apporteurs marqués '
-                + '« interne ».'
-              : '<br><br>✅ <b>Nos propres octrois sont écartés</b>, automatiquement : la '
-                + 'colonne <code>apporteurs.interne</code> les reconnaît, il n’y a aucune '
-                + 'liste à tenir. <b>' + aoInternes + '</b> des ' + aoTous + ' accès '
-                + '<b>en cours</b> sont écartés à ce titre, et <b>' + aoTousInternes
-                + '</b> des ' + aoTotal + ' accordés <b>en tout</b>.'))
-      // ⚠️ UN TIRET SANS EXPLICATION, ENTRE DEUX VRAIS NOMBRES, EST UN TROU.
-      + ((vus == null)
-          ? '<br><br>⚠️ <b>RevenueCat n’a annoncé aucun compte d’accès promotionnel</b> : '
-            + 'la ligne correspondante affiche « — », et <b>aucun écart ne peut être '
-            + 'calculé</b>. Ce n’est pas un zéro.'
-          : '')
-      // ⚠️ DEUX UNITES DIFFERENTES, ET IL FAUT LE DIRE. Notre table compte des
-      // OCTROIS (`count(*)` sur `attributions`) ; RevenueCat compte des PERSONNES
-      // (`count(distinct app_user_id)`). Un ecart positif peut donc venir d'un
-      // octroi jamais annonce AUSSI BIEN que de deux octrois pour une meme
-      // personne. L'ancienne phrase concluait a la premiere cause toute seule.
-      + ((vus != null && (aoTous - Number(vus)) > 0)
-          ? '<br><br>Notre table compte <b>' + aoTous + '</b> octroi(s) en cours ; '
-            + 'RevenueCat annonce <b>' + nb(vus) + '</b> personne(s) en accès '
-            + 'promotionnel. <b>Ce ne sont pas les mêmes unités</b> — des octrois d’un '
-            + 'côté, des personnes de l’autre : l’écart peut venir d’un octroi jamais '
-            + 'annoncé comme de deux octrois pour une même personne. <b>Sans '
-            + 'conséquence</b> : ces accès valent zéro euro, et notre table fait foi.'
-          : ''));
+      h += res('Accès offerts en cours', nb(aoAffiche), detailAcces,
+        'Source : <b>notre</b> table d’attributions, écrite au moment de l’octroi — pas le '
+        + 'journal de RevenueCat.'
+        + (!marqueInterne
+            ? '<br><br>🔶 <b>La vue ne porte pas la marque « apporteur interne »</b> : '
+              + 'rien n’est écarté ici, quel que soit l’interrupteur.'
+            : (compterNosTests()
+                ? '<br><br>🔶 <b>Nos propres octrois sont comptés.</b> ' + aoInternes
+                  + ' des ' + aoTous + ' accès en cours viennent d’apporteurs marqués '
+                  + '« interne ».'
+                : '<br><br>✅ <b>Nos propres octrois sont écartés</b>, automatiquement : la '
+                  + 'colonne <code>apporteurs.interne</code> les reconnaît, il n’y a aucune '
+                  + 'liste à tenir. <b>' + aoInternes + '</b> des ' + aoTous + ' accès '
+                  + '<b>en cours</b> sont écartés à ce titre'
+                  + ((aoTousInternes !== null && aoTotal !== null)
+                      ? ', et <b>' + aoTousInternes + '</b> des ' + aoTotal + ' accordés <b>en tout</b>.'
+                      : '. Le total « accordés en tout » n’a pas pu être lu.')))
+        // ⚠️ UN TIRET SANS EXPLICATION, ENTRE DEUX VRAIS NOMBRES, EST UN TROU.
+        + ((vus == null)
+            ? '<br><br>⚠️ <b>RevenueCat n’a annoncé aucun compte d’accès promotionnel</b> : '
+              + 'la ligne correspondante affiche « — », et <b>aucun écart ne peut être '
+              + 'calculé</b>. Ce n’est pas un zéro.'
+            : '')
+        // ⚠️ DEUX UNITES DIFFERENTES, ET IL FAUT LE DIRE. Notre table compte des
+        // OCTROIS (`count(*)` sur `attributions`) ; RevenueCat compte des PERSONNES
+        // (`count(distinct app_user_id)`). Un ecart positif peut donc venir d'un
+        // octroi jamais annonce AUSSI BIEN que de deux octrois pour une meme
+        // personne. L'ancienne phrase concluait a la premiere cause toute seule.
+        + ((vus != null && (aoTous - Number(vus)) > 0)
+            ? '<br><br>Notre table compte <b>' + aoTous + '</b> octroi(s) en cours ; '
+              + 'RevenueCat annonce <b>' + nb(vus) + '</b> personne(s) en accès '
+              + 'promotionnel. <b>Ce ne sont pas les mêmes unités</b> — des octrois d’un '
+              + 'côté, des personnes de l’autre : l’écart peut venir d’un octroi jamais '
+              + 'annoncé comme de deux octrois pour une même personne. <b>Sans '
+              + 'conséquence</b> : ces accès valent zéro euro, et notre table fait foi.'
+            : ''));
+    }
     // ⚠️ LE ZERO DOIT SE VOIR. C'est le chiffre qui compte vraiment.
     //
     // ⚠️ MAIS UN CHIFFRE ILLISIBLE N'EST PAS UN ZERO (13/09/2026). `null > 0`

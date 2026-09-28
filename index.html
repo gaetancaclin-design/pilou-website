@@ -6,10 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-site-verification" content="DiIu0Imn5_zKSq7x2IPHkzdaKNvhJgsmUiknK81Gd8M" />
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-<title>Pilou — Pilulier & rappels de médicaments | Ordonnance</title>
+<title>Pilou — Pilulier & rappel de médicaments | Scan d’ordonnance</title>
   <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="description" content="Pilou, pilulier numérique français. Photographiez votre ordonnance, validez vos prises, recevez vos rappels. Sans compte. Édité en France.">
-<meta property="og:title" content="Pilou — Pilulier & rappels de médicaments | Ordonnance">
+<meta property="og:title" content="Pilou — Pilulier & rappel de médicaments | Scan d’ordonnance">
 <meta property="og:description" content="Pilulier numérique français. Photographiez votre ordonnance, validez vos prises, recevez vos rappels. Sans compte.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
@@ -21,7 +21,7 @@
 <meta property="og:image:height" content="500">
 <meta name="twitter:image" content="https://pilou-app.fr/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Pilou — Pilulier & rappels de médicaments">
+<meta name="twitter:title" content="Pilou — Pilulier & rappel de médicaments | Scan d’ordonnance">
 <meta name="twitter:description" content="Photographiez votre ordonnance, Pilou prépare votre pilulier. Rappels, stocks, journal de prises. Sans compte.">
 <link rel="canonical" href="https://pilou-app.fr/">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -376,6 +376,14 @@ h2{
   margin-bottom:14px;transition:transform .3s cubic-bezier(.16,1,.3,1),background .3s ease;
 }
 .feat-icon svg{width:22px;height:22px;stroke:var(--brand-dark);fill:none;stroke-width:1.8;stroke-linecap:round}
+h3.feat-name{margin:0 0 7px}
+h3.gallery-title{margin:0 0 6px}
+h3.faq-q-titre{margin:0}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+h1 .hero-tag{line-height:1.4;vertical-align:top}
+h1 .hero-tag-dot{display:inline-block}
+h2 .eyebrow{display:block;line-height:1.4}
+.faq-q-titre{font:inherit;color:inherit;letter-spacing:inherit}
 .feat-name{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:7px;letter-spacing:-.3px}
 .feat-desc{font-size:13px;color:var(--muted);line-height:1.65}
 .feat-badge{
@@ -931,10 +939,18 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     },
     {
       "@type": "Question",
+      "name": "Pilou convient-il quand on prend beaucoup de médicaments ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, c’est pour cela qu’il a été conçu. Quand on prend plusieurs médicaments chaque jour, ce qu’on appelle la polymédication, Pilou les rassemble dans un seul pilulier et vous rappelle chaque moment de prise : matin, midi, soir ou coucher, aux heures que vous choisissez. La formule Gratuite suit jusqu’à 5 médicaments en même temps ; avec Pilou+, il n’y a pas de limite."
+      }
+    },
+    {
+      "@type": "Question",
       "name": "Puis-je ajouter un médicament sans photographier mon ordonnance ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Oui. Depuis le menu d’ajout, choisissez « Ajouter manuellement » : vous saisissez vous-même le nom, le dosage, les créneaux et la durée. Aucune photo n’est nécessaire, et cela n’utilise aucune de vos lectures d’ordonnance — le nombre de médicaments dépend simplement de votre formule. Et si vous préférez le scan, un écran de recadrage vous laisse ne transmettre que la liste de vos médicaments."
+        "text": "Oui. Depuis le menu d’ajout, choisissez « Saisir manuellement » : vous saisissez vous-même le nom, le dosage, les créneaux et la durée. Aucune photo n’est nécessaire, et cela n’utilise aucune de vos lectures d’ordonnance — le nombre de médicaments dépend simplement de votre formule. Et si vous préférez le scan, un écran de recadrage vous laisse ne transmettre que la liste de vos médicaments."
       }
     },
     {
@@ -1005,8 +1021,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   <div class="hero-bg-blur"></div>
   <div class="hero">
     <div class="hero-text">
-      <div class="hero-tag fade-up visible"><div class="hero-tag-dot"></div>Nouveau · Pilulier avec scan d’ordonnance</div>
-      <h1 class="fade-up visible fade-up-d1">Pour ne plus oublier<br><em>vos médicaments</em></h1>
+      <h1 class="fade-up visible fade-up-d1"><span class="hero-tag"><span class="hero-tag-dot"></span>Pilulier et rappel de médicaments<span class="sr-only">&nbsp;: </span></span><br>Pour ne plus oublier<br><em>vos médicaments</em></h1>
       <p class="hero-sub fade-up visible fade-up-d2">Photographiez votre ordonnance. Pilou la lit et prépare votre pilulier en quelques secondes. Vérifiez, ajustez si besoin, validez.</p>
       <div class="hero-store fade-up visible fade-up-d3" id="heroStore">
         <span class="store-badges"><a class="store-badge-img" href="https://apps.apple.com/fr/app/pilou-pilulier-ordonnance/id6806332290"><img src="/badge-app-store-fr.svg" alt="Télécharger Pilou dans l’App Store" width="127" height="40"></a><a class="store-badge-img" href="https://play.google.com/store/apps/details?id=com.pilou.app"><img src="/badge-google-play-fr.svg" alt="Télécharger Pilou sur Google Play" width="135" height="40"></a></span>
@@ -1043,8 +1058,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 <!-- GALLERY -->
 <section class="gallery" aria-label="Aperçu de l’application">
   <div class="gallery-wrap">
-    <div class="eyebrow fade-up">En images</div>
-    <h2 class="fade-up fade-up-d1">Pensé pour votre quotidien</h2>
+    <h2 class="fade-up fade-up-d1"><span class="eyebrow">Votre pilulier numérique en images<span class="sr-only">&nbsp;: </span></span>Pensé pour votre quotidien</h2>
     <p class="section-lead fade-up fade-up-d2">Une interface claire, conçue pour aller à l’essentiel. Voici Pilou en situation.</p>
     <p class="gallery-hint"><b>‹</b>  glissez pour découvrir  <b>›</b></p>
     <div class="gallery-viewport">
@@ -1056,7 +1070,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <img class="gallery-screen" src="/pilou-gallery-scan.webp" alt="Écran Pilou confirmant les médicaments lus sur l’ordonnance, prêts à valider" width="640" height="1246" loading="eager">
         </div>
         <div class="gallery-caption">
-          <div class="gallery-title">Votre ordonnance, déjà organisée</div>
+          <h3 class="gallery-title">Votre ordonnance, déjà organisée</h3>
           <div class="gallery-desc">Photographiez, Pilou lit et prépare votre pilulier. Vérifiez, validez.</div>
         </div>
       </div>
@@ -1066,7 +1080,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <img class="gallery-screen" src="/pilou-gallery-renouvellement.webp" alt="Écran Pilou affichant le badge Renouvellement avec la date de reprise calculée automatiquement" width="640" height="1255" loading="lazy">
         </div>
         <div class="gallery-caption">
-          <div class="gallery-title">Enchaînez, sans y penser</div>
+          <h3 class="gallery-title">Enchaînez, sans y penser</h3>
           <div class="gallery-desc">Photographiez le renouvellement : Pilou calcule la date de reprise, pile après le précédent.</div>
         </div>
       </div>
@@ -1076,7 +1090,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <img class="gallery-screen" src="/pilou-gallery-traitements.webp" alt="Écran Pilou affichant la liste des traitements avec badges de durée et de stock" width="640" height="1254" loading="lazy">
         </div>
         <div class="gallery-caption">
-          <div class="gallery-title">Tout d’un coup d’œil</div>
+          <h3 class="gallery-title">Tout d’un coup d’œil</h3>
           <div class="gallery-desc">Durée restante, stock, « si besoin » — chaque médicament affiche ce qui compte.</div>
         </div>
       </div>
@@ -1086,7 +1100,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <img class="gallery-screen" src="/pilou-gallery-prises.webp" alt="Écran Pilou confirmant que toutes les prises du jour sont enregistrées" width="640" height="1254" loading="lazy">
         </div>
         <div class="gallery-caption">
-          <div class="gallery-title">Le devoir accompli</div>
+          <h3 class="gallery-title">Le devoir accompli</h3>
           <div class="gallery-desc">La satisfaction, chaque jour, de n’avoir rien oublié.</div>
         </div>
       </div>
@@ -1096,7 +1110,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <img class="gallery-screen" src="/pilou-gallery-historique.webp" alt="Écran historique Pilou avec taux d’observance de 98 pourcent" width="640" height="1254" loading="lazy">
         </div>
         <div class="gallery-caption">
-          <div class="gallery-title">Suivez votre observance</div>
+          <h3 class="gallery-title">Suivez votre observance</h3>
           <div class="gallery-desc">Un historique clair, semaine par semaine et mois par mois, à partager si vous le souhaitez.</div>
         </div>
       </div>
@@ -1106,7 +1120,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <img class="gallery-screen" src="/pilou-gallery-voyage.webp" alt="Écran trousse de voyage Pilou calculant les quantités de médicaments à emporter" width="640" height="1254" loading="lazy">
         </div>
         <div class="gallery-caption">
-          <div class="gallery-title">Partez l’esprit tranquille</div>
+          <h3 class="gallery-title">Partez l’esprit tranquille</h3>
           <div class="gallery-desc">Les bonnes quantités, calculées pour la durée de votre séjour.</div>
         </div>
       </div>
@@ -1116,7 +1130,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
           <img class="gallery-screen" src="/pilou-gallery-sibesoin.webp" alt="Écran Pilou affichant l’heure de la dernière prise d’un médicament « si besoin »" width="640" height="1254" loading="lazy">
         </div>
         <div class="gallery-caption">
-          <div class="gallery-title">Vous savez quand vous l’avez pris</div>
+          <h3 class="gallery-title">Vous savez quand vous l’avez pris</h3>
           <div class="gallery-desc">Pour vos médicaments « si besoin », Pilou retient l’heure de votre dernière prise.</div>
         </div>
       </div>
@@ -1189,8 +1203,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 <!-- FEATURES -->
 <section class="section section-alt" id="fonctionnalites">
   <div class="section-wrap">
-    <div class="eyebrow fade-up">Fonctionnalités</div>
-    <h2 class="fade-up fade-up-d1">Tout ce dont vous avez besoin,<br>rien de plus</h2>
+    <h2 class="fade-up fade-up-d1"><span class="eyebrow">Rappels et scan d’ordonnance<span class="sr-only">&nbsp;: </span></span>Tout ce dont vous avez besoin,<br>rien de plus</h2>
     <p class="section-lead section-lead-tight fade-up fade-up-d2">Conçu pour les patients — et pour les proches qui les accompagnent. Chaque fonctionnalité est pensée pour être simple, fiable et respectueuse de vos données de santé.</p>
     <div class="proof-row fade-up fade-up-d3">
       <div class="trust-item">
@@ -1209,53 +1222,53 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
     <div class="feat-grid">
       <div class="feat fade-up fade-up-d1">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/><circle cx="15" cy="15" r="2"/></svg></div>
-        <div class="feat-name">Lecture d’ordonnance</div>
+        <h3 class="feat-name">Lecture d’ordonnance</h3>
         <div class="feat-desc">Photographiez votre ordonnance. Pilou la lit et prépare votre pilulier : médicaments, posologies, durées et créneaux de prise. Vérifiez et validez. Médicaments reconnus grâce à la base officielle du médicament français (BDPM).</div>
         <span class="feat-badge">Exclusif Pilou</span>
       </div>
       <div class="feat fade-up fade-up-d2">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg></div>
-        <div class="feat-name">Renouvellement automatique</div>
+        <h3 class="feat-name">Renouvellement automatique</h3>
         <div class="feat-desc">Vous renouvelez un traitement ? Photographiez la nouvelle ordonnance : Pilou calcule la date de reprise pour enchaîner juste après la fin du précédent. Aucun trou, aucun double — vous vérifiez et validez.</div>
         <span class="feat-badge">Exclusif Pilou</span>
       </div>
       <div class="feat fade-up fade-up-d2">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14 6l4 4"/><path d="M13 20h7"/></svg></div>
-        <div class="feat-name">Bloc-notes pour le médecin</div>
+        <h3 class="feat-name">Bloc-notes pour le médecin</h3>
         <div class="feat-desc">Notez dans Pilou ce que vous ne voulez pas oublier de dire à votre médecin, et relisez-le pendant le rendez-vous. À la fin de Pilou+, vos notes restent lisibles ; écrire une nouvelle note demande un abonnement actif.</div>
         <span class="feat-badge">Pilou+</span>
       </div>
       <div class="feat fade-up fade-up-d3">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1m-2 0H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h12"/><path d="M6 8V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"/></svg></div>
-        <div class="feat-name">Rappels intelligents</div>
+        <h3 class="feat-name">Rappels de médicaments</h3>
         <div class="feat-desc">Notifications précises à chaque créneau de prise. Pilou vous rappelle même quand l’application est fermée.</div>
       </div>
       <div class="feat fade-up fade-up-d1">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></div>
-        <div class="feat-name">Alertes de fin de traitement</div>
+        <h3 class="feat-name">Alertes de fin de traitement</h3>
         <div class="feat-desc">Pilou vous prévient 7 jours et 3 jours avant la fin de chaque traitement. Jamais pris au dépourvu pour renouveler votre ordonnance.</div>
         <span class="feat-badge">Pilou+</span>
       </div>
       <div class="feat fade-up fade-up-d3">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
-        <div class="feat-name">Médicaments « si besoin »</div>
+        <h3 class="feat-name">Médicaments « si besoin »</h3>
         <div class="feat-desc">Migraine, douleur, fièvre... Vous touchez « Prendre » au moment où vous le prenez. Pilou enregistre l’heure et affiche le temps écoulé depuis la dernière prise.</div>
       </div>
       <div class="feat fade-up fade-up-d1">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6m-4 5H8m4 4H8m2-8H8"/></svg></div>
-        <div class="feat-name">Journal de prises (PDF)</div>
+        <h3 class="feat-name">Journal de prises (PDF)</h3>
         <div class="feat-desc">Exportez le journal de vos prises, jusqu’à un an : observance mois par mois, dosages réels et détail des prises non validées. À partager, si vous le souhaitez, avec votre médecin ou votre pharmacien.</div>
         <span class="feat-badge">Pilou+</span>
       </div>
       <div class="feat fade-up fade-up-d2">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-        <div class="feat-name">Suivi des stocks</div>
+        <h3 class="feat-name">Suivi des stocks</h3>
         <div class="feat-desc">Saisissez la quantité dans votre boîte. Pilou calcule les jours restants et vous prévient avant d’être à court.</div>
           <span class="feat-badge">Pilou+</span>
       </div>
       <div class="feat fade-up fade-up-d3">
         <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M20 7h-9m9 5h-7m7 5h-9M4 5l2-2 2 2M4 12l2-2 2 2M4 19l2-2 2 2"/></svg></div>
-        <div class="feat-name">Trousse de voyage</div>
+        <h3 class="feat-name">Trousse de voyage</h3>
         <div class="feat-desc">Pilou calcule exactement la quantité à emporter pour la durée de votre séjour et génère votre liste complète.</div>
           <span class="feat-badge">Pilou+</span>
       </div>
@@ -1266,8 +1279,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 <!-- PRICING -->
 <section class="section" id="tarifs">
   <div class="section-wrap">
-    <div class="eyebrow fade-up">Tarifs</div>
-    <h2 class="fade-up fade-up-d1">Simple. Transparent.<br>Sans surprise.</h2>
+    <h2 class="fade-up fade-up-d1"><span class="eyebrow">Tarifs · gratuit ou Pilou+<span class="sr-only">&nbsp;: </span></span>Simple. Transparent.<br>Sans surprise.</h2>
     <p class="section-lead fade-up fade-up-d2">Commencez gratuitement. Passez à Pilou+ uniquement si vous avez besoin de plus.</p>
     <div class="price-grid">
       <div class="price-card fade-up fade-up-d1">
@@ -1349,8 +1361,7 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
 <section class="trust-section" aria-label="Confiance et sécurité">
   <div class="trust-bg-pattern"></div>
   <div class="section-wrap">
-    <div class="eyebrow fade-up">Confiance</div>
-    <h2 class="fade-up fade-up-d1">Conçu pour vos données de santé</h2>
+    <h2 class="fade-up fade-up-d1"><span class="eyebrow">Confidentialité<span class="sr-only">&nbsp;: </span></span>Conçu pour vos données de santé</h2>
     <p class="section-lead fade-up fade-up-d2">Pilou a été conçu avec une conviction : vos traitements, vos prises et votre historique sont enregistrés sur votre téléphone, pas chez nous, et sur iPhone dans votre sauvegarde iCloud si vous l’avez activée. Deux opérations transmettent le contenu de vos données de santé hors de votre appareil : le scan d’ordonnance, analysé au sein de l’Union européenne, et la recherche de la molécule d’un médicament, qui envoie le premier mot de son nom. Nos serveurs ne conservent pas la photo.</p>
     <div class="trust-grid">
       <div class="trust-card fade-up fade-up-d1">
@@ -1411,43 +1422,46 @@ footer{background:#0a0f0c;color:white;padding:64px 40px 40px}
   <!-- MINI-FAQ (avant CTA final) -->
   <section class="faq-section" aria-label="Questions fréquentes">
     <div class="faq-wrap">
-      <div class="eyebrow fade-up">Questions fréquentes</div>
-      <h2 class="fade-up fade-up-d1">Tout ce que vous vous demandez</h2>
+      <h2 class="fade-up fade-up-d1"><span class="eyebrow">Questions fréquentes sur Pilou<span class="sr-only">&nbsp;: </span></span>Tout ce que vous vous demandez</h2>
       <div class="faq-list fade-up fade-up-d2">
         <details class="faq-item">
-          <summary class="faq-q">Pilou est-il vraiment gratuit&#8239;?<span class="faq-icon"></span></summary>
+          <summary class="faq-q"><h3 class="faq-q-titre">Pilou est-il vraiment gratuit&#8239;?</h3><span class="faq-icon"></span></summary>
           <div class="faq-a">Oui. La formule Gratuite l’est pour toujours, sans carte bancaire ni inscription. Elle couvre jusqu’à 5 médicaments et des traitements d’une durée maximale de 92&nbsp;jours, soit un renouvellement trimestriel. La formule Pilou+ lève ces limites : nombre de médicaments et durées sans limite, 30 lectures d’ordonnance par mois, un an d’historique, alertes de fin de traitement, suivi des stocks, trousse de voyage et journal de prises en PDF.</div>
         </details>
         <details class="faq-item">
-          <summary class="faq-q">Où sont stockées mes données de santé&#8239;?<span class="faq-icon"></span></summary>
+          <summary class="faq-q"><h3 class="faq-q-titre">Où sont stockées mes données de santé&#8239;?</h3><span class="faq-icon"></span></summary>
           <div class="faq-a">Sur votre téléphone. Ce que vous ajoutez dans Pilou — traitements, posologies, prises, historique et stocks — y est enregistré : nous n’en gardons aucune copie. Sur iPhone, une copie peut figurer dans votre sauvegarde iCloud, si vous l’avez activée. Deux opérations transmettent le contenu de vos données de santé hors de votre appareil. Le scan : la photo de votre ordonnance est envoyée à notre serveur dans l’Union européenne, puis analysée par un service de Google au sein de l’Union européenne pour en extraire le texte ; nous ne l’enregistrons pas. La recherche de molécule : lorsque la molécule d’un médicament manque, seul le premier mot de son nom est envoyé, pour chacun des médicaments concernés. D’autres informations partent aussi, sans aucun nom de médicament : l’adresse internet de votre appareil lors d’un scan, une mesure d’usage que vous pouvez désactiver, et les informations d’abonnement ou de code partenaire si vous en utilisez. Voir notre politique de confidentialité.</div>
         </details>
         <details class="faq-item">
-          <summary class="faq-q">Pilou fonctionne-t-il sans connexion internet&#8239;?<span class="faq-icon"></span></summary>
+          <summary class="faq-q"><h3 class="faq-q-titre">Pilou fonctionne-t-il sans connexion internet&#8239;?</h3><span class="faq-icon"></span></summary>
           <div class="faq-a">Oui. Une fois vos médicaments enregistrés, Pilou fonctionne hors ligne pour l’essentiel&#8239;: rappels, validation des prises et suivi restent disponibles sans internet. Vous pouvez même ajouter un médicament à la main sans connexion — la lecture d’une ordonnance par photo et la recherche de la molécule d’un médicament, elles, demandent internet.</div>
         </details>
         <details class="faq-item">
-          <summary class="faq-q">Pilou remplace-t-il mon médecin&#8239;?<span class="faq-icon"></span></summary>
+          <summary class="faq-q"><h3 class="faq-q-titre">Pilou remplace-t-il mon médecin&#8239;?</h3><span class="faq-icon"></span></summary>
           <div class="faq-a">Non. Pilou est un outil d’aide à l’observance, pas un dispositif médical. Il vous aide à suivre votre traitement, mais ne remplace jamais l’avis de votre médecin ou de votre pharmacien.</div>
         </details>
         <details class="faq-item">
-          <summary class="faq-q">Comment fonctionne la lecture d’ordonnance&#8239;?<span class="faq-icon"></span></summary>
+          <summary class="faq-q"><h3 class="faq-q-titre">Comment fonctionne la lecture d’ordonnance&#8239;?</h3><span class="faq-icon"></span></summary>
           <div class="faq-a">Vous photographiez votre ordonnance&#8239;; Pilou en extrait les médicaments, posologies, durées et créneaux, et prépare votre pilulier. Vous vérifiez et validez chaque ligne avant l’enregistrement. Les médicaments sont reconnus grâce à la base officielle du médicament français (BDPM).</div>
         </details>
         <details class="faq-item">
-          <summary class="faq-q">Puis-je ajouter un médicament sans photographier mon ordonnance&#8239;?<span class="faq-icon"></span></summary>
-          <div class="faq-a">Oui. Depuis le menu d’ajout, choisissez «&#8239;Ajouter manuellement&#8239;»&#8239;: vous saisissez vous-même le nom, le dosage, les créneaux et la durée. Aucune photo n’est nécessaire, et cela n’utilise aucune de vos lectures d’ordonnance — le nombre de médicaments dépend simplement de votre formule. Et si vous préférez le scan, un écran de recadrage vous laisse ne transmettre que la liste de vos médicaments.</div>
+          <summary class="faq-q"><h3 class="faq-q-titre">Pilou convient-il quand on prend beaucoup de médicaments&#8239;?</h3><span class="faq-icon"></span></summary>
+          <div class="faq-a">Oui, c’est pour cela qu’il a été conçu. Quand on prend plusieurs médicaments chaque jour, ce qu’on appelle la polymédication, Pilou les rassemble dans un seul pilulier et vous rappelle chaque moment de prise&#8239;: matin, midi, soir ou coucher, aux heures que vous choisissez. La formule Gratuite suit jusqu’à 5 médicaments en même temps&#8239;; avec Pilou+, il n’y a pas de limite.</div>
         </details>
         <details class="faq-item">
-          <summary class="faq-q">Que devient la photo de mon ordonnance&#8239;?<span class="faq-icon"></span></summary>
+          <summary class="faq-q"><h3 class="faq-q-titre">Puis-je ajouter un médicament sans photographier mon ordonnance&#8239;?</h3><span class="faq-icon"></span></summary>
+          <div class="faq-a">Oui. Depuis le menu d’ajout, choisissez «&#8239;Saisir manuellement&#8239;»&#8239;: vous saisissez vous-même le nom, le dosage, les créneaux et la durée. Aucune photo n’est nécessaire, et cela n’utilise aucune de vos lectures d’ordonnance — le nombre de médicaments dépend simplement de votre formule. Et si vous préférez le scan, un écran de recadrage vous laisse ne transmettre que la liste de vos médicaments.</div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q"><h3 class="faq-q-titre">Que devient la photo de mon ordonnance&#8239;?</h3><span class="faq-icon"></span></summary>
           <div class="faq-a">Elle est envoyée à notre serveur, hébergé dans l’Union européenne, puis analysée au sein de l’Union européenne par un service de Google, à la seule fin d’en extraire le texte. Elle n’est enregistrée sur aucun de nos serveurs. Ce que vous enregistrez dans Pilou — posologies, prises, historique — n’est, lui, pas transmis.</div>
         </details>
         <details class="faq-item">
-          <summary class="faq-q">Faut-il créer un compte pour utiliser Pilou&#8239;?<span class="faq-icon"></span></summary>
+          <summary class="faq-q"><h3 class="faq-q-titre">Faut-il créer un compte pour utiliser Pilou&#8239;?</h3><span class="faq-icon"></span></summary>
           <div class="faq-a">Non. Pilou fonctionne sans compte, sans email et sans mot de passe&#8239;: vous commencez directement, et vos traitements sont enregistrés sur votre téléphone — et, sur iPhone, dans votre sauvegarde iCloud si vous l’avez activée. Deux opérations transmettent le contenu de vos données de santé hors de votre appareil. Elles sont décrites dans notre politique de confidentialité.</div>
         </details>
         <details class="faq-item">
-          <summary class="faq-q">Sur quels téléphones Pilou est-il disponible&#8239;?<span class="faq-icon"></span></summary>
+          <summary class="faq-q"><h3 class="faq-q-titre">Sur quels téléphones Pilou est-il disponible&#8239;?</h3><span class="faq-icon"></span></summary>
           <div class="faq-a">Pilou fonctionne sur les téléphones Android à partir d’Android 7 et sur iPhone à partir d’iOS 15.</div>
         </details>
       </div>

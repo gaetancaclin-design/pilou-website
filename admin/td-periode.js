@@ -90,9 +90,22 @@
       if(par[r.jour]) return { cause:'le ' + C.jourTexte(r.jour) + ' apparaît deux fois' };
       par[r.jour] = r;
     }
-    var s = 0, lus = 0, prov = false;
+    var s = 0, lus = 0, prov = false, negatifs = 0;
     for(var k = 0; k < jours.length; k++){
       var g = par[jours[k]];
+      if(col === 'revenants'){
+        // « Habitués » = revenants, MÊMES règles que la tuile « Personnes revenues »
+        // de index.html (l. 4808-4825) : les deux relevés lus, sinon pas lu ; une
+        // valeur absente ou illisible = pas lu ; négative = jour non lu (signalé) ;
+        // provisoire si actifs ou nouveaux sont marqués incomplets.
+        if(!g || !(C.entierOuNul(g.actifs_lu) > 0 && C.entierOuNul(g.nouveaux_lu) > 0)) continue;
+        var rv = C.entierOuNul(g.revenants);
+        if(rv === null) continue;
+        if(rv < 0){ negatifs++; continue; }
+        s += rv; lus++;
+        if(g.actifs_incomplet === true || g.nouveaux_incomplet === true) prov = true;
+        continue;
+      }
       if(!g || !(C.entierOuNul(g[col + '_lu']) > 0) || g[col] == null) continue;
       var v = C.entierOuNul(g[col]);
       if(v === null) return { cause:'valeur illisible le ' + C.jourTexte(jours[k]) };
@@ -100,7 +113,28 @@
       s += v; lus++;
       if(g[col + '_incomplet'] === true) prov = true;
     }
-    return { somme:s, lus:lus, sur:jours.length, provisoire:prov };
+    return { somme:s, lus:lus, sur:jours.length, provisoire:prov, negatifs:negatifs };
+  }
+  // Envois reçus de la version 1.4.22 (charge 3), PRODUCTION seulement (test = false),
+  // sur les semaines de la période qui en ont : moyenne par jour, et par téléphone.
+  // L'application envoie au plus UNE fois par jour local et par installation
+  // (mesureAgregeeEnvoi.ts) ; `envoi_second` (second envoi du jour de l'acceptation)
+  // est une autre clé, non comptée ici.
+  function envoisParJour(rows, semaines){
+    var par = {}, n = 0, and = 0, ios = 0, vues = {};
+    if(!Array.isArray(rows)) return null;
+    for(var i = 0; i < rows.length; i++){
+      var r = rows[i];
+      if(!r || r.test !== false || C.entierOuNul(r.charge) !== 3 || semaines.indexOf(r.semaine) < 0) continue;
+      vues[r.semaine] = true;
+      if(r.cle !== 'envoi_recu') continue;
+      var v = C.entierOuNul(r.n);
+      if(v === null || v <= 0) return null;
+      n += v; if(r.plateforme === 'and') and += v; else if(r.plateforme === 'ios') ios += v;
+    }
+    var k = Object.keys(vues).length;
+    if(!k) return { semaines:0 };
+    return { semaines:k, parJour:n / (7 * k), and:and / (7 * k), ios:ios / (7 * k), sur:semaines.length };
   }
   // Courbe : MOYENNE PAR JOUR des semaines closes (jours relus seulement), jusqu'à
   // `fin` comprise ; elle s'arrête au premier trou (une courbe qui relie un trou ment).
@@ -305,7 +339,7 @@
     joursEntre:joursEntre, jj_mm:jj_mm, periode:periode, precedente:precedente,
     finParDefaut:finParDefaut, bornes:bornes, semainesProduction:semainesProduction, trouProduction:trouProduction, premiersPasProduction:premiersPasProduction, premiereSemaineVisible:premiereSemaineVisible, libelle:libelle, premiereSemaine:premiereSemaine,
     pctEntier:pctEntier, PLANCHER:PLANCHER,
-    audience:audience, courbeAudience:courbeAudience, casesMesure:casesMesure, somme:somme,
+    audience:audience, courbeAudience:courbeAudience, envoisParJour:envoisParJour, casesMesure:casesMesure, somme:somme,
     semainesMesure:semainesMesure, agregerCharge:agregerCharge, sommeCharge:sommeCharge,
     etatRetention:etatRetention, variation:variation, scanServeur:scanServeur
   };

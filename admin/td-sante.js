@@ -110,10 +110,11 @@
       var eb = etatDe(tc);
       P.collecte.etat = pire(eb, grilleCollecte.etat);
       P.collecte.valeur = RANG[grilleCollecte.etat] > RANG[eb] ? grilleCollecte.valeur : texte(dc);
+      P.collecte.bouton = { etat:eb, delai:texte(dc) };   // le bouton « Actualiser » suit le bouton de la console
     }
     var ts = doc.getElementById('tache-sauvegarde'), ds = doc.getElementById('haut-delai-sauvegarde');
     if(!ts || !ds || !texte(ds)) nonLu(P.sauvegarde);
-    else { P.sauvegarde.etat = etatDe(ts); P.sauvegarde.valeur = texte(ds); }
+    else { P.sauvegarde.etat = etatDe(ts); P.sauvegarde.valeur = texte(ds); P.sauvegarde.bouton = { etat:P.sauvegarde.etat, delai:texte(ds) }; }
     // 4. La mesure : avertissements, puis taux sur 4 semaines (rétention, premier traitement).
     var M = P.mesure, av = doc.getElementById('cadre-mesure-avert'), rt = doc.getElementById('cadre-mesure-retention');
     M.refus = 0; M.motif = ''; M.motifs = []; M.dates = [];
@@ -197,21 +198,27 @@
     }catch(e){}
   }
 
-  // Charge index.html dans un cadre caché ; promesse de l'état lu, ou de { gris, raison }.
+  // Le cadre reste OUVERT entre deux lectures (V4.1) : « Actualiser » et
+  // « Sauvegarder » actionnent ses boutons. Première lecture : on le crée ;
+  // lectures suivantes : on clique son « Recharger » (lecture seule). En cas
+  // d'échec, il est retiré (et recréé à la lecture suivante).
+  // `lue` : une lecture de santé est TERMINÉE (et réussie) depuis le dernier
+  // rechargement du cadre ; les boutons n'agissent qu'à cette condition.
+  var cadre = null, lue = false;
+  function retirer(f){ try{ f.parentNode.removeChild(f); }catch(e){} if(cadre === f){ cadre = null; lue = false; } }
   function lire(adresse, ctx){
+    lue = false;
     return new Promise(function(resoudre){
-      var f = document.createElement('iframe'), fini = false, avant = memoriser();
-      f.setAttribute('aria-hidden', 'true'); f.setAttribute('tabindex', '-1'); f.title = 'Console détaillée (lecture)';
-      f.style.cssText = 'position:absolute;width:1px;height:1px;left:-9999px;top:0;border:0;visibility:hidden';
+      var f = cadre, neuf = !f, fini = false, avant = memoriser();
       function finir(v){
         if(fini) return; fini = true;
         // La console détaillée ne touche à ses réglages QUE si elle s'éteint :
         // dans ce cas seulement, on remet ceux de Gaétan.
-        if(v.gris || v.fermee) restaurer(avant);
-        try{ f.parentNode.removeChild(f); }catch(e){}
+        if(v.gris || v.fermee){ restaurer(avant); retirer(f); }
+        else if(cadre === f) lue = true;
         resoudre(v);
       }
-      setTimeout(function(){ finir({ gris:true, raison:'délai dépassé' }); }, DELAI_MS);   // dès l'ajout
+      setTimeout(function(){ finir({ gris:true, raison:'délai dépassé' }); }, DELAI_MS);   // dès l'ajout ou la relecture
       function sonder(){
         if(fini) return;
         var doc = null;
@@ -227,12 +234,96 @@
         }catch(e){ return finir({ gris:true, raison:'lecture du cadre impossible' }); }
         setTimeout(sonder, PAS_MS);
       }
-      f.onerror = function(){ finir({ gris:true, raison:'cadre en échec' }); };
-      f.onload = function(){ setTimeout(sonder, PAS_MS); };
-      f.src = adresse || 'index.html';
-      document.body.appendChild(f);
+      if(neuf){
+        f = document.createElement('iframe');
+        f.setAttribute('aria-hidden', 'true'); f.setAttribute('tabindex', '-1'); f.title = 'Console détaillée (lecture)';
+        f.style.cssText = 'position:absolute;width:1px;height:1px;left:-9999px;top:0;border:0;visibility:hidden';
+        f.onerror = function(){ finir({ gris:true, raison:'cadre en échec' }); };
+        f.onload = function(){ setTimeout(sonder, PAS_MS); };
+        f.src = adresse || 'index.html';
+        cadre = f;
+        document.body.appendChild(f);
+      } else {
+        try{ var r = f.contentDocument.getElementById('btn-recharger'); if(r && !r.disabled) r.click(); }
+        catch(e){ return finir({ gris:true, raison:'cadre inaccessible' }); }
+        setTimeout(sonder, PAS_MS);
+      }
     });
   }
 
-  racine.TDSante = { lire:lire, lireDocument:lireDocument, nomsEnAlerte:nomsEnAlerte, NOMS:NOMS, ORDRE:ORDRE, pire:pire };
+  // Visible pour de vrai dans la console détaillée : ni `hidden`, ni
+  // `display:none`, ni `visibility:hidden`, sur lui ou un de ses parents.
+  function visible(win, el){
+    for(var e = el; e && e.nodeType === 1; e = e.parentElement){
+      if(e.hidden) return false;
+      var cs = win.getComputedStyle(e);
+      if(!cs || cs.display === 'none' || cs.visibility === 'hidden') return false;
+    }
+    return true;
+  }
+  // Ligne « Empreinte SHA-256 » du tableau « Sauvegarde de la base » (lecture).
+  function empreinteAffichee(doc){
+    var th = doc.querySelectorAll('#cadre-sauvegarde th');
+    for(var i = 0; i < th.length; i++) if(texte(th[i]) === 'Empreinte SHA-256'){
+      var v = th[i].nextElementSibling ? texte(th[i].nextElementSibling) : '';
+      return /^[0-9a-f]{64}$/.test(v) ? v : null;
+    }
+    return null;
+  }
+
+  // Actionne « Collecter » ou « Sauvegarder » DANS la console détaillée (aucune
+  // logique recopiée) et suit sa zone de résultat jusqu'à l'état final, SANS
+  // limite de durée : tant qu'elle n'a pas rendu son résultat, l'action est en
+  // cours (au-delà de 90 s, `suivi('long')` est appelé une fois).
+  // Observé sans rien modifier : le code HTTP de la collecte (Resource Timing,
+  // `responseStatus`, null si le navigateur ne le donne pas) et le nom du
+  // fichier de sauvegarde (lien `download` ajouté puis retiré par la console).
+  // Rend { etat:'fini'|'indisponible'|'occupe', etapes:[{classe, texte}], efface,
+  //        code, nom, empreinte }.
+  function agir(quoi, suivi){
+    return new Promise(function(resoudre){
+      var f = cadre, doc = null, win = null;
+      try{ doc = f && f.contentDocument; win = f && f.contentWindow; }catch(e){ doc = null; }
+      var bt = doc && doc.getElementById('btn-' + quoi), zone = doc && doc.getElementById(quoi + '-resultat');
+      if(!bt || !zone || !win || !visible(win, bt)) return resoudre({ etat:'indisponible', etapes:[] });
+      if(bt.disabled) return resoudre({ etat:'occupe', etapes:[] });
+      var etapes = [], debut = Date.now(), long = false, code = null, nom = null, po = null, mo = null;
+      function voirRessources(l){
+        for(var i = 0; i < l.length; i++) if(/\/functions\/v1\/archiver-audience/.test(l[i].name)){
+          var c = l[i].responseStatus; code = (typeof c === 'number' && c > 0) ? c : null;
+        }
+      }
+      function voirAjouts(l){
+        for(var i = 0; i < l.length; i++) for(var k = 0; k < l[i].addedNodes.length; k++){
+          var n = l[i].addedNodes[k];
+          if(n && n.nodeName === 'A' && n.getAttribute('download')) nom = n.getAttribute('download');
+        }
+      }
+      try{ if(quoi === 'collecte' && win.PerformanceObserver){ po = new win.PerformanceObserver(function(l){ voirRessources(l.getEntries()); }); po.observe({ type:'resource' }); } }catch(e){ po = null; }
+      try{ if(quoi === 'sauvegarde' && win.MutationObserver){ mo = new win.MutationObserver(voirAjouts); mo.observe(doc.body, { childList:true }); } }catch(e){ mo = null; }
+      function finir(v){
+        try{ if(po){ voirRessources(po.takeRecords()); po.disconnect(); } }catch(e){}
+        try{ if(mo){ voirAjouts(mo.takeRecords()); mo.disconnect(); } }catch(e){}
+        v.code = code; v.nom = nom; v.empreinte = null;
+        if(v.etat === 'fini' && quoi === 'sauvegarde'){
+          var der = v.etapes[v.etapes.length - 1], m = der && /\b[0-9a-f]{64}\b/.exec(der.texte);
+          try{ v.empreinte = v.efface ? empreinteAffichee(doc) : (m ? m[0] : null); }catch(e){ v.empreinte = null; }
+        }
+        resoudre(v);
+      }
+      bt.click();
+      function sonder(){
+        if(cadre !== f) return finir({ etat:'indisponible', etapes:etapes });   // cadre retiré : plus rien ne tourne
+        var cl = String(zone.className || ''), tx = texte(zone), der = etapes[etapes.length - 1];
+        if(tx && (!der || der.texte !== tx || der.classe !== cl)) etapes.push({ classe:cl, texte:tx });
+        var enCours = /\bcharge\b/.test(cl) || /vérification…/.test(tx);
+        if(etapes.length && !enCours) return finir({ etat:'fini', etapes:etapes, efface:!tx });
+        if(!long && Date.now() - debut > 90000){ long = true; if(suivi) suivi('long'); }
+        setTimeout(sonder, 150);
+      }
+      setTimeout(sonder, 60);
+    });
+  }
+
+  racine.TDSante = { lire:lire, agir:agir, pret:function(){ return !!cadre && lue; }, lireDocument:lireDocument, nomsEnAlerte:nomsEnAlerte, NOMS:NOMS, ORDRE:ORDRE, pire:pire };
 })(typeof window !== 'undefined' ? window : this);

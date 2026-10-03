@@ -12,7 +12,8 @@
   détaillée (index.html) reste intacte ; cette page la lit dans un cadre caché
   pour la santé technique (équivalence stricte avec son bandeau).
   Fichiers : td-calculs.js (copies à l'identique de index.html), td-periode.js,
-  td-bulles.js, td-donnees.js, td-cartes.js, td-sante.js, td-app.js.
+  td-bulles.js, td-donnees.js, td-cartes.js, td-sante.js, td-direct.js (V4.1),
+  td-actions.js (V4.1), td-app.js.
   Police système, aucune requête vers un tiers, mode sombre automatique.
 -->
 <style>
@@ -96,6 +97,9 @@ h2{margin:28px 0 12px 4px}
 .c.illisible .k-val b{color:var(--ko)}
 .c.gris .k-val b{color:var(--encre3)}
 .k-sous{margin-top:6px;color:var(--encre2)}
+.c.grand .k-val b{font-size:46px}
+.k-ligne{margin-top:6px;color:var(--encre2);font-size:13px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}.k-ligne .tag{margin-left:0}.k-ligne.ko{color:var(--ko);font-weight:600}
+a.act{text-decoration:none}
 .k-pied{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;flex-wrap:wrap}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-weight:650;font-size:12.5px;line-height:1.35}
 .chip.ok{background:var(--ok-c);color:var(--ok)}.chip.att{background:var(--att-c);color:var(--att)}
@@ -175,6 +179,29 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
   .droite .aide>.bulle{left:0;right:auto;width:340px;max-width:calc(100vw - 32px)}
   .ent.seul .mini{align-self:center}
 }
+
+/* ── V4.1 : boutons d'action, bandeau « En direct » ── */
+.ligne2{width:100%;display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
+.actions{display:flex;gap:8px;margin-left:auto;align-items:center;flex-wrap:wrap;position:relative}
+.act{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:var(--encre);
+  font-weight:650;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.act .act-delai{font-weight:550;color:var(--encre2);font-size:12.5px}
+.act.att{border-color:var(--att)}.act.att .act-delai{color:var(--att)}
+.act.ko{border-color:var(--ko)}.act.ko .act-delai{color:var(--ko)}
+.act[disabled]{opacity:.55;cursor:default}
+.actres{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-weight:650;font-size:12.5px}
+.actres.ok{background:var(--ok-c);color:var(--ok)}.actres.att{background:var(--att-c);color:var(--att)}
+.actres.ko{background:var(--ko-c);color:var(--ko)}.actres.gris{background:var(--gris-c);color:var(--gris)}
+.actions .aide>.bulle{left:auto;right:0;width:340px;max-width:calc(100vw - 32px)}
+.direct{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 22px;background:var(--carte);border-radius:14px;padding:10px 16px;
+  margin-bottom:18px;box-shadow:var(--ombre);font-size:13px;color:var(--encre2);position:relative}
+.direct:empty{display:none}
+.dtitre{font-weight:750;text-transform:uppercase;letter-spacing:.06em;font-size:12px;color:var(--encre3);display:inline-flex;align-items:center;gap:6px}
+.dj{display:inline-flex;flex-wrap:wrap;gap:2px 12px;align-items:baseline}
+.dt{font-weight:650;color:var(--encre)}
+.dv b{color:var(--encre);font-size:15px;font-variant-numeric:tabular-nums}
+.dv.ko{color:var(--ko)}
+@media (max-width:700px){ .actions{margin-left:0} .dj{width:100%} .act{padding:0 10px} }
 </style>
 </head>
 <body>
@@ -194,10 +221,19 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
     <span id="tests-aide"></span>
     <span class="etat gris" id="etat"><span class="pt"></span><span id="etat-texte">Lecture…</span><span id="etat-aide"></span></span>
   </div>
-  <span class="releve" id="releve">chargement…</span>
+  <div class="ligne2">
+    <span class="releve" id="releve">chargement…</span>
+    <div class="actions">
+      <span id="action-resultat" role="status"></span>
+      <button type="button" class="act gris" id="act-collecte" disabled>Actualiser <span class="act-delai" id="act-delai-collecte"></span></button>
+      <button type="button" class="act gris" id="act-sauvegarde" disabled>Sauvegarder <span class="act-delai" id="act-delai-sauvegarde"></span></button>
+      <span id="act-aide"></span>
+    </div>
+  </div>
 </header>
 <div id="panne" role="alert"></div>
 <main id="contenu">
+  <section class="direct" id="direct" aria-label="En direct"></section>
   <section class="questions" id="questions" aria-label="Les quatre questions"></section>
   <section class="grille2">
     <div class="c" id="scan"></div>
@@ -206,17 +242,19 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
   <h2 id="sante-titre">Santé technique</h2>
   <section class="c sante" id="sante" aria-labelledby="sante-titre"></section>
 </main>
-<footer>Lecture seule : cette page n’écrit rien dans la base et ne contient que des agrégats. Bibliothèque supabase-js 2.105.4, hébergée sur ce site — aucune requête vers un tiers.</footer>
+<footer>Deux boutons agissent, en passant par la console détaillée : « Actualiser » lui fait collecter les chiffres de RevenueCat (une fonction du serveur les archive) ; « Sauvegarder » lui fait produire le fichier de sauvegarde, remis à votre navigateur (Chrome et Edge sur ordinateur ; ailleurs, le bouton ouvre la console détaillée), et n’écrit en base qu’une ligne de journal. Rien d’autre sur cette page ne modifie la base ; elle ne contient que des agrégats. Bibliothèque supabase-js 2.105.4, hébergée sur ce site — aucune requête vers un tiers.</footer>
 <script src="./supabase-js-2.105.4.umd.js"></script>
 <script src="./lecture.js?v=20260928v1"></script>
 <script src="./c3-revenus.js?v=20260926c3b"></script>
 <script src="./apporteurs.js?v=20260928v3"></script>
 <script src="./td-calculs.js?v=20261003a"></script>
-<script src="./td-periode.js?v=20261003a"></script>
-<script src="./td-bulles.js?v=20261003a"></script>
-<script src="./td-donnees.js?v=20261003a"></script>
-<script src="./td-cartes.js?v=20261003a"></script>
-<script src="./td-sante.js?v=20261003a"></script>
-<script src="./td-app.js?v=20261003a"></script>
+<script src="./td-periode.js?v=20261004a"></script>
+<script src="./td-bulles.js?v=20261004e"></script>
+<script src="./td-donnees.js?v=20261004a"></script>
+<script src="./td-cartes.js?v=20261004e"></script>
+<script src="./td-sante.js?v=20261004b"></script>
+<script src="./td-direct.js?v=20261004b"></script>
+<script src="./td-actions.js?v=20261004b"></script>
+<script src="./td-app.js?v=20261004a"></script>
 </body>
 </html>

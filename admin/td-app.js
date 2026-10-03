@@ -31,6 +31,7 @@
     var b = document.querySelectorAll('.seg button, .fl, #tests');
     for(var i = 0; i < b.length; i++) b[i].disabled = etat.charge;
     if(!v) bornerFleches();
+    if(racine.TDActions) racine.TDActions.maj(undefined, etat.charge);
   }
   function panne(titre, texte, gris){
     $('panne').innerHTML = '<div' + (gris ? ' class="gris"' : '') + '><b>' + ech(titre) + '</b>' + ech(texte)
@@ -53,7 +54,8 @@
     verrou(true);
     $('releve').textContent = 'chargement…';
     etatGeneral('gris', 'Lecture…', null);
-    racine.TDDonnees.charger().then(function(r){
+    // Rend une promesse résolue une fois le tableau redessiné (utile à « Actualiser »).
+    return racine.TDDonnees.charger().then(function(r){
       if(!r) return;                                   // réponse périmée : on ne touche à rien
       if(r.etat === 'sans-session'){ racine.location.replace('index.html'); return; }
       verrou(false);
@@ -111,6 +113,7 @@
               cases: a.cause ? {} : P.casesMesure(d.mesure, etat.avecTest),
               ach: P.agregerCharge(d.mesureCharge, etat.avecTest), illisibles:0 };
     $('libelle').textContent = P.libelle(p) + (p.enCours ? ' · en cours' : '');
+    $('direct').innerHTML = racine.TDDirect.rendre(d, J, d.audEtat);
     $('questions').innerHTML = K.questions(x);
     $('scan').innerHTML = K.scan(x);
     $('officines').innerHTML = K.officines(x);
@@ -212,6 +215,7 @@
       h += pastille('recente', x.ach.cause ? 'Version 1.4.22 : non lue' : 'Version 1.4.22 : '
         + x.ach.clesInconnues.length + (x.ach.clesInconnues.length > 1 ? ' noms inconnus' : ' nom inconnu'), x.ach.cause ? 'ko' : 'att');
     $('sante').innerHTML = h + '<a class="lien" href="index.html">Console détaillée →</a>';
+    if(racine.TDActions) racine.TDActions.maj(s, etat.charge);
   }
 
   // ── Commandes ──────────────────────────────────────────────────────────────
@@ -249,6 +253,7 @@
 
   function demarrer(){
     B.installer();
+    racine.TDActions.installer();
     lireTests(); majTests();
     $('tests-aide').innerHTML = B.aide('Nos tests', 'tests');
     $('avant').addEventListener('click', function(){ deplacer(-1); });

@@ -34,7 +34,9 @@
       pages:['semaine','cle','plateforme','version','anciennete','test','charge'], facultative:true },
     { cle:'netJour',      vue:'v_admin_net_jour',            ordre:{ col:'jour', asc:false } },
     { cle:'attendus',     vue:'v_admin_paiements_attendus',  unique:true },
-    { cle:'cohorte',      vue:'v_admin_apporteurs_cohorte' }
+    { cle:'cohorte',      vue:'v_admin_apporteurs_cohorte' },
+    // V4.1 : heure de la dernière collecte (bandeau « En direct », « Actualiser »).
+    { cle:'audEtat',      vue:'v_admin_audience_etat',       unique:true }
   ];
 
   var sb = null, jeton = 0;

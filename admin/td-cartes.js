@@ -36,13 +36,13 @@
     return '<span class="tend">' + ech(v.f + ' ' + v.t + ' vs ' + libPrec(x) + ' (' + ref + ')') + '</span>'; }
   function precNonMesuree(x){ return x.p.mode === '4sem' ? '4 semaines précédentes non mesurées' : 'Semaine précédente non mesurée'; }
 
-  // o = { nom, aide, extra, tag, classe, grand, unite, sous, pied:[], courbe, corps }
+  // o = { nom, aide, extra, tag, classe, grand, unite, sous, ligne (HTML déjà échappé), pied:[], courbe, corps }
   function carte(o){
     var pied = (o.pied || []).join('') + (o.courbe || '');
     return '<div class="c' + (o.classe ? ' ' + o.classe : '') + '"><div class="k-tete">' + ech(o.nom)
       + B.aide(o.nom, o.aide, o.extra) + (o.tag ? '<span class="tag">' + ech(o.tag) + '</span>' : '') + '</div>'
       + (o.corps || ('<div class="k-val"><b>' + ech(o.grand) + '</b>' + (o.unite ? '<span>' + ech(o.unite) + '</span>' : '') + '</div>'))
-      + (o.sous ? '<div class="k-sous">' + ech(o.sous) + '</div>' : '')
+      + (o.sous ? '<div class="k-sous">' + ech(o.sous) + '</div>' : '') + (o.ligne || '')
       + (pied ? '<div class="k-pied">' + pied + '</div>' : '') + '</div>';
   }
   function illisible(x, nom, aide, cause, tag){
@@ -74,17 +74,19 @@
   function finCourbe(x){ return x.p.enCours ? C.jourMoins(x.p.fin, 7) : x.p.fin; }
 
   // ── ARRIVENT ──────────────────────────────────────────────────────────────
-  function audienceCarte(x, nom, aide, col, moyenne){
+  function audienceCarte(x, nom, aide, col, moyenne, plus){
     var tg = 'tests inclus';
     if(!x.d.audMesures || !x.d.audMesures.length) return grise(nom, aide, 'Aucune série RevenueCat archivée', tg);
     if(!C.audienceLibellesConformes(x.d.audMesures))
       return grise(nom, aide, 'Non affiché : les séries RevenueCat ont changé de nom', tg);
     var a = P.audience(x.d.audJours, x.p.jours, col);
     if(a.cause) return illisible(x, nom, aide, a.cause, tg);
-    if(!a.lus) return grise(nom, aide, 'Pas encore de chiffre pour cette période', tg, [], ['RevenueCat n’a pas encore été relu pour ces jours (bouton « Collecter » de la console détaillée).']);
+    if(!a.lus) return grise(nom, aide, 'Pas encore de chiffre pour cette période', tg, [], ['RevenueCat n’a pas encore été relu pour ces jours (bouton « Actualiser », en haut).']);
     var parJour = a.somme / a.lus, pied = chipsPeriode(x);
     if(a.provisoire) pied.push(chip('gris', 'provisoire'));
     if(a.lus < a.sur && !x.p.enCours) pied.push(chip('gris', a.lus + ' jours sur ' + a.sur));
+    var ajout = plus ? plus(a) : { extra:[] };
+    if(a.negatifs) pied.push(chip('gris', a.negatifs + (a.negatifs > 1 ? ' jours non lus' : ' jour non lu')));
     if(!x.p.enCours){
       var b = P.audience(x.d.audJours, x.prev.jours, col);
       if(b.cause || !b.lus) pied.push(chip('gris', precNonMesuree(x)));
@@ -92,18 +94,53 @@
       else if(a.lus === a.sur && b.lus === b.sur) pied.push(tend(P.variation(a.somme, b.somme), String(b.somme), x));
       else pied.push(tend(P.variation(parJour, b.somme / b.lus), arrondi(b.somme / b.lus) + ' par jour', x));
     }
-    return carte({ nom:nom, aide:aide, tag:tg, extra: a.lus < a.sur && !x.p.enCours
-        ? ['« ' + a.lus + ' jours sur ' + a.sur + ' » : un jour n’a pas encore été relu chez RevenueCat ; le calcul porte sur les jours connus.'] : [],
+    return carte({ nom:nom, aide:aide, tag:tg, sous:ajout.sous, ligne:ajout.ligne, extra: (a.lus < a.sur && !x.p.enCours
+        ? ['« ' + a.lus + ' jours sur ' + a.sur + ' » : un jour n’a pas encore été relu chez RevenueCat ; le calcul porte sur les jours connus.'] : [])
+        .concat(a.negatifs ? ['Un jour à valeur négative n’est pas compté : la journée n’était pas entièrement relue.'] : [], ajout.extra || []),
       grand: moyenne ? arrondi(parJour) : String(a.somme),
       unite: moyenne ? 'en moyenne' : '≈ ' + arrondi(parJour) + ' par jour', pied:pied,
       courbe: courbe(P.courbeAudience(x.d.audJours, x.J, finCourbe(x), col)) });
   }
 
+  // ARRIVENT = une seule carte (décision de Gaétan, 04/10). Ligne « sur N ouvertures »
+  // (RevenueCat, tests compris) : mêmes règles que les autres séries RevenueCat
+  // (« provisoire », « x jours sur 7 », jamais un 0 inventé) ; « environ 1 sur K »
+  // seulement si les deux nombres valent au moins 10, les ouvertures sont complètes
+  // et portent sur les mêmes semaines que les nouveaux.
+  function ligneOuvertures(x, t, sem){
+    var tg = ' <span class="tag">tests inclus</span>' + B.aide('Ouvertures de Pilou', 'ouvertures');
+    function l(txt, chips, ko){ return '<div class="k-ligne' + (ko ? ' ko' : '') + '">' + ech(txt) + (chips || '') + tg + '</div>'; }
+    if(!x.d.audMesures || !x.d.audMesures.length) return l('ouvertures de Pilou : aucune série RevenueCat archivée');
+    if(!C.audienceLibellesConformes(x.d.audMesures)) return l('ouvertures de Pilou non lues (séries RevenueCat renommées)');
+    var a = P.audience(x.d.audJours, x.p.jours, 'nouveaux');
+    // Illisible : compté dans « chiffres non lus » (pastille générale rouge), en rouge, comme toute carte illisible.
+    if(a.cause){ x.illisibles++; return l('ouvertures de Pilou non lues (' + a.cause + '). N’en concluez rien.', '', true); }
+    if(!a.lus) return l('ouvertures de Pilou pas encore relevées');
+    var chips = (a.provisoire ? chip('gris', 'provisoire') : '') + (a.lus < a.sur && !x.p.enCours ? chip('gris', a.lus + ' jours sur ' + a.sur) : '');
+    var complet = a.lus === a.sur && !a.provisoire && !x.p.enCours && sem === x.p.semaines.length;
+    var k = Math.round(a.somme / t);
+    // K < 2 (au moins ~ 67 %) : « soit X % » plutôt qu'« environ 1 sur 1 ».
+    var ratio = complet && t !== null && t >= C.MESURE_PLANCHER && a.somme >= C.MESURE_PLANCHER && a.somme >= t && k >= 1
+      ? (k < 2 ? ' (soit ' + P.pctEntier(t, a.somme) + ')' : ' (environ 1 sur ' + k + ')') : '';
+    return l('sur ' + a.somme + (a.somme > 1 ? ' ouvertures' : ' ouverture') + ' de Pilou' + ratio, chips);
+  }
+  // Courbe : nouveaux par semaine close, jusqu'à 8 semaines, arrêtée au premier trou.
+  function courbeNouveaux(x){
+    var out = [], fin = finCourbe(x);
+    for(var k = 0; k < 8; k++){
+      var w = C.jourMoins(fin, 7 * k);
+      if(w < x.premiere || !C.aPropriete(x.a.parSemaine, w)) break;
+      out.unshift(P.somme(x.cases, [w], 'jalon_accueil'));
+    }
+    return out;
+  }
   function nouveaux(x){
     var nom = 'Nouveaux utilisateurs', aide = 'nouveaux';
-    if(x.a.cause) return illisible(x, nom, aide, x.a.cause);
+    if(x.a.cause){ x.illisibles++;
+      return carte({ nom:nom, aide:aide, classe:'illisible', grand:'—', sous:'Non lu : ' + x.a.cause + '. N’en concluez rien.', ligne:ligneOuvertures(x, null, 0) }); }
     var s = lues(x, x.p);
-    if(s.message) return grise(nom, aide, s.message, '', chipsPeriode(x), s.bulle);
+    if(s.message) return carte({ nom:nom, aide:aide, classe:'gris', grand:'—', extra:s.bulle, ligne:ligneOuvertures(x, null, 0),
+      pied:[chip('gris', s.message)].concat(chipsPeriode(x)) });
     var t = P.somme(x.cases, s.lues, 'jalon_accueil'), web = P.somme(x.cases, s.lues, 'jalon_accueil', 'web');
     var pied = chipsPeriode(x, s);
     if(!x.p.enCours){
@@ -111,9 +148,10 @@
       if(sp.message || sp.avant) pied.push(chip('gris', precNonMesuree(x)));
       else { var tp = P.somme(x.cases, sp.lues, 'jalon_accueil'); pied.push(tend(P.variation(t, tp), String(tp), x)); }
     }
-    return carte({ nom:nom, aide:aide, grand:String(t), unite:'premiers pas',
+    return carte({ nom:nom, aide:aide, classe:'grand', grand:String(t), unite:'premiers pas',
       sous:'Android ' + P.somme(x.cases, s.lues, 'jalon_accueil', 'and') + ' · iPhone '
-        + P.somme(x.cases, s.lues, 'jalon_accueil', 'ios') + (web ? ' · Navigateur ' + web : ''), pied:pied });
+        + P.somme(x.cases, s.lues, 'jalon_accueil', 'ios') + (web ? ' · Navigateur ' + web : ''),
+      ligne:ligneOuvertures(x, t, s.lues.length), pied:pied, courbe:courbe(courbeNouveaux(x)) });
   }
 
   // ── S'EN SERVENT ─────────────────────────────────────────────────────────
@@ -164,7 +202,26 @@
       sous:'sur ' + den + ' nouveaux · ' + fenetre, pied:pied });
   }
 
-  function actifs(x){ return audienceCarte(x, 'Actifs par jour', 'actifs', 'actifs', true); }
+  // ── Actifs par jour. Ligne « 1.4.22 » (revue adverse V4.1, M2) : jours
+  // d'utilisation reçus de l'application (`envoi_recu`, charge 3, hors tests),
+  // SEULEMENT si toute la période est postérieure à la sortie : à partir de la
+  // première semaine ENTIÈRE après la sortie Android du 03/10, et chaque semaine
+  // de la période doit avoir des lignes. Sinon : rien (pas de ligne grise).
+  var SEMAINE_V3 = '2026-10-05';
+  function ligne122(x){
+    if(x.p.enCours || x.ach.cause || !x.p.semaines.length || x.p.semaines[0] < SEMAINE_V3) return '';
+    var e = P.envoisParJour(x.d.mesureCharge, x.p.semaines);
+    if(!e || !e.semaines || e.semaines < e.sur) return '';
+    return '<div class="k-ligne">' + ech('jours d’utilisation reçus de la 1.4.22 : ' + arrondi(e.parJour) + ' par jour (premier jour compris) · Android '
+      + arrondi(e.and) + ' · iPhone ' + arrondi(e.ios)) + ' <span class="tag">hors tests</span>' + B.aide('Jours d’utilisation reçus de la 1.4.22', 'jours122') + '</div>';
+  }
+  function actifs(x){
+    return audienceCarte(x, 'Actifs par jour', 'actifs', 'actifs', true, function(){ return { ligne:ligne122(x), extra:[] }; });
+  }
+
+  // ── Habitués par jour (V4.1) : personnes DÉJÀ VUES qui rouvrent Pilou, chaque jour
+  // (`revenants` de RevenueCat, règles de la tuile « Personnes revenues »).
+  function habitues(x){ return audienceCarte(x, 'Habitués par jour', 'habitues', 'revenants', true); }
 
   // ── REVIENNENT ───────────────────────────────────────────────────────────
   var NOMS_RET = ['le lendemain', 'du 2ᵉ au 7ᵉ jour'];
@@ -249,9 +306,9 @@
 
   function questions(x){
     function col(t, h){ return '<div class="q-col"><h3>' + t + '</h3>' + h + '</div>'; }
-    return col('Arrivent', audienceCarte(x, 'Ouvertures', 'ouvertures', 'nouveaux', false) + nouveaux(x))
+    return col('Arrivent', nouveaux(x))
       + col('S’en servent', pilulier(x) + actifs(x))
-      + col('Reviennent', reviennent(x))
+      + col('Reviennent', habitues(x) + reviennent(x))
       + col('Rapportent', abonnes(x) + net(x));
   }
 

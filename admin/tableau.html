@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Pilou · Tableau de bord</title>
+<!--
+  PILOU — TABLEAU DE BORD (console V4, plan v2 du 03/10/2026).
+  Lecture seule : aucune écriture en base depuis cette page. La console
+  détaillée (index.html) reste intacte ; cette page la lit dans un cadre caché
+  pour la santé technique (équivalence stricte avec son bandeau).
+  Fichiers : td-calculs.js (copies à l'identique de index.html), td-periode.js,
+  td-bulles.js, td-donnees.js, td-cartes.js, td-sante.js, td-app.js.
+  Police système, aucune requête vers un tiers, mode sombre automatique.
+-->
+<style>
+:root{
+  --fond:#f6f5f1; --carte:#ffffff; --encre:#13201a; --encre2:#3f4d45; --encre3:#56635b; --ligne:#e1e5df;
+  --accent:#2f5a3f; --accent2:#3b6c4d; --sur-accent:#ffffff;
+  --ok:#1d6f39; --ok-c:#e2f1e7; --att:#875408; --att-c:#fbefd9; --ko:#a1261a; --ko-c:#fbe5e1;
+  --gris:#46514b; --gris-c:#eaece8; --hachure1:#f1f3f0; --hachure2:#e5e8e4;
+  --bulle:#13201a; --bulle-encre:#eef3ef; --tog:#b9c1bb;
+  --r:18px; --ombre:0 1px 2px rgba(19,32,26,.05),0 8px 24px rgba(19,32,26,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --fond:#0d1310; --carte:#151d18; --encre:#e8efe9; --encre2:#b9c6bd; --encre3:#9fada4; --ligne:#2a352e;
+    --accent:#86c29c; --accent2:#6fae88; --sur-accent:#0d1310;
+    --ok:#86d6a1; --ok-c:#173020; --att:#e9b860; --att-c:#30260f; --ko:#f4958a; --ko-c:#361b18;
+    --gris:#c3cdc6; --gris-c:#252e28; --hachure1:#1c2520; --hachure2:#232d27;
+    --bulle:#26332b; --bulle-encre:#eef3ef; --tog:#4a564f;
+    --ombre:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --fond:#0d1310; --carte:#151d18; --encre:#e8efe9; --encre2:#b9c6bd; --encre3:#9fada4; --ligne:#2a352e;
+  --accent:#86c29c; --accent2:#6fae88; --sur-accent:#0d1310;
+  --ok:#86d6a1; --ok-c:#173020; --att:#e9b860; --att-c:#30260f; --ko:#f4958a; --ko-c:#361b18;
+  --gris:#c3cdc6; --gris-c:#252e28; --hachure1:#1c2520; --hachure2:#232d27;
+  --bulle:#26332b; --bulle-encre:#eef3ef; --tog:#4a564f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--fond);color:var(--encre);font-size:14px;line-height:1.4;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num,.k-val b,.duo b{font-variant-numeric:tabular-nums}
+
+/* ── Barre du haut ── */
+.barre{display:flex;align-items:center;gap:12px 14px;padding:14px 32px;background:var(--carte);
+  border-bottom:1px solid var(--ligne);position:sticky;top:0;z-index:10;flex-wrap:wrap}
+.marque{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+.logo{width:30px;height:30px;border-radius:9px;background:var(--accent);color:var(--sur-accent);display:grid;place-items:center;font-weight:800}
+.marque small{font-weight:500;color:var(--encre3);font-size:14px}
+.seg{display:flex;gap:4px;background:var(--gris-c);border-radius:12px;padding:4px}
+.seg button{border:0;background:none;min-height:44px;padding:0 14px;border-radius:9px;font-weight:600;color:var(--encre2);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--carte);color:var(--encre);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.semaine{display:flex;align-items:center;gap:8px;font-weight:650}
+.semaine .lib{min-width:7.5em;text-align:center}
+.fl{width:44px;height:44px;border-radius:10px;border:1px solid var(--ligne);display:grid;place-items:center;
+  color:var(--encre2);background:var(--carte);font-size:18px;cursor:pointer}
+.fl[disabled],.seg button[disabled],.tests[disabled]{opacity:.45;cursor:default}
+.droite{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tests{display:flex;align-items:center;gap:8px;color:var(--encre2);font-weight:600;background:none;border:0;min-height:44px;cursor:pointer;padding:0 4px}
+.tog{width:38px;height:22px;border-radius:99px;background:var(--tog);position:relative;flex:none}
+.tog:after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.tests[aria-checked="true"] .tog{background:var(--accent)}
+.tests[aria-checked="true"] .tog:after{left:19px}
+.etat{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 6px 0 14px;border-radius:999px;font-weight:650}
+.etat.ok{background:var(--ok-c);color:var(--ok)}.etat.att{background:var(--att-c);color:var(--att)}
+.etat.ko{background:var(--ko-c);color:var(--ko)}.etat.gris{background:var(--gris-c);color:var(--gris)}
+.pt{width:9px;height:9px;border-radius:50%;background:currentColor;flex:none}
+.releve{color:var(--encre3);font-size:12.5px}
+
+/* ── Bandeau de panne (console fermée, lecture ou affichage impossible) ── */
+#panne{display:none;max-width:1240px;margin:22px auto 24px;padding:0 32px}
+#panne .lien{margin-left:0;color:inherit;text-decoration:underline}
+#panne div{border-radius:var(--r);padding:16px 18px;background:var(--ko-c);color:var(--ko);border:1px solid var(--ko)}
+#panne div.gris{background:var(--gris-c);color:var(--gris);border-color:var(--ligne)}
+#panne b{display:block;margin-bottom:2px}
+
+main{max-width:1240px;margin:0 auto;padding:26px 32px 40px}
+.questions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+h2,.q-col h3{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--encre3);font-weight:750}
+.q-col h3{margin:0 0 10px 4px}
+h2{margin:28px 0 12px 4px}
+.c{background:var(--carte);border-radius:var(--r);box-shadow:var(--ombre);padding:18px 20px;position:relative;min-width:0}
+.c+.c{margin-top:12px}
+.k-tete{display:flex;align-items:center;gap:8px;color:var(--encre2);font-weight:650;position:relative;flex-wrap:wrap}
+.tag{white-space:nowrap;font-size:11.5px;font-weight:650;color:var(--gris);border:1px solid var(--ligne);border-radius:6px;padding:1px 6px;margin-left:auto}
+.k-val{display:flex;align-items:baseline;gap:8px;margin-top:8px;flex-wrap:wrap}
+.k-val b{font-size:38px;line-height:1;font-weight:760;letter-spacing:-.02em}
+.k-val span{color:var(--encre2);font-weight:550}
+.c.illisible .k-val b{color:var(--ko)}
+.c.gris .k-val b{color:var(--encre3)}
+.k-sous{margin-top:6px;color:var(--encre2)}
+.k-pied{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-weight:650;font-size:12.5px;line-height:1.35}
+.chip.ok{background:var(--ok-c);color:var(--ok)}.chip.att{background:var(--att-c);color:var(--att)}
+.chip.ko{background:var(--ko-c);color:var(--ko)}.chip.gris{background:var(--gris-c);color:var(--gris)}
+.tend{font-weight:650;color:var(--encre2);font-size:12.5px}
+.spark{width:120px;height:34px;color:var(--accent);flex:none}
+.duo{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--ligne)}
+.k-tete+.duo{border-top:0;margin-top:6px}
+.duo b{font-size:24px;font-weight:750}
+.duo span{color:var(--encre2);font-weight:550}
+.duo small{display:block;text-align:right;font-size:12.5px;font-weight:650;color:var(--encre2)}
+
+/* ── Scan et officines ── */
+.grille2{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-top:22px;align-items:start}
+.titre-c{display:flex;align-items:center;gap:8px;font-weight:720;font-size:15px;margin-bottom:14px;position:relative;flex-wrap:wrap}
+.titre-c .chip{margin-left:auto}
+.ent{display:grid;grid-template-columns:150px minmax(0,1fr) 72px;align-items:center;gap:12px;padding:6px 0}
+.ent .lb{color:var(--encre2);font-weight:600}
+.ent .bar{height:26px;border-radius:8px;background:var(--gris-c);overflow:hidden}
+.ent .bar i{display:flex;align-items:center;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));color:var(--sur-accent);
+  font-weight:700;font-style:normal;padding-left:10px;border-radius:8px;font-size:13px;min-width:30px}
+.ent .pc{text-align:right;font-weight:650}
+.ent.seul .mini{align-self:center}
+.ent .bar em{display:flex;align-items:center;height:100%;padding-left:10px;font-style:normal;font-weight:700;color:var(--encre2);font-size:13px}
+.ent.fut .bar{background:repeating-linear-gradient(135deg,var(--hachure1) 0 6px,var(--hachure2) 6px 12px)}
+.ent.fut .lb,.ent.fut .pc{color:var(--encre3)}
+.ent.fut .pc{font-size:12.5px}
+.sep{border-top:1px solid var(--ligne);margin:8px 0 4px;padding-top:8px;display:flex;align-items:center;gap:8px;color:var(--encre3);font-size:12.5px;font-weight:650;position:relative;flex-wrap:wrap}
+.serveur{margin-top:12px;padding-top:12px;border-top:1px solid var(--ligne);display:flex;align-items:center;gap:8px;color:var(--encre2);flex-wrap:wrap;position:relative}
+.serveur b{color:var(--encre)}
+.serveur.ko b{color:var(--ko)}
+.message{color:var(--encre3);padding:6px 0}
+.message.ko{color:var(--ko);font-weight:600}
+.lignes>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--ligne)}
+.lignes>div:first-child{border-top:0;padding-top:0}
+.lignes b{font-size:22px}
+.lignes b.ko{color:var(--ko)}
+.mini{color:var(--encre3);font-size:12.5px}
+
+/* ── Santé technique ── */
+.sante{display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:relative}
+.sante .pastille{display:inline-flex;align-items:center;gap:2px;position:static}
+.sante .chip{font-size:13px;padding:7px 12px}
+.lien{margin-left:auto;color:var(--accent);font-weight:700;text-decoration:none;min-height:44px;display:inline-flex;align-items:center;padding:0 4px}
+footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);font-size:12.5px}
+
+/* ── Bulles « ? » (mécanique de index.html : survol, focus, toucher) ── */
+.aide{display:inline-block;position:static}
+.q{all:unset;position:relative;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;
+  background:var(--gris-c);color:var(--encre2);font-size:11.5px;font-weight:750;cursor:pointer}
+.q::after{content:"";position:absolute;inset:-12px}
+.q:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.aide>.bulle{display:none;position:absolute;left:0;top:calc(100% + 8px);width:340px;max-width:calc(100vw - 40px);background:var(--bulle);color:var(--bulle-encre);
+  border-radius:12px;padding:12px 14px;font-size:12.5px;line-height:1.5;font-weight:500;box-shadow:0 12px 30px rgba(0,0,0,.25);
+  z-index:30;text-align:left;text-transform:none;letter-spacing:0;white-space:normal}
+.aide>.bulle b{color:#fff}
+.aide>.bulle::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:10px}
+.aide:focus-within>.bulle{display:block}
+.aide:focus-within>.q{background:var(--bulle);color:#fff}
+@media (hover:hover){ .aide:hover>.bulle{display:block} }
+.droite .aide{position:relative}
+.droite .aide>.bulle{left:auto;right:-8px;width:300px;max-width:calc(100vw - 32px)}
+.cache{display:none!important}
+
+@media (max-width:1100px){.questions{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){
+  .barre{padding:10px 16px;gap:8px 10px;position:static}
+  .droite{margin-left:0;width:100%}
+  .releve{width:100%}
+  main{padding:16px 16px 32px} #panne{padding:0 16px} footer{padding:0 16px 32px}
+  .questions,.grille2{grid-template-columns:minmax(0,1fr)}
+  .ent{grid-template-columns:104px minmax(0,1fr) 60px;gap:8px}
+  .k-val b{font-size:34px}
+  .etat{max-width:100%}
+  .droite{position:relative}
+  .droite .aide{position:static}
+  .droite .aide>.bulle{left:0;right:auto;width:340px;max-width:calc(100vw - 32px)}
+  .ent.seul .mini{align-self:center}
+}
+</style>
+</head>
+<body>
+<header class="barre">
+  <div class="marque"><div class="logo" aria-hidden="true">P</div>Pilou <small>Tableau de bord</small></div>
+  <div class="seg" role="group" aria-label="Durée affichée">
+    <button type="button" data-mode="semaine" aria-pressed="true">Semaine</button>
+    <button type="button" data-mode="4sem" aria-pressed="false">4 semaines</button>
+  </div>
+  <div class="semaine">
+    <button type="button" class="fl" id="avant" aria-label="Période précédente">‹</button>
+    <span class="lib" id="libelle" aria-live="polite">—</span>
+    <button type="button" class="fl" id="apres" aria-label="Période suivante">›</button>
+  </div>
+  <div class="droite">
+    <button type="button" class="tests" id="tests" role="switch" aria-checked="false"><span class="tog" aria-hidden="true"></span><span id="tests-lib">Nos tests exclus</span></button>
+    <span id="tests-aide"></span>
+    <span class="etat gris" id="etat"><span class="pt"></span><span id="etat-texte">Lecture…</span><span id="etat-aide"></span></span>
+  </div>
+  <span class="releve" id="releve">chargement…</span>
+</header>
+<div id="panne" role="alert"></div>
+<main id="contenu">
+  <section class="questions" id="questions" aria-label="Les quatre questions"></section>
+  <section class="grille2">
+    <div class="c" id="scan"></div>
+    <div class="c" id="officines"></div>
+  </section>
+  <h2 id="sante-titre">Santé technique</h2>
+  <section class="c sante" id="sante" aria-labelledby="sante-titre"></section>
+</main>
+<footer>Lecture seule : cette page n’écrit rien dans la base et ne contient que des agrégats. Bibliothèque supabase-js 2.105.4, hébergée sur ce site — aucune requête vers un tiers.</footer>
+<script src="./supabase-js-2.105.4.umd.js"></script>
+<script src="./lecture.js?v=20260928v1"></script>
+<script src="./c3-revenus.js?v=20260926c3b"></script>
+<script src="./apporteurs.js?v=20260928v3"></script>
+<script src="./td-calculs.js?v=20261003a"></script>
+<script src="./td-periode.js?v=20261003a"></script>
+<script src="./td-bulles.js?v=20261003a"></script>
+<script src="./td-donnees.js?v=20261003a"></script>
+<script src="./td-cartes.js?v=20261003a"></script>
+<script src="./td-sante.js?v=20261003a"></script>
+<script src="./td-app.js?v=20261003a"></script>
+</body>
+</html>

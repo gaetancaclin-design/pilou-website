@@ -16,9 +16,6 @@
 
   // Mise en service de la mesure (texte de la console détaillée : « 21/09/2026 »).
   var MESURE_DEBUT = '2026-09-21';
-  // Première semaine où la version 1.4.22 (lignes « charge 3 ») peut être lue en
-  // vrai : Android publiée le 03/10 (analyse du 03/10). Sert au seul message gris.
-  var V3_PREMIERE = '2026-10-05';
   // Durées de conservation des vues (définitions lues dans les migrations ; scan :
   // commentaire de la console détaillée, la définition SQL n'est pas dans le dépôt).
   var GARDE = { mesure:182, scan:14, net:62 };
@@ -43,7 +40,8 @@
 
   // ── Périodes ──────────────────────────────────────────────────────────────
   // `fin` = lundi de la DERNIÈRE semaine de la période. « 4 semaines » = les
-  // quatre semaines qui finissent par celle-là, toujours closes.
+  // quatre semaines qui finissent par celle-là (V4.3 : la semaine en cours
+  // comprise, lue en direct).
   function periode(J, mode, fin){
     var n = mode === '4sem' ? 4 : 1, sem = [];
     for(var k = n - 1; k >= 0; k--) sem.push(C.jourMoins(fin, 7 * k));
@@ -53,7 +51,8 @@
              dernierJour:dernier, jours:joursEntre(sem[0], dernier), nbJours:7 * n };
   }
   function precedente(J, p){ return periode(J, p.mode, C.jourMoins(p.debut, 7)); }
-  function finParDefaut(J){ return C.jourMoins(C.lundiDe(J), 7); }
+  // V4.3 (17/10) : la page s'ouvre sur la semaine EN COURS (avant : la dernière close).
+  function finParDefaut(J){ return C.lundiDe(J); }
   // Borne gauche : la première semaine dont au moins une source est encore dans
   // sa période conservée — la mesure (semaines > J − 182) ou l'archive RevenueCat
   // (son plus ancien jour). Les autres sources ont des fenêtres plus courtes.
@@ -68,7 +67,7 @@
   }
   function bornes(J, mode, gauche){
     var L = C.lundiDe(J), g = gauche || C.jourMoins(L, 7 * 26);
-    return { max: mode === '4sem' ? C.jourMoins(L, 7) : L, min: mode === '4sem' ? C.jourMoins(g, -21) : g };
+    return { max:L, min: mode === '4sem' ? C.jourMoins(g, -21) : g };   // V4.3 : « 4 semaines » peut finir par la semaine en cours
   }
   function libelle(p){
     var a = d(p.debut), b = d(p.dimanche);
@@ -114,27 +113,6 @@
       if(g[col + '_incomplet'] === true) prov = true;
     }
     return { somme:s, lus:lus, sur:jours.length, provisoire:prov, negatifs:negatifs };
-  }
-  // Envois reçus de la version 1.4.22 (charge 3), PRODUCTION seulement (test = false),
-  // sur les semaines de la période qui en ont : moyenne par jour, et par téléphone.
-  // L'application envoie au plus UNE fois par jour local et par installation
-  // (mesureAgregeeEnvoi.ts) ; `envoi_second` (second envoi du jour de l'acceptation)
-  // est une autre clé, non comptée ici.
-  function envoisParJour(rows, semaines){
-    var par = {}, n = 0, and = 0, ios = 0, vues = {};
-    if(!Array.isArray(rows)) return null;
-    for(var i = 0; i < rows.length; i++){
-      var r = rows[i];
-      if(!r || r.test !== false || C.entierOuNul(r.charge) !== 3 || semaines.indexOf(r.semaine) < 0) continue;
-      vues[r.semaine] = true;
-      if(r.cle !== 'envoi_recu') continue;
-      var v = C.entierOuNul(r.n);
-      if(v === null || v <= 0) return null;
-      n += v; if(r.plateforme === 'and') and += v; else if(r.plateforme === 'ios') ios += v;
-    }
-    var k = Object.keys(vues).length;
-    if(!k) return { semaines:0 };
-    return { semaines:k, parJour:n / (7 * k), and:and / (7 * k), ios:ios / (7 * k), sur:semaines.length };
   }
   // Courbe : MOYENNE PAR JOUR des semaines closes (jours relus seulement), jusqu'à
   // `fin` comprise ; elle s'arrête au premier trou (une courbe qui relie un trou ment).
@@ -268,14 +246,6 @@
     }
     return { parSemaine:par, clesInconnues:Object.keys(inconnues).sort(), ecartees:ecartees, rejetTotal:rejet };
   }
-  function sommeCharge(a, semaines, charge, cle){
-    var t = 0;
-    for(var i = 0; i < semaines.length; i++){
-      var s = a.parSemaine[semaines[i]], c = s && s[charge];
-      if(c && c[cle]) t += c[cle];
-    }
-    return t;
-  }
 
   // ── Rétention : ce que la console détaillée affiche, ou quand elle le pourra ──
   // Le calcul est `retentionMesure` (copie). Ici : le motif d'un refus et la
@@ -283,7 +253,7 @@
   function etatRetention(a, J, premiere){
     var debut = premiere || MESURE_DEBUT;
     var ret = C.retentionMesure(a), out = [];
-    var jalons = ['jalon_revenu_j1', 'jalon_revenu_j2_7'];
+    var jalons = ['jalon_revenu_j1', 'jalon_revenu_j2_7', 'jalon_revenu_j8_30'];   // V4.3 : le 8ᵉ–30ᵉ jour aussi
     for(var k = 0; k < jalons.length; k++){
       var dec = C.MESURE_DECALAGE[jalons[k]];
       var date = C.jourMoins(debut, -7 * (4 + dec));   // lundi où la fenêtre est close
@@ -335,12 +305,12 @@
   }
 
   racine.TDPeriode = {
-    MESURE_DEBUT:MESURE_DEBUT, V3_PREMIERE:V3_PREMIERE, GARDE:GARDE, CLES_TABLE:CLES_TABLE,
+    MESURE_DEBUT:MESURE_DEBUT, GARDE:GARDE, CLES_TABLE:CLES_TABLE,
     joursEntre:joursEntre, jj_mm:jj_mm, periode:periode, precedente:precedente,
     finParDefaut:finParDefaut, bornes:bornes, semainesProduction:semainesProduction, trouProduction:trouProduction, premiersPasProduction:premiersPasProduction, premiereSemaineVisible:premiereSemaineVisible, libelle:libelle, premiereSemaine:premiereSemaine,
     pctEntier:pctEntier, PLANCHER:PLANCHER,
-    audience:audience, courbeAudience:courbeAudience, envoisParJour:envoisParJour, casesMesure:casesMesure, somme:somme,
-    semainesMesure:semainesMesure, agregerCharge:agregerCharge, sommeCharge:sommeCharge,
+    audience:audience, courbeAudience:courbeAudience, casesMesure:casesMesure, somme:somme,
+    semainesMesure:semainesMesure, agregerCharge:agregerCharge,
     etatRetention:etatRetention, variation:variation, scanServeur:scanServeur
   };
 })(typeof window !== 'undefined' ? window : this);

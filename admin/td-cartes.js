@@ -1,15 +1,20 @@
 /* ============================================================================
- * PILOU — TABLEAU DE BORD (console V4) — LES CARTES
+ * PILOU — TABLEAU DE BORD (console V4.3) — LES CARTES
  * ============================================================================
  * Quatre questions (arrivent, s'en servent, reviennent, rapportent), puis le
  * scan d'ordonnance et les officines. Chaque carte reçoit le contexte `x` :
  *   { d (vues lues), J (jour de la base), p / prev (période et précédente),
  *     avecTest, a (agregerMesure), cases (par semaine/clé/plateforme),
  *     ach (agrégat de v_admin_mesure_charge) }.
+ * V4.3 (17/10) : tout est lu EN DIRECT, semaine en cours comprise. « Pilulier
+ * créé », « Scan d'ordonnance » et la ligne « jours d'utilisation » lisent
+ * `v_admin_entonnoir_semaine` (td-pilotage.js), seule vue déjà chargée qui
+ * rend ces clés pour la semaine en cours et pour toutes les versions ; elle
+ * est hors tests : « Nos tests » ne s'y applique pas (étiquette « hors tests »).
  * RÈGLES : toute donnée passe par `ech` ; illisible → « — » rouge, jamais 0 ;
  * absent → « — » gris qui dit pourquoi ; vert/orange/rouge réservés aux
- * pastilles d'état ; flèches de tendance neutres ; semaine en cours : ni
- * flèche ni pourcentage. ES5 strict. Expose `TDCartes`.
+ * pastilles d'état ; flèches de tendance neutres ; semaine en cours : pas
+ * de flèche (une semaine partielle ne se compare pas à une semaine pleine). ES5 strict. Expose `TDCartes`.
  * ========================================================================== */
 (function(racine){
   'use strict';
@@ -148,72 +153,59 @@
       if(sp.message || sp.avant) pied.push(chip('gris', precNonMesuree(x)));
       else { var tp = P.somme(x.cases, sp.lues, 'jalon_accueil'); pied.push(tend(P.variation(t, tp), String(tp), x)); }
     }
-    return carte({ nom:nom, aide:aide, classe:'grand', grand:String(t), unite:'premiers pas',
+    return carte({ nom:nom, aide:aide, classe:'grand', grand:String(t), unite: t > 1 ? 'acceptations' : 'acceptation',
       sous:'Android ' + P.somme(x.cases, s.lues, 'jalon_accueil', 'and') + ' · iPhone '
         + P.somme(x.cases, s.lues, 'jalon_accueil', 'ios') + (web ? ' · Navigateur ' + web : ''),
       ligne:ligneOuvertures(x, t, s.lues.length), pied:pied, courbe:courbe(courbeNouveaux(x)) });
   }
 
   // ── S'EN SERVENT ─────────────────────────────────────────────────────────
-  // « Pilulier créé » : TOUJOURS sur une fenêtre de 4 semaines finissant à la
-  // semaine regardée — en « Semaine » comme en « 4 semaines » (contre-revue,
-  // M4 bis). Alignée sur la console détaillée, c'est SON calcul
-  // (`premierTraitementMesure`) et SES règles : chiffres identiques. Une autre
-  // fenêtre suit les mêmes règles, et elle est en plus masquée si une de ses
-  // semaines manque. Jamais un chiffre d'une seule semaine : une semaine sous le
-  // plancher ne se retrouve pas par soustraction (voir le rapport).
+  // V4.3 : la vue de l'historique (v_admin_entonnoir_semaine), lue en direct, sur les semaines de la période.
+  function E(x){ return x.ent || (x.ent = racine.TDPilotage ? racine.TDPilotage.semaines(x.d.pilotage) : { cause:'le fichier td-pilotage.js n’a pas été chargé' }); }
+  function S(x, cle){ return racine.TDPilotage.somme(E(x), x.p.semaines, cle); }
+  // « Pilulier créé » : premiers traitements / acceptations 1.4.19+ de la période.
+  // MASQUAGE (AIPD n° 5, plancher de 10 de la console) : aucun nombre ni
+  // pourcentage si la période compte moins de 10 acceptations 1.4.19+, ou si
+  // l'une de ses semaines en compte moins de 10 (sinon, le tableau d'historique
+  // la ferait retrouver par soustraction).
   function pilulier(x){
-    var nom = 'Pilulier créé', aide = 'pilulier';
-    if(x.a.cause) return illisible(x, nom, aide, x.a.cause);
-    if(x.p.enCours) return grise(nom, aide, 'Disponible à la fin de la semaine', '', chipsPeriode(x));
-    var pt = C.premierTraitementMesure(x.a), aligne = !pt.cause && pt.fin === x.p.fin, w, num, den, manque = null;
-    if(aligne){ num = pt.num; den = pt.den; manque = pt.manque; }
-    else {
-      num = 0; den = 0;
-      for(w = 0; w < 4; w++){
-        var sw = C.semaineMoins(x.p.fin, w);
-        if(!C.aPropriete(x.a.parSemaine, sw) && manque === null) manque = sw;
-        num += C.caseMesure(x.a, sw, 'jalon_creation_jour_essai') + C.caseMesure(x.a, sw, 'jalon_creation_plus_tard');
-        den += C.caseMesure(x.a, sw, 'jalon_accueil_v2');
-      }
-    }
-    var fenetre = aligne ? '4 dernières semaines' : '4 semaines jusqu’au ' + P.jj_mm(x.p.dimanche);
-    var fin30 = C.jourMoins(x.p.dimanche, -30), ouvert = x.J <= fin30, pied = [], extra = ['Calculé sur les nouveaux en version 1.4.19 ou plus.'];
-    if(ouvert) pied.push(chip('gris', 'D’autres peuvent arriver jusqu’au ' + P.jj_mm(fin30)));
-    // Règles de la console détaillée : sous 10 nouveaux, AUCUN nombre de piluliers (AIPD n° 5).
-    if(den < C.MESURE_PLANCHER) return carte({ nom:nom, aide:aide, classe:'gris', grand:'—', extra:extra,
-      sous: (den ? 'Moins de 10 nouveaux : chiffre masqué' : 'Aucun nouveau') + ' · ' + fenetre, pied:pied });
-    if(!aligne && manque) return carte({ nom:nom, aide:aide, classe:'gris', grand:'—',
-      extra: extra.concat(['L’application n’a rien envoyé la semaine du ' + P.jj_mm(manque) + ' : pas de chiffre sur cette fenêtre.']),
-      sous:'Pas de chiffre · ' + fenetre, pied:pied });
-    var pct = '';
-    if(manque){
-      // Même date que pour « Rouvrent Pilou » : 4 semaines complètes après le début de la mesure.
-      var dPct = C.jourMoins(x.premiere, -28);
-      pied.unshift(chip('gris', dPct > x.J ? 'Pourcentage dès le ' + P.jj_mm(dPct) : 'Pas de pourcentage pour l’instant'));
-      extra.push('Pas de pourcentage : l’application n’a rien envoyé la semaine du ' + P.jj_mm(manque) + ' (4 semaines complètes nécessaires).');
-    } else if(num > den){
-      pied.unshift(chip('gris', 'Pas de pourcentage pour l’instant'));
-      extra.push('Plus de piluliers que de nouveaux sur la fenêtre : des nouveaux plus anciens y contribuent.');
-    } else pct = P.pctEntier(num, den);
-    if(pct && aligne) extra.push('Console détaillée : ' + C.pctMesure(num, den) + '.');
-    return carte({ nom:nom, aide:aide, grand:String(num), extra:extra,
-      unite: pct ? 'soit ' + pct : (ouvert ? 'pour l’instant' : (num > 1 ? 'piluliers' : 'pilulier')),
-      sous:'sur ' + den + ' nouveaux · ' + fenetre, pied:pied });
+    var nom = 'Pilulier créé', aide = 'pilulier', tg = 'hors tests', e = E(x);
+    if(e.cause) return illisible(x, nom, aide, e.cause, tg);
+    var num = S(x, 'premiers_traitements'), den = S(x, 'acceptations_v2'), pied = chipsPeriode(x);
+    if(num.ko || den.ko) return illisible(x, nom, aide, 'valeur illisible dans la vue de l’historique', tg);
+    if(num.hors || den.hors) return grise(nom, aide, 'Trop ancien, plus conservé', tg, [], ['L’historique garde 27 semaines.']);
+    if(den.v === null && num.v === null) return grise(nom, aide, x.p.enCours ? 'Pas encore de chiffre cette semaine' : 'Pas de chiffre pour cette période', tg, pied);
+    if(num.masque || den.v === null || den.v < C.MESURE_PLANCHER)
+      return carte({ nom:nom, aide:aide, tag:tg, classe:'gris', grand:'—', pied:pied,
+        sous: num.masque && den.v >= C.MESURE_PLANCHER ? 'Une semaine compte moins de 10 acceptations en 1.4.19 et plus : chiffre masqué' : 'Moins de 10 acceptations en 1.4.19 et plus : chiffre masqué' });
+    if(num.v === null) return carte({ nom:nom, aide:aide, tag:tg, classe:'gris', grand:'—', pied:pied,
+      sous:'Aucun premier traitement reçu · sur ' + den.v + ' acceptations en 1.4.19 et plus' });
+    var n = num.v, extra = [];
+    if(n > den.v) extra.push('Plus de piluliers que d’acceptations : des acceptations de semaines précédentes y contribuent, d’où l’absence de pourcentage.');
+    return carte({ nom:nom, aide:aide, tag:tg, grand:String(n), extra:extra, pied:pied,
+      unite: n <= den.v ? 'soit ' + P.pctEntier(n, den.v) : (n > 1 ? 'piluliers' : 'pilulier'),
+      sous:'sur ' + den.v + ' acceptations en 1.4.19 et plus' });
   }
 
-  // ── Actifs par jour. Ligne « 1.4.22 » (revue adverse V4.1, M2) : jours
-  // d'utilisation reçus de l'application (`envoi_recu`, charge 3, hors tests),
-  // SEULEMENT si toute la période est postérieure à la sortie : à partir de la
-  // première semaine ENTIÈRE après la sortie Android du 03/10, et chaque semaine
-  // de la période doit avoir des lignes. Sinon : rien (pas de ligne grise).
-  var SEMAINE_V3 = '2026-10-05';
+  // ── Actifs par jour. Ligne « jours d'utilisation » (V4.3) : total de la période,
+  // lu en direct dans la vue de l'historique (versions 1.4.22 et plus, hors tests),
+  // SEULEMENT si chaque semaine de la période a un chiffre. Sinon : rien.
+  var OUVERTURES = ['jours_ouverture_moins_7j', 'jours_ouverture_7j_et_plus', 'jours_ouverture_anciennete_inconnue'];
   function ligne122(x){
-    if(x.p.enCours || x.ach.cause || !x.p.semaines.length || x.p.semaines[0] < SEMAINE_V3) return '';
-    var e = P.envoisParJour(x.d.mesureCharge, x.p.semaines);
-    if(!e || !e.semaines || e.semaines < e.sur) return '';
-    return '<div class="k-ligne">' + ech('jours d’utilisation reçus de la 1.4.22 : ' + arrondi(e.parJour) + ' par jour (premier jour compris) · Android '
-      + arrondi(e.and) + ' · iPhone ' + arrondi(e.ios)) + ' <span class="tag">hors tests</span>' + B.aide('Jours d’utilisation reçus de la 1.4.22', 'jours122') + '</div>';
+    var e = E(x);
+    if(e.cause || !x.p.semaines.length) return '';
+    var t = 0;
+    for(var i = 0; i < x.p.semaines.length; i++){
+      var s = [x.p.semaines[i]], vu = false;
+      for(var k = 0; k < OUVERTURES.length; k++){
+        var o = racine.TDPilotage.somme(e, s, OUVERTURES[k]);
+        if(o.ko || o.hors) return '';
+        if(o.v !== null){ t += o.v; vu = true; }
+      }
+      if(!vu) return '';
+    }
+    return '<div class="k-ligne">' + ech('jours d’utilisation reçus (1.4.22 et plus) : ' + t + (x.p.enCours ? ' jusqu’à maintenant' : ''))
+      + ' <span class="tag">hors tests</span>' + B.aide('Jours d’utilisation reçus', 'jours122') + '</div>';
   }
   function actifs(x){
     return audienceCarte(x, 'Actifs par jour', 'actifs', 'actifs', true, function(){ return { ligne:ligne122(x), extra:[] }; });
@@ -224,40 +216,38 @@
   function habitues(x){ return audienceCarte(x, 'Habitués par jour', 'habitues', 'revenants', true); }
 
   // ── REVIENNENT ───────────────────────────────────────────────────────────
-  var NOMS_RET = ['le lendemain', 'du 2ᵉ au 7ᵉ jour'];
+  // Nombres de la période en direct (vue v_admin_mesure, « Nos tests » respecté).
+  // Pourcentage : 4 semaines COMPLÈTES, décalées (définition de la console
+  // détaillée) ; sur la semaine en cours, celui des 4 dernières semaines complètes.
+  var NOMS_RET = ['le lendemain', 'du 2ᵉ au 7ᵉ jour', 'du 8ᵉ au 30ᵉ jour'], COURTS_RET = ['lendemain', '2ᵉ–7ᵉ jour', '8ᵉ–30ᵉ jour'];
   function reviennent(x){
     var nom = 'Rouvrent Pilou', aide = 'reviennent';
     if(x.a.cause) return illisible(x, nom, aide, x.a.cause);
     var s = lues(x, x.p);
     if(s.message) return grise(nom, aide, s.message, '', chipsPeriode(x), s.bulle);
-    var er = P.etatRetention(x.a, x.J, x.premiere), cles = ['jalon_revenu_j1', 'jalon_revenu_j2_7'];
-    var montrer = !x.p.enCours && er.fin === x.p.fin, corps = '', extra = [], dates = [], motifs = [];
-    for(var k = 0; k < 2; k++){
+    var er = P.etatRetention(x.a, x.J, x.premiere), cles = ['jalon_revenu_j1', 'jalon_revenu_j2_7', 'jalon_revenu_j8_30'];
+    var montrer = er.fin === x.p.fin || (x.p.enCours && x.p.mode === 'semaine' && er.fin === C.jourMoins(x.p.fin, 7));
+    var corps = '', extra = [], dates = [], motifs = [];
+    for(var k = 0; k < 3; k++){
       var L = er.lignes[k], v = P.somme(x.cases, s.lues, cles[k]), pc = '';
       if(L.ok){
-        // Le pourcentage (et sa bulle) seulement pour la fenêtre qui finit à la semaine regardée.
         if(montrer){
-          extra.push('Sur 4 semaines, ' + NOMS_RET[k] + ' : ' + L.pct + ' (' + L.num + ' sur ' + L.den
+          extra.push('Sur les 4 dernières semaines complètes, ' + NOMS_RET[k] + ' : ' + L.pct + ' (' + L.num + ' sur ' + L.den
             + '). Fourchette plausible ' + L.fourchette + ' : plus elle est large, moins le chiffre est sûr.');
           pc = '<small>' + ech(P.pctEntier(L.num, L.den) + ' sur 4 sem.') + '</small>';
         }
-      } else if(L.raison === 'date') dates.push(L.date);
-      else motifs.push(L.raison === 'absente' ? 'l’application n’a rien envoyé la semaine du ' + P.jj_mm(L.semaine)
+      } else if(L.raison === 'date') dates.push(COURTS_RET[k] + ' : dès le ' + P.jj_mm(L.date));
+      else motifs.push(COURTS_RET[k] + ' : ' + (L.raison === 'absente' ? 'l’application n’a rien envoyé la semaine du ' + P.jj_mm(L.semaine)
         : L.raison === 'plus' ? 'plus de retours que de nouveaux'
-        : L.raison === 'peu' ? 'moins de 10 nouveaux' : 'rien reçu la dernière semaine complète');
-      corps += '<div class="duo"><span>' + (k ? 'Du 2ᵉ au 7ᵉ jour' : 'Le lendemain') + '</span><span><b>' + v + '</b>' + pc + '</span></div>';
+        : L.raison === 'peu' ? 'moins de 10 nouveaux' : 'rien reçu la dernière semaine complète'));
+      corps += '<div class="duo"><span>' + ech(NOMS_RET[k].charAt(0).toUpperCase() + NOMS_RET[k].slice(1)) + '</span><span><b>' + v + '</b>' + pc + '</span></div>';
     }
     corps += '<div class="mini">Retours reçus ' + (x.p.mode === '4sem' ? 'ces 4 semaines' : 'cette semaine')
-      + ' (tous nouveaux confondus)</div>';
+      + (x.p.enCours ? ', jusqu’à maintenant' : '') + ' (tous nouveaux confondus)</div>';
     var pied = chipsPeriode(x, s);
-    if(dates.length){
-      pied.push(chip('gris', dates.length === 2 && dates[0] !== dates[1]
-        ? 'Pourcentage à partir du ' + P.jj_mm(dates[0]) + ' (lendemain) et du ' + P.jj_mm(dates[1])
-        : 'Pourcentage à partir du ' + P.jj_mm(dates[0])));
-      extra.push('Pourcentage calculable le ' + P.jj_mm(dates[0]) + (dates[1] ? ' (le lendemain), le ' + P.jj_mm(dates[1]) + ' (du 2ᵉ au 7ᵉ jour)' : '') + '.');
-    }
+    if(dates.length){ pied.push(chip('gris', 'Pourcentage dès le ' + dates[0].replace(/^(.*) : dès le (.*)$/, '$2 ($1)'))); extra.push('Pourcentage calculable : ' + dates.join(' ; ') + '.'); }
     if(motifs.length){ pied.push(chip('gris', 'Pas de pourcentage pour l’instant')); extra.push('Pas de pourcentage : ' + motifs.join(' ; ') + '.'); }
-    if(!montrer && !x.p.enCours && (er.lignes[0].ok || er.lignes[1].ok))
+    if(!montrer && (er.lignes[0].ok || er.lignes[1].ok || er.lignes[2].ok))
       pied.push(chip('gris', 'Pourcentage : 4 dernières semaines complètes seulement'));
     return carte({ nom:nom, aide:aide, extra:extra, corps:corps, pied:pied });
   }
@@ -312,67 +302,38 @@
       + col('Rapportent', abonnes(x) + net(x));
   }
 
-  // ── SCAN D'ORDONNANCE ────────────────────────────────────────────────────
-  function barre(lb, v, base, pc, fut){
-    var w = base > 0 ? Math.min(100, Math.round(100 * v / base)) : 0;
-    return '<div class="ent' + (fut ? ' fut' : '') + '"><span class="lb">' + ech(lb) + '</span><span class="bar">'
-      + (fut ? '' : (v > 0 ? '<i style="width:' + w + '%">' + ech(String(v)) + '</i>' : '<em>0</em>'))
-      + '</span><span class="pc">' + ech(pc) + '</span></div>';
+  // ── SCAN D'ORDONNANCE (V4.3 : en direct, vue de l'historique, hors tests) ──────
+  function barre(lb, r, base, pc){
+    var v = r.v, w = base > 0 && v !== null ? Math.min(100, Math.round(100 * v / base)) : 0;
+    return '<div class="ent' + (v === null ? ' fut' : '') + '"><span class="lb">' + ech(lb) + '</span><span class="bar">'
+      + (v === null ? '' : (v > 0 ? '<i style="width:' + w + '%">' + ech(String(v)) + '</i>' : '<em>0</em>'))
+      + '</span><span class="pc">' + ech(v === null ? '—' : pc) + '</span></div>';
   }
-  var ETAPES = [['scan_lance','Scan lancé'],['photo_obtenue','Photo prise'],['consentement_affiche','Accord demandé'],
-    ['analyse_envoyee','Analyse envoyée'],['liste_recue','Liste reçue']];
-  var RECENTES = [['liste_validee','Liste enregistrée'],['liste_corrigee','Liste corrigée'],['saisie_manuelle_validee','Saisie à la main']];
-
+  function part(r, base){
+    if(r.v === null || base.v === null) return '';
+    return base.v >= P.PLANCHER ? P.pctEntier(r.v, base.v) : r.v + ' sur ' + base.v;
+  }
   function scan(x){
-    var h = '<div class="titre-c">Scan d’ordonnance' + B.aide('Scan d’ordonnance', 'scan') + chip('gris', 'en tentatives') + '</div>';
-    if(x.a.cause){ x.illisibles++; h += '<div class="message ko">Non lu : ' + ech(x.a.cause) + '. N’en concluez rien.</div>'; }
-    else {
-      var s = lues(x, x.p);
-      if(s.message) h += '<div class="message">' + ech(s.message) + '</div>';
-      else {
-        var base = P.somme(x.cases, s.lues, 'scan_lance'), petit = base < P.PLANCHER;
-        if(petit) h += '<div class="mini">' + chip('gris', 'Petit nombre : pas de pourcentage sous 10 scans') + '</div>';
-        for(var i = 0; i < ETAPES.length; i++){
-          var v = P.somme(x.cases, s.lues, ETAPES[i][0]);
-          h += barre(ETAPES[i][1], v, base, petit ? v + ' sur ' + base : P.pctEntier(v, base));
-        }
-        if(s.avant) h += '<div class="mini">Compté sur ' + s.lues.length + ' des ' + x.p.semaines.length + ' semaines (la mesure a commencé le ' + ech(P.jj_mm(x.premiere)) + ').</div>';
-      }
-      h += recentes(x);
-    }
+    var h = '<div class="titre-c">Scan d’ordonnance' + B.aide('Scan d’ordonnance', 'scan') + chip('gris', 'en tentatives · hors tests') + '</div>', e = E(x);
+    if(e.cause){ x.illisibles++; return h + '<div class="message ko">Non lu : ' + ech(e.cause) + '. N’en concluez rien.</div>' + serveur(x); }
+    var sc = S(x, 'scans_lances'), ph = S(x, 'photos_annulees'), lr = S(x, 'listes_recues'), lv = S(x, 'listes_validees'),
+      lc = S(x, 'listes_corrigees'), sm = S(x, 'saisies_validees'), tous = [sc, ph, lr, lv, lc, sm];
+    for(var i = 0; i < tous.length; i++) if(tous[i].ko){ x.illisibles++; return h + '<div class="message ko">Non lu : valeur illisible dans la vue de l’historique. N’en concluez rien.</div>' + serveur(x); }
+    if(sc.hors) return h + '<div class="message">Trop ancien, plus conservé (27 semaines).</div>' + serveur(x);
+    if(sc.v === null && ph.v === null && lr.v === null && lv.v === null && sm.v === null)
+      return h + '<div class="message">' + (x.p.enCours ? 'Pas encore de chiffre cette semaine' : 'Pas de chiffre pour cette période') + '</div>' + serveur(x);
+    var base = sc.v || 0;
+    if(sc.v !== null && base < P.PLANCHER) h += '<div class="mini">' + chip('gris', 'Petit nombre : pas de pourcentage sous 10 scans') + '</div>';
+    h += barre('Scans lancés', sc, base, '');
+    h += barre('Photo annulée', ph, base, part(ph, sc));
+    h += barre('Liste reçue', lr, base, part(lr, sc));
+    h += barre('Liste enregistrée', lv, base, part(lv, sc));
+    h += barre('dont corrigée', lc, base, part(lc, lv));   // même échelle que les autres barres (revue V4.3)
+    h += '<div class="ent seul"><span class="lb">Saisie à la main</span><span class="mini">sans photo</span><span class="pc">' + ech(sm.v === null ? '—' : String(sm.v)) + '</span></div>';
+    h += '<div class="mini">Pourcentages : part des scans lancés ; « dont corrigée » : part des listes enregistrées.'
+      + ' Photo annulée, liste enregistrée, corrigée et saisie : versions 1.4.22 et plus seulement ; scans : toutes versions.'
+      + (x.p.enCours ? ' Semaine en cours, jusqu’à maintenant.' : '') + '</div>';
     return h + serveur(x);
-  }
-  function recentes(x){
-    function tete(msg){ return '<div class="sep">Avec la dernière version (1.4.22)' + B.aide('Dernière version', 'scanRecent')
-      + (msg ? chip('gris', msg) : '') + '</div>'; }
-    function futures(court, msg){
-      var o = tete(msg);
-      for(var i = 0; i < RECENTES.length; i++) o += barre(RECENTES[i][1], 0, 0, i ? '' : court, true);
-      return o;
-    }
-    if(x.ach.cause){ x.illisibles++; return tete('') + '<div class="message ko">Non lu : ' + ech(x.ach.cause) + '. N’en concluez rien.</div>'; }
-    if(x.p.enCours) return futures('', 'disponible à la fin de la semaine');
-    var sem = [];
-    for(var k = 0; k < x.p.semaines.length; k++) if(x.p.semaines[k] > C.jourMoins(x.J, P.GARDE.mesure)) sem.push(x.p.semaines[k]);
-    if(sem.length < x.p.semaines.length) return futures('', 'trop ancien');
-    var base = P.sommeCharge(x.ach, sem, 3, 'scan_lance');
-    if(!base){
-      var p1 = P.V3_PREMIERE, court = String(Number(p1.slice(8, 10))) + '–' + P.jj_mm(C.jourMoins(p1, -6));
-      return x.p.dimanche < p1 ? futures(court, 'premiers chiffres : semaine du ' + court)
-                               : futures('', 'aucun scan avec cette version');
-    }
-    // Sens vérifié dans l'application (src/lib/mesureValidation.ts, l. 192-214) :
-    // « liste enregistrée » vient d'un scan ; « liste corrigée » en est un
-    // SOUS-ENSEMBLE ; « saisie à la main » se fait SANS scan (nombre seul).
-    var val = P.sommeCharge(x.ach, sem, 3, 'liste_validee'), cor = P.sommeCharge(x.ach, sem, 3, 'liste_corrigee');
-    var main = P.sommeCharge(x.ach, sem, 3, 'saisie_manuelle_validee');
-    // « Petit nombre » seulement si AUCUNE des deux lignes n'a de pourcentage.
-    var h = tete(base < P.PLANCHER && val < P.PLANCHER ? 'Petit nombre' : '');
-    h += barre('Liste enregistrée', val, base, base >= P.PLANCHER ? P.pctEntier(val, base) + ' des scans' : val + ' sur ' + base);
-    h += val ? barre('Liste corrigée', cor, val, val >= P.PLANCHER ? P.pctEntier(cor, val) + ' des listes' : cor + ' sur ' + val)
-             : barre('Liste corrigée', 0, 0, '—', true);
-    h += '<div class="ent seul"><span class="lb">Saisie à la main</span><span class="mini">sans photo</span><span class="pc">' + main + '</span></div>';
-    return h + '<div class="mini">' + base + (base > 1 ? ' scans lancés' : ' scan lancé') + ' avec cette version.</div>';
   }
   function serveur(x){
     var r = P.scanServeur(x.d.scan, x.J, x.p), aide = B.aide('Vu par le serveur', 'serveur'), tg = '<span class="tag">tests inclus</span>';

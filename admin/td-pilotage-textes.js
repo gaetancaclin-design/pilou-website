@@ -1,7 +1,7 @@
 /* ============================================================================
- * PILOU — TABLEAU DE BORD (console V4) — PILOTAGE : TEXTES DES BULLES « ? »
+ * PILOU — TABLEAU DE BORD (console V4.3) — HISTORIQUE : TEXTES DES BULLES « ? »
  * ============================================================================
- * Textes de la section « Pilotage semaine par semaine » (td-pilotage.js),
+ * Textes de la section « Historique semaine par semaine » (td-pilotage.js),
  * AJOUTÉS au même dictionnaire que les autres (`TDBulles.textes`), sous des
  * clés en `pil…` : une seule mécanique, une seule façon d'afficher. Fichier à
  * part pour que td-bulles.js ne grossisse pas.
@@ -14,17 +14,15 @@
 (function(racine){
   'use strict';
   var PAS_SOUS_10 = 'Pas de pourcentage sous 10, comme ailleurs dans le tableau de bord.';
-  var OUV = 'Jours d’ouverture : un message par jour et par installation qui ouvre Pilou (doublon rare si une réponse se perd). Ce ne sont pas des personnes : une installation ouverte 5 jours compte 5. Hors nos tests. Versions 1.4.22 et plus seulement.';
+  var OUV = 'Jours d’utilisation : un message par jour et par installation qui ouvre Pilou (doublon rare si une réponse se perd). Ce ne sont pas des personnes : une installation ouverte 5 jours compte 5. Hors nos tests. Versions 1.4.22 et plus seulement.';
   var T = {
-    pilSection: ['Une ligne par semaine, du lundi au dimanche. Indépendant de la période et du bouton « Nos tests » choisis en haut.',
-      'Chiffres de l’application : hors nos téléphones de test, et hors installations qui ont désactivé « Contribuer à améliorer Pilou ». RevenueCat et compteurs du serveur : nos tests compris.',
+    pilSection: ['Une ligne par semaine terminée, du lundi au dimanche ; la semaine en cours est en haut de la page, une seule fois. Par défaut l’essentiel ; « Tout afficher » montre toutes les colonnes et toutes les semaines conservées.',
+      'Chiffres de l’application : hors nos téléphones de test, et hors installations qui ont désactivé « Contribuer à améliorer Pilou ». RevenueCat et compteurs du serveur : nos tests compris. Le bouton « Nos tests » ne s’applique pas ici.',
       '« — » : rien de reçu pour cette case — zéro, ou pas encore mesuré : n’en concluez rien. Ce sont des totaux par semaine, sans identifiant.'],
-    pilEnCours: ['La semaine commence lundi à 0 h en heure universelle (1 h ou 2 h du matin à Paris) et se termine dimanche à minuit, heure universelle : ses chiffres sont partiels.',
-      'À côté de chaque chiffre, la dernière semaine complète, pour situer — pas pour comparer.'],
     pilSemaine: ['Lundi de la semaine. Les chiffres de l’application suivent la semaine en heure universelle ; les achats et l’encaissé, la semaine de Paris ; le serveur du scan, le jour en heure universelle ; RevenueCat, sa propre date du jour.'],
     // Arrivées
     pilArrivees: ['De l’installation à l’acceptation des conditions, à l’accueil.'],
-    pilRc: ['Nouveaux clients selon RevenueCat (le service des abonnements). Compte aussi nos tests, des robots et les réinstallations : ce ne sont pas des personnes.'],
+    pilRc: ['Installations ouvertes pour la première fois, selon RevenueCat (le service des abonnements) : même notion que « ouvertures de Pilou » dans la carte Nouveaux utilisateurs. Compte aussi nos tests, des robots et les réinstallations : ce ne sont pas des personnes.'],
     pilActifs: ['Nombre moyen d’installations qui ont ouvert Pilou chaque jour, selon RevenueCat. Nos téléphones de test sont dedans.'],
     pilEntrees: ['Installations qui ont transmis leur parcours d’entrée, hors nos tests, comptées le jour de réception (heure universelle).',
       'Sous-compte : une installation qui s’y oppose, ou qui ne l’a pas transmis dans ses 7 premiers jours, n’y est pas.'],
@@ -76,7 +74,7 @@
     pilOuvM: [OUV, 'Installations acceptées depuis 7 à 30 jours.'],
     pilOuvT: [OUV, 'Installations acceptées depuis 31 à 90 jours.'],
     pilOuvL: [OUV, 'Installations acceptées depuis plus de 90 jours.'],
-    pilOuvI: [OUV, 'Tranche « inconnue » : mélange les envois faits avant l’acceptation des conditions et les installations dont la date d’acceptation est inconnue.'],
+    pilOuvI: [OUV, 'Ancienneté inconnue : mélange les envois faits avant l’acceptation des conditions et les installations dont la date d’acceptation est inconnue.'],
     pilPresentes: ['Installations présentes : au plus une case par installation et par semaine — la semaine de l’appareil (lundi, date du téléphone), reçue dans la semaine de la base. Hors nos tests.',
       'Ce sont des installations, pas des personnes.'],
     pilPresTranche: ['Installations présentes cette semaine, par ancienneté depuis l’acceptation. Au plus une case par installation et par semaine. « Inconnue » : envoi fait avant l’acceptation, ou date d’acceptation inconnue.'],

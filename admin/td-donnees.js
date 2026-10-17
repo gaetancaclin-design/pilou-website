@@ -37,7 +37,8 @@
     { cle:'cohorte',      vue:'v_admin_apporteurs_cohorte' },
     // V4.1 : heure de la dernière collecte (bandeau « En direct », « Actualiser »).
     { cle:'audEtat',      vue:'v_admin_audience_etat',       unique:true },
-    // Pilotage semaine par semaine (td-pilotage.js) : 27 lignes ; son échec n'éteint que sa section.
+    // Historique semaine par semaine et cartes « Pilulier créé », « Scan » (td-pilotage.js, td-cartes.js) :
+    // 27 lignes ; son échec n'éteint que ce qui s'en sert.
     // Lue avec les autres (Promise.all) : mesuré en production le 17/10, tables de 64 à 3 507 lignes, partie la plus lourde 11 ms.
     { cle:'pilotage',     vue:'v_admin_entonnoir_semaine',   ordre:{ col:'semaine', asc:false }, facultative:true }
   ];

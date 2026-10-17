@@ -117,8 +117,8 @@
     $('questions').innerHTML = K.questions(x);
     $('scan').innerHTML = K.scan(x);
     $('officines').innerHTML = K.officines(x);
-    // Pilotage (td-pilotage.js) : ne lève jamais, ne dépend pas de la période ni de « Nos tests ».
-    if(racine.TDPilotage) racine.TDPilotage.maj(d.pilotage); else $('pilotage').textContent = 'Pilotage non affiché : le fichier td-pilotage.js n’a pas été chargé.';
+    // Historique semaine par semaine (td-pilotage.js) : ne lève jamais, ne dépend pas de la période ni de « Nos tests ».
+    if(racine.TDPilotage) racine.TDPilotage.maj(d.pilotage); else $('pilotage').textContent = 'Historique non affiché : le fichier td-pilotage.js n’a pas été chargé.';
     etat.dernier = x;
     dessinerSante();
     bornerFleches();

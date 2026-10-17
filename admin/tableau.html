@@ -13,7 +13,7 @@
   pour la santé technique (équivalence stricte avec son bandeau).
   Fichiers : td-calculs.js (copies à l'identique de index.html), td-periode.js,
   td-bulles.js, td-donnees.js, td-cartes.js, td-sante.js, td-direct.js (V4.1),
-  td-actions.js (V4.1), td-app.js.
+  td-actions.js (V4.1), td-pilotage-textes.js et td-pilotage.js (pilotage), td-app.js.
   Police système, aucune requête vers un tiers, mode sombre automatique.
 -->
 <style>
@@ -202,6 +202,57 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 .dv b{color:var(--encre);font-size:15px;font-variant-numeric:tabular-nums}
 .dv.ko{color:var(--ko)}
 @media (max-width:700px){ .actions{margin-left:0} .dj{width:100%} .act{padding:0 10px} }
+
+/* ── Pilotage semaine par semaine (td-pilotage.js) ── */
+.pil-intro{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;margin:0 0 12px 4px;color:var(--encre2);font-size:13px;font-weight:550;position:relative}
+.pil-kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.pil-kpi .c{padding:16px 18px;display:flex;flex-direction:column}
+.pil-kpi .c+.c{margin-top:0}
+.pil-kpi .k-val b{font-size:34px}
+.pil-kpi .k-sous{font-size:13px}
+.pil-prec{margin-top:auto;padding-top:10px;border-top:1px solid var(--ligne);color:var(--encre3);font-size:12.5px;font-weight:550}
+.pil-kpi .k-sous+.pil-prec,.pil-kpi .k-val+.pil-prec{margin-top:12px}
+.pil-prec b{color:var(--encre2);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pil-tab{margin-top:16px}
+.pil-defil{overflow-x:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--ligne);
+  background:linear-gradient(to left,var(--carte) 40%,transparent) right center/44px 100% no-repeat local,
+  radial-gradient(farthest-side at 100% 50%,rgba(0,0,0,.16),transparent) right center/14px 100% no-repeat scroll}
+.pil-t{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%}
+.pil-t th,.pil-t td{padding:9px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--ligne);font-variant-numeric:tabular-nums}
+.pil-t thead th{vertical-align:bottom;font-size:12px;font-weight:650;color:var(--encre2);white-space:normal;min-width:76px;line-height:1.25}
+.pil-t thead tr+tr .aide{display:block;margin-top:6px}
+.pil-t thead tr+tr .tag{display:table;margin:5px 0 0 auto;font-size:11px;white-space:nowrap}
+.pil-t tr.pil-blocs .q,.pil-t thead th.s .q{margin-left:6px;vertical-align:-5px}
+.pil-t tr.pil-blocs th{text-align:left;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--encre3);font-weight:750;white-space:nowrap;padding-top:12px}
+.pil-t tr.pil-blocs .tag{margin-left:6px;text-transform:none;letter-spacing:0}
+.pil-t .g{border-left:1px solid var(--ligne)}
+.pil-t .s{position:sticky;left:0;z-index:2;background:var(--carte);text-align:left;min-width:92px;box-shadow:1px 0 0 var(--ligne)}
+.pil-t thead th.s{z-index:3} /* sa bulle passe au-dessus de la colonne figée du corps */
+.pil-t tbody th.s{font-weight:550;color:var(--encre3);font-size:12px}
+.pil-t tbody th.s b{display:block;color:var(--encre);font-size:13.5px;font-weight:720}
+.pil-t tbody th.s small{display:block;font-size:11.5px}
+.pil-t tbody th.s .chip{margin-top:2px;padding:1px 8px;font-size:11.5px}
+.pil-t tbody td{color:var(--encre);font-weight:600}
+.pil-t tr.pil-encours>*{background:var(--hachure1)}
+.pil-t tbody tr:last-child>*{border-bottom:0}
+.pil-t:not(.tout) tr.pil-plus{display:none}
+.pil-vide{color:var(--encre3);font-weight:500}
+.pil-ko{color:var(--ko);font-weight:750}
+.pil-t .aide>.bulle{position:fixed;top:0;left:0}
+.pil-t .aide>.bulle.haut::before{bottom:auto;top:100%}
+.pil-pied{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;margin-top:12px}
+.pil-notes{margin-top:8px;display:flex;flex-direction:column;gap:2px}
+.pil-msg span{font-weight:500}
+@media (max-width:700px){
+  .pil-kpi{grid-template-columns:minmax(0,1fr);gap:10px}
+  .pil-kpi .c{padding:14px 16px}
+  .pil-kpi .k-val{margin-top:4px}
+  .pil-kpi .k-val b{font-size:30px}
+  .pil-prec{padding-top:8px}
+  .pil-kpi .k-sous+.pil-prec,.pil-kpi .k-val+.pil-prec{margin-top:10px}
+  .pil-t .s{min-width:78px}
+  .pil-pied .act{width:100%;justify-content:center}
+}
 </style>
 </head>
 <body>
@@ -239,6 +290,8 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
     <div class="c" id="scan"></div>
     <div class="c" id="officines"></div>
   </section>
+  <h2 id="pilotage-titre">Pilotage semaine par semaine</h2>
+  <section id="pilotage" aria-labelledby="pilotage-titre"><div class="c"><div class="message">Lecture…</div></div></section>
   <h2 id="sante-titre">Santé technique</h2>
   <section class="c sante" id="sante" aria-labelledby="sante-titre"></section>
 </main>
@@ -250,11 +303,13 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 <script src="./td-calculs.js?v=20261003a"></script>
 <script src="./td-periode.js?v=20261004a"></script>
 <script src="./td-bulles.js?v=20261004e"></script>
-<script src="./td-donnees.js?v=20261004a"></script>
+<script src="./td-donnees.js?v=20261017a"></script>
 <script src="./td-cartes.js?v=20261004e"></script>
 <script src="./td-sante.js?v=20261004b"></script>
 <script src="./td-direct.js?v=20261004b"></script>
 <script src="./td-actions.js?v=20261004b"></script>
-<script src="./td-app.js?v=20261004a"></script>
+<script src="./td-pilotage-textes.js?v=20261017a"></script>
+<script src="./td-pilotage.js?v=20261017a"></script>
+<script src="./td-app.js?v=20261017a"></script>
 </body>
 </html>

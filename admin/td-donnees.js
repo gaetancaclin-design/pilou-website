@@ -36,7 +36,10 @@
     { cle:'attendus',     vue:'v_admin_paiements_attendus',  unique:true },
     { cle:'cohorte',      vue:'v_admin_apporteurs_cohorte' },
     // V4.1 : heure de la dernière collecte (bandeau « En direct », « Actualiser »).
-    { cle:'audEtat',      vue:'v_admin_audience_etat',       unique:true }
+    { cle:'audEtat',      vue:'v_admin_audience_etat',       unique:true },
+    // Pilotage semaine par semaine (td-pilotage.js) : 27 lignes ; son échec n'éteint que sa section.
+    // Lue avec les autres (Promise.all) : mesuré en production le 17/10, tables de 64 à 3 507 lignes, partie la plus lourde 11 ms.
+    { cle:'pilotage',     vue:'v_admin_entonnoir_semaine',   ordre:{ col:'semaine', asc:false }, facultative:true }
   ];
 
   var sb = null, jeton = 0;

@@ -14,7 +14,7 @@
   Fichiers : td-calculs.js (copies à l'identique de index.html), td-periode.js,
   td-bulles.js, td-donnees.js, td-cartes.js, td-sante.js, td-direct.js (V4.1),
   td-actions.js (V4.1), td-pilotage-textes.js et td-pilotage.js (pilotage),
-  td-utilisent.js (V4.4 : « Utilisent Pilou », en haut), td-app.js.
+  td-utilisent.js (V4.4 : « Utilisent Pilou », en haut), td-jours.js (V4.5 : « Chaque jour »), td-app.js.
   Police système, aucune requête vers un tiers, mode sombre automatique.
 -->
 <style>
@@ -206,7 +206,9 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 
 /* ── V4.4 : « Utilisent Pilou » tout en haut (td-utilisent.js) ── */
 .ut{background:var(--carte);border-radius:var(--r);box-shadow:var(--ombre);padding:18px 20px;margin-bottom:18px;position:relative}
-.ut-tete{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.ut-tete{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.ut-tete>div:first-child{flex:1 1 auto;min-width:0}
+.ut-total{flex:none}
 .ut-titre{font-weight:720;font-size:17px;display:flex;align-items:center;gap:8px;position:relative;flex-wrap:wrap}
 .ut-sous{color:var(--encre2);font-size:13px;margin-top:2px}
 .ut-total{text-align:right}
@@ -228,11 +230,24 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 .ut-jours b{color:var(--encre)}
 .ut-notes{margin-top:8px;display:flex;flex-direction:column;gap:2px}
 @media (max-width:700px){
+  .ut-tete{flex-wrap:wrap}
   .ut-tranches{grid-template-columns:minmax(0,1fr)}
   .ut-tr:last-child .aide>.bulle{left:0;right:auto}
   .ut-total{text-align:left}
   .ut-total b{font-size:40px}
 }
+
+/* ── V4.5 : « Chaque jour » (td-jours.js) ── */
+.jr-deux{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.jr-deux b{display:block;font-size:30px;font-weight:760;font-variant-numeric:tabular-nums;margin-top:2px}
+.jr-detail{margin-top:6px;color:var(--encre2);font-size:12.5px;line-height:1.5}
+.jr-inc{font-style:normal;color:var(--att);font-weight:700}
+.jr-courbe{display:flex;align-items:flex-end;gap:3px;height:68px;margin-top:16px;padding-bottom:2px;border-bottom:1px solid var(--ligne)}
+.jr-b{flex:1 1 0;min-width:4px;max-width:28px;background:var(--accent2);border-radius:3px 3px 0 0;opacity:.75}
+.jr-b.jr-cours{opacity:1;background:var(--accent);outline:2px dashed var(--encre);outline-offset:1px}
+.jr-b.jr-incb{opacity:1;background:repeating-linear-gradient(135deg,transparent 0 3px,var(--encre3) 3px 5px);box-shadow:inset 0 0 0 1px var(--encre3)}
+.jr-pied{margin-top:6px}
+@media (max-width:700px){ .jr-deux{grid-template-columns:minmax(0,1fr)} .jr-deux b{font-size:28px} }
 
 /* ── Historique semaine par semaine (td-pilotage.js) ── */
 .pil-tab .titre-c .act{margin-left:auto}
@@ -302,6 +317,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 <div id="panne" role="alert"></div>
 <main id="contenu">
   <section class="ut" id="utilisent" aria-label="Utilisent Pilou"></section>
+  <section class="ut" id="jours" aria-label="Chaque jour"></section>
   <section class="direct" id="direct" aria-label="En direct"></section>
   <section class="questions" id="questions" aria-label="Les quatre questions"></section>
   <section class="grille2">
@@ -321,7 +337,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 <script src="./td-calculs.js?v=20261003a"></script>
 <script src="./td-periode.js?v=20261017c"></script>
 <script src="./td-bulles.js?v=20261017c"></script>
-<script src="./td-donnees.js?v=20261017c"></script>
+<script src="./td-donnees.js?v=20261027a"></script>
 <script src="./td-cartes.js?v=20261017c"></script>
 <script src="./td-sante.js?v=20261004b"></script>
 <script src="./td-direct.js?v=20261004b"></script>
@@ -329,6 +345,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 <script src="./td-pilotage-textes.js?v=20261017c"></script>
 <script src="./td-pilotage.js?v=20261017c"></script>
 <script src="./td-utilisent.js?v=20261026a"></script>
-<script src="./td-app.js?v=20261026a"></script>
+<script src="./td-jours.js?v=20261027a"></script>
+<script src="./td-app.js?v=20261027a"></script>
 </body>
 </html>

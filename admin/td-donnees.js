@@ -40,7 +40,11 @@
     // Historique semaine par semaine et cartes « Pilulier créé », « Scan » (td-pilotage.js, td-cartes.js) :
     // 27 lignes ; son échec n'éteint que ce qui s'en sert.
     // Lue avec les autres (Promise.all) : mesuré en production le 17/10, tables de 64 à 3 507 lignes, partie la plus lourde 11 ms.
-    { cle:'pilotage',     vue:'v_admin_entonnoir_semaine',   ordre:{ col:'semaine', asc:false }, facultative:true }
+    { cle:'pilotage',     vue:'v_admin_entonnoir_semaine',   ordre:{ col:'semaine', asc:false }, facultative:true },
+    // V4.5 : totaux par jour (td-jours.js), depuis le 26/10 ; jusqu'à ~900 lignes → lues par pages.
+    { cle:'jours',        vue:'v_admin_jours',               ordre:{ col:'jour', asc:false },
+      pages:['jour','cle','groupe'], facultative:true },
+    { cle:'joursReleves', vue:'v_admin_jours_releves',       ordre:{ col:'jour', asc:false }, facultative:true }
   ];
 
   var sb = null, jeton = 0;

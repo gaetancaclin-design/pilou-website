@@ -68,6 +68,7 @@
       if(r.etat === 'erreur') return panne('LECTURE IMPOSSIBLE. ', 'La base n’a pas répondu comme prévu : ' + r.message
         + '. Aucun chiffre n’est affiché — mieux vaut rien qu’un chiffre faux.');
       etat.d = r.d;
+      etat.lu = Date.now();                            // heure de la lecture (« Chaque jour » : relevé arrêté ?)
       etat.J = C.jourServeurValide(r.d.resume);
       if(etat.J === null) return panne('AFFICHAGE IMPOSSIBLE. ', 'La date de la base manque : aucune période ne peut être '
         + 'calculée. Aucun chiffre n’est affiché.');
@@ -116,6 +117,9 @@
     // V4.4 : « Utilisent Pilou », tout en haut (td-utilisent.js) : ne lève jamais.
     $('utilisent').innerHTML = racine.TDUtilisent ? racine.TDUtilisent.rendre(d.pilotage, p)
       : '<div class="message ko"><b>Non affiché.</b> Le fichier td-utilisent.js n’a pas été chargé.</div>';
+    // V4.5 : « Chaque jour » (td-jours.js) : ne lève jamais, ne dépend pas de la période.
+    $('jours').innerHTML = racine.TDJours ? racine.TDJours.rendre(d.jours, d.joursReleves, etat.lu)
+      : '<div class="message ko"><b>Non affiché.</b> Le fichier td-jours.js n’a pas été chargé.</div>';
     $('direct').innerHTML = racine.TDDirect.rendre(d, J, d.audEtat);
     $('questions').innerHTML = K.questions(x);
     $('scan').innerHTML = K.scan(x);

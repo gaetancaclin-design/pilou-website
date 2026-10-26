@@ -113,6 +113,9 @@
               cases: a.cause ? {} : P.casesMesure(d.mesure, etat.avecTest),
               ach: P.agregerCharge(d.mesureCharge, etat.avecTest), illisibles:0 };
     $('libelle').textContent = P.libelle(p) + (p.enCours ? ' · en cours' : '');
+    // V4.4 : « Utilisent Pilou », tout en haut (td-utilisent.js) : ne lève jamais.
+    $('utilisent').innerHTML = racine.TDUtilisent ? racine.TDUtilisent.rendre(d.pilotage, p)
+      : '<div class="message ko"><b>Non affiché.</b> Le fichier td-utilisent.js n’a pas été chargé.</div>';
     $('direct').innerHTML = racine.TDDirect.rendre(d, J, d.audEtat);
     $('questions').innerHTML = K.questions(x);
     $('scan').innerHTML = K.scan(x);

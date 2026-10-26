@@ -13,7 +13,8 @@
   pour la santé technique (équivalence stricte avec son bandeau).
   Fichiers : td-calculs.js (copies à l'identique de index.html), td-periode.js,
   td-bulles.js, td-donnees.js, td-cartes.js, td-sante.js, td-direct.js (V4.1),
-  td-actions.js (V4.1), td-pilotage-textes.js et td-pilotage.js (pilotage), td-app.js.
+  td-actions.js (V4.1), td-pilotage-textes.js et td-pilotage.js (pilotage),
+  td-utilisent.js (V4.4 : « Utilisent Pilou », en haut), td-app.js.
   Police système, aucune requête vers un tiers, mode sombre automatique.
 -->
 <style>
@@ -203,6 +204,36 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 .dv.ko{color:var(--ko)}
 @media (max-width:700px){ .actions{margin-left:0} .dj{width:100%} .act{padding:0 10px} }
 
+/* ── V4.4 : « Utilisent Pilou » tout en haut (td-utilisent.js) ── */
+.ut{background:var(--carte);border-radius:var(--r);box-shadow:var(--ombre);padding:18px 20px;margin-bottom:18px;position:relative}
+.ut-tete{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.ut-titre{font-weight:720;font-size:17px;display:flex;align-items:center;gap:8px;position:relative;flex-wrap:wrap}
+.ut-sous{color:var(--encre2);font-size:13px;margin-top:2px}
+.ut-total{text-align:right}
+.ut-total b{display:block;font-size:46px;line-height:1;font-weight:760;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.ut-total span{color:var(--encre2);font-weight:550}
+.ut-total small{display:block;margin-top:4px;color:var(--encre2);font-size:12.5px;font-weight:650}
+.ut-tranches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.ut-tr{background:var(--gris-c);border-radius:12px;padding:12px 14px;position:relative;min-width:0}
+.ut-tr b{display:block;font-size:26px;font-weight:750;font-variant-numeric:tabular-nums}
+.ut-tr>span{display:flex;align-items:center;gap:6px;flex-wrap:wrap;color:var(--encre2);font-size:13px;font-weight:600}
+.ut-tr small{display:block;margin-top:4px;color:var(--encre2);font-size:12px}
+.ut-tr.ut-fort{box-shadow:inset 0 0 0 2px var(--accent)}
+.ut-tr .q{background:var(--carte)}
+.ut-tr.ut-fort b{color:var(--accent)}
+.ut-tr:last-child .aide>.bulle{left:auto;right:0}
+.ut .ut-ko{color:var(--ko);font-weight:750}
+.ut .ut-vide{color:var(--encre3)}
+.ut-jours{margin-top:12px;color:var(--encre2);display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:relative}
+.ut-jours b{color:var(--encre)}
+.ut-notes{margin-top:8px;display:flex;flex-direction:column;gap:2px}
+@media (max-width:700px){
+  .ut-tranches{grid-template-columns:minmax(0,1fr)}
+  .ut-tr:last-child .aide>.bulle{left:0;right:auto}
+  .ut-total{text-align:left}
+  .ut-total b{font-size:40px}
+}
+
 /* ── Historique semaine par semaine (td-pilotage.js) ── */
 .pil-tab .titre-c .act{margin-left:auto}
 .pil-defil{overflow-x:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--ligne);
@@ -270,6 +301,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 </header>
 <div id="panne" role="alert"></div>
 <main id="contenu">
+  <section class="ut" id="utilisent" aria-label="Utilisent Pilou"></section>
   <section class="direct" id="direct" aria-label="En direct"></section>
   <section class="questions" id="questions" aria-label="Les quatre questions"></section>
   <section class="grille2">
@@ -296,6 +328,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 <script src="./td-actions.js?v=20261004b"></script>
 <script src="./td-pilotage-textes.js?v=20261017c"></script>
 <script src="./td-pilotage.js?v=20261017c"></script>
-<script src="./td-app.js?v=20261017c"></script>
+<script src="./td-utilisent.js?v=20261026a"></script>
+<script src="./td-app.js?v=20261026a"></script>
 </body>
 </html>

@@ -206,6 +206,40 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 
 /* ── V4.4 : « Utilisent Pilou » tout en haut (td-utilisent.js) ── */
 .ut{background:var(--carte);border-radius:var(--r);box-shadow:var(--ombre);padding:18px 20px;margin-bottom:18px;position:relative}
+/* V4.6 : « Le parcours » (td-essentiel.js) */
+.es{margin-bottom:18px}
+.es-tete h2{display:flex;align-items:center;gap:8px;margin:0 0 2px;position:relative}
+.es-sous{color:var(--encre2);font-size:13px;margin-bottom:10px}
+.es-m{display:flex;gap:14px;align-items:flex-start;background:var(--carte);border-radius:var(--r);box-shadow:var(--ombre);padding:14px 18px;margin-bottom:10px;position:relative}
+.es-m.es-mko{box-shadow:inset 0 0 0 1px var(--ko),var(--ombre)}
+.es-n{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--ok-c);color:var(--ok);font-weight:750}
+.es-c{flex:1 1 auto;min-width:0}
+.es-t{font-weight:720;font-size:16px;display:flex;align-items:center;gap:8px;position:relative;flex-wrap:wrap}
+.es-d{color:var(--encre2);font-size:13px;margin-top:3px}
+.es-p{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.es-puce{background:var(--gris-c);color:var(--encre2);border-radius:7px;padding:2px 8px;font-size:12.5px;font-weight:600}
+.es-x{color:var(--encre3);font-size:12.5px;margin-top:5px}
+.es-rouge{color:var(--ko);font-weight:600}
+.es-r{flex:none;text-align:right;max-width:46%}
+.es-g b{display:block;font-size:30px;line-height:1.05;font-weight:760;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.es-g span{color:var(--encre2);font-size:12.5px;font-weight:600}
+.es-g.es-ko b{color:var(--ko)}.es-g.es-vide b{color:var(--gris)}
+.es-r small{display:block;margin-top:3px;color:var(--encre2);font-size:12px}
+.es-det{margin-top:8px}
+.es-det summary{cursor:pointer;font-weight:650;font-size:13px;color:var(--encre2);display:flex;align-items:center;gap:6px;min-height:32px;position:relative}
+.es-det summary::-webkit-details-marker{display:none}
+.es-det summary::before{content:"▸";display:inline-block;width:12px;transition:transform .15s}
+.es-det[open] summary::before{transform:rotate(90deg)}
+.es-tab{border-collapse:collapse;margin-top:6px;font-size:13px;width:100%}
+.es-tab th{text-align:left;font-weight:600;color:var(--encre2);padding:4px 10px 4px 0;vertical-align:top;width:42%}
+.es-tab td{padding:4px 0;color:var(--encre)}
+@media (max-width:700px){
+  .es-m{flex-wrap:wrap;padding:12px 14px;gap:10px}
+  .es-t,.es-det summary{position:static}
+  .es-c{flex-basis:calc(100% - 46px)}
+  .es-r{max-width:none;width:100%;text-align:left;padding-left:42px}
+  .es-tab th{width:auto;display:block;padding-bottom:0}.es-tab td{display:block;padding-top:0}
+}
 .ut-tete{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .ut-tete>div:first-child{flex:1 1 auto;min-width:0}
 .ut-total{flex:none}
@@ -317,6 +351,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 <div id="panne" role="alert"></div>
 <main id="contenu">
   <section class="ut" id="utilisent" aria-label="Utilisent Pilou"></section>
+  <section class="es" id="essentiel" aria-label="Le parcours"></section>
   <section class="ut" id="jours" aria-label="Chaque jour"></section>
   <section class="direct" id="direct" aria-label="En direct"></section>
   <section class="questions" id="questions" aria-label="Les quatre questions"></section>
@@ -337,15 +372,18 @@ footer{max-width:1240px;margin:0 auto;padding:0 32px 40px;color:var(--encre3);fo
 <script src="./td-calculs.js?v=20261003a"></script>
 <script src="./td-periode.js?v=20261017c"></script>
 <script src="./td-bulles.js?v=20261017c"></script>
-<script src="./td-donnees.js?v=20261027a"></script>
+<script src="./td-donnees.js?v=20261028a"></script>
 <script src="./td-cartes.js?v=20261017c"></script>
 <script src="./td-sante.js?v=20261004b"></script>
 <script src="./td-direct.js?v=20261004b"></script>
 <script src="./td-actions.js?v=20261004b"></script>
-<script src="./td-pilotage-textes.js?v=20261017c"></script>
+<script src="./td-pilotage-textes.js?v=20261028a"></script>
 <script src="./td-pilotage.js?v=20261017c"></script>
 <script src="./td-utilisent.js?v=20261026a"></script>
 <script src="./td-jours.js?v=20261027a"></script>
-<script src="./td-app.js?v=20261027a"></script>
+<script src="./td-essentiel-calc.js?v=20261028a"></script>
+<script src="./td-essentiel-textes.js?v=20261028a"></script>
+<script src="./td-essentiel.js?v=20261028a"></script>
+<script src="./td-app.js?v=20261028a"></script>
 </body>
 </html>

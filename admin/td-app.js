@@ -19,7 +19,7 @@
   function ech(s){ return C.ech(s); }
 
   var CLE_TESTS = 'pilou.tableau.nos-tests';
-  var etat = { mode:'semaine', fin:null, avecTest:false, d:null, J:null, charge:false, sante:null, jetonSante:0, dernier:null };
+  var etat = { mode:'semaine', fin:null, avecTest:false, d:null, J:null, charge:false, sante:null, jetonSante:0, dernier:null, suite:undefined };
   var fmtReleve = new Intl.DateTimeFormat('fr-FR', { timeZone:'Europe/Paris', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
 
   function lireTests(){ try{ etat.avecTest = racine.localStorage.getItem(CLE_TESTS) === 'oui'; }catch(e){} }
@@ -51,6 +51,8 @@
 
   // ── Chargement ─────────────────────────────────────────────────────────────
   function charger(){
+    // Toute lecture de « Le parcours » encore en route est périmée (revue du code, B1).
+    etat.jetonSuite = (etat.jetonSuite || 0) + 1; etat.suite = undefined;
     verrou(true);
     $('releve').textContent = 'chargement…';
     etatGeneral('gris', 'Lecture…', null);
@@ -68,6 +70,7 @@
       if(r.etat === 'erreur') return panne('LECTURE IMPOSSIBLE. ', 'La base n’a pas répondu comme prévu : ' + r.message
         + '. Aucun chiffre n’est affiché — mieux vaut rien qu’un chiffre faux.');
       etat.d = r.d;
+      etat.suite = undefined;                          // « Le parcours » : relu après l'affichage
       etat.lu = Date.now();                            // heure de la lecture (« Chaque jour » : relevé arrêté ?)
       etat.J = C.jourServeurValide(r.d.resume);
       if(etat.J === null) return panne('AFFICHAGE IMPOSSIBLE. ', 'La date de la base manque : aucune période ne peut être '
@@ -88,7 +91,22 @@
       if(rendre()){
         $('releve').textContent = 'Relevé le ' + fmtReleve.format(new Date()).replace(' ', ' à ') + ' (heure de Paris)';
         lireSante();
+        lireSuite();
       }
+    });
+  }
+
+  // V4.6 : vues de « Le parcours », lues APRÈS le premier affichage ; à leur
+  // arrivée, la page est redessinée (même période, même interrupteur).
+  function lireSuite(){
+    if(!racine.TDDonnees.chargerSuite) return;
+    var moi = etat.jetonSuite;
+    racine.TDDonnees.chargerSuite().then(function(o){
+      // Jamais après un nouveau chargement, pendant une lecture, ni par-dessus une panne :
+      // « mieux vaut rien qu'un chiffre faux » (revue du code, B1).
+      if(!o || !etat.d || moi !== etat.jetonSuite || etat.charge || $('panne').style.display === 'block') return;
+      etat.suite = o;
+      rendre();
     });
   }
 
@@ -117,6 +135,13 @@
     // V4.4 : « Utilisent Pilou », tout en haut (td-utilisent.js) : ne lève jamais.
     $('utilisent').innerHTML = racine.TDUtilisent ? racine.TDUtilisent.rendre(d.pilotage, p)
       : '<div class="message ko"><b>Non affiché.</b> Le fichier td-utilisent.js n’a pas été chargé.</div>';
+    // V4.6 : « Le parcours » (td-essentiel.js) : ne lève jamais ; filet en plus.
+    var es;
+    try { es = racine.TDEssentiel ? racine.TDEssentiel.rendre(x, etat.suite)
+      : { html:'<div class="message ko"><b>Non affiché.</b> Le fichier td-essentiel.js n’a pas été chargé.</div>', illisibles:0 }; }
+    catch(e){ es = { html:'<div class="message ko"><b>Non affiché.</b> « Le parcours » n’a pas pu être dessiné.</div>', illisibles:1 }; }
+    $('essentiel').innerHTML = es.html;
+    x.illisibles += es.illisibles;
     // V4.5 : « Chaque jour » (td-jours.js) : ne lève jamais, ne dépend pas de la période.
     $('jours').innerHTML = racine.TDJours ? racine.TDJours.rendre(d.jours, d.joursReleves, etat.lu)
       : '<div class="message ko"><b>Non affiché.</b> Le fichier td-jours.js n’a pas été chargé.</div>';

@@ -78,8 +78,9 @@
     pilPresentes: ['Installations présentes : au plus une case par installation et par semaine — la semaine de l’appareil (lundi, date du téléphone), reçue dans la semaine de la base. Hors nos tests.',
       'Ce sont des installations, pas des personnes.'],
     pilPresTranche: ['Installations présentes cette semaine, par ancienneté depuis l’acceptation. Au plus une case par installation et par semaine. « Inconnue » : envoi fait avant l’acceptation, ou date d’acceptation inconnue.'],
-    pilRappels: ['Installations présentes dont les notifications étaient autorisées au moment de l’envoi.'],
-    pilPartRappels: ['Présentes avec rappels autorisés divisées par les installations présentes.', PAS_SOUS_10]
+    pilRappels: ['Installations présentes dont les notifications étaient autorisées au moment de l’envoi.',
+      'Compte aussi les installations SANS traitement en cours : ce n’est pas la part des rappels qui marchent. Le bon chiffre : « Le parcours », étape 5 (dès la semaine du 26/10).'],
+    pilPartRappels: ['Présentes avec rappels autorisés divisées par TOUTES les installations présentes, avec ou sans traitement : chiffre trompeur, gardé pour comparaison. Le bon chiffre : « Le parcours », étape 5.', PAS_SOUS_10]
   };
   var D = racine.TDBulles && racine.TDBulles.textes;
   if(D) for(var k in T) if(Object.prototype.hasOwnProperty.call(T, k) && !Object.prototype.hasOwnProperty.call(D, k)) D[k] = T[k];

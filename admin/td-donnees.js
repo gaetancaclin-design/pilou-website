@@ -100,5 +100,38 @@
     });
   }
 
-  racine.TDDonnees = { charger:charger, VUES:VUES, URL_PROJET:URL_PROJET };
+  // V4.6 : « Le parcours » (td-essentiel.js). Vues lues APRÈS le premier
+  // affichage (revue du 27/10, M4) : la page ne les attend pas, et leur panne
+  // n'éteint que « Le parcours ». Même session, aucune écriture. Rend une
+  // promesse de { mesureV4, mesureV5, essais } (chacune : lignes ou { erreur }),
+  // ou null si une lecture plus récente a été lancée.
+  var SUITE = [
+    { cle:'mesureV4', vue:'v_admin_mesure_v4', pages:['semaine','cle','plateforme','version','anciennete','test'] },
+    { cle:'mesureV5', vue:'v_admin_mesure_v5', pages:['semaine','cle','plateforme','version','anciennete','test'] },
+    { cle:'essais',   vue:'v_admin_essais',    ordre:{ col:'debut', asc:false } }
+  ];
+  var jetonSuite = 0;
+  function chargerSuite(){
+    var moi = ++jetonSuite;
+    function une(v){
+      var pr = v.pages ? (racine.PilouLecture ? racine.PilouLecture.toutes(client(), v.vue, v.pages)
+        : Promise.resolve({ error:{ message:'le fichier lecture.js n’a pas été chargé' } })) : lire(v.vue, v.ordre);
+      return Promise.resolve(pr).then(function(r){
+        if(r.error) return { erreur: r.error.message || String(r.error) };
+        var data = r.data || [];
+        // Jamais une liste coupée en silence (vue non lue par pages).
+        if(!v.pages && data.length >= 1000) return { erreur: v.vue + ' a rendu 1 000 lignes : la liste est probablement coupée' };
+        return data;
+      }, function(e){ return { erreur: (e && e.message) ? e.message : String(e) }; });
+    }
+    if(!racine.supabase || !racine.supabase.createClient) return Promise.resolve(null);
+    return Promise.all(SUITE.map(une)).then(function(res){
+      if(moi !== jetonSuite) return null;
+      var o = {};
+      for(var i = 0; i < SUITE.length; i++) o[SUITE[i].cle] = res[i];
+      return o;
+    });
+  }
+
+  racine.TDDonnees = { charger:charger, chargerSuite:chargerSuite, VUES:VUES, SUITE:SUITE, URL_PROJET:URL_PROJET };
 })(typeof window !== 'undefined' ? window : this);

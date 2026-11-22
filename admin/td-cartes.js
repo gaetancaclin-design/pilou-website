@@ -256,10 +256,14 @@
   function abonnes(x){
     var nom = 'Abonnés Pilou+', aide = 'abonnes', r = x.d.resume;
     if(!r) return illisible(x, nom, aide, 'le résumé manque', 'en ce moment');
-    var n = C.entierOuNul(r.clients_payants);
-    if(n === null) return illisible(x, nom, aide, 'colonne illisible', 'en ce moment');
+    // 22/11/2026 (V138-46) : accès PAYÉS en cours (migration console_abonnes_en_cours) ;
+    // sans la colonne (migration pas encore collée) : l'ancien « ont payé un jour », dit tel quel.
+    var neuf = ('abonnes_payes_en_cours' in r) && ('abonnes_renouvellement_actif' in r);
+    var n = C.entierOuNul(neuf ? r.abonnes_payes_en_cours : r.clients_payants);
+    var renouv = neuf ? C.entierOuNul(r.abonnes_renouvellement_actif) : 0;
+    if(n === null || renouv === null || renouv > n) return illisible(x, nom, aide, 'colonne illisible', 'en ce moment');
     // Accès offerts : mêmes règles que la tuile « Abonnés » de la console détaillée
-    // (index.html l. 4834-4849) ; nos octrois internes retirés si l'interrupteur est éteint.
+    // (index.html, `tuileAbonnes`) ; nos octrois internes retirés si l'interrupteur est éteint.
     var ao = C.entierOuNul(r.acces_offerts_en_cours);
     if(ao === null) return illisible(x, nom, aide, 'colonne illisible', 'en ce moment');
     var marque = ('acces_offerts_en_cours_internes' in r) && ('acces_offerts_total_internes' in r);
@@ -267,8 +271,8 @@
     if(internes === null) return illisible(x, nom, aide, 'accès offerts internes illisibles', 'en ce moment');
     var aff = (marque && !x.avecTest) ? ao - internes : ao;
     if(aff < 0) return illisible(x, nom, aide, 'plus d’accès internes que d’accès en cours', 'en ce moment');
-    return carte({ nom:nom, aide:aide, tag:'en ce moment', grand:String(n), unite: n > 1 ? 'payants' : 'payant',
-      sous:'+ ' + aff + (aff > 1 ? ' accès offerts en cours' : ' accès offert en cours')
+    return carte({ nom:nom, aide:aide, tag:'en ce moment', grand:String(n), unite: neuf ? (n > 1 ? 'payants en cours' : 'payant en cours') : (n > 1 ? 'ont déjà payé' : 'a déjà payé'),
+      sous:(neuf ? 'dont ' + renouv + ' avec renouvellement automatique · ' : '') + '+ ' + aff + (aff > 1 ? ' accès offerts en cours' : ' accès offert en cours')
         + ((!marque && !x.avecTest) ? ' (nos accès internes n’ont pas pu être séparés)' : '') });
   }
 

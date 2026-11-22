@@ -2176,9 +2176,9 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     // — qu'il faut survoler — disait « pas pu etre lu ». La franchise ne peut
     // pas etre dans l'info-bulle et le mensonge dans le chiffre.
     var payantsLus = entierOuNul(r.clients_payants);
-    h += res('Clients payants', (payantsLus === null) ? '—' : nb(payantsLus),
+    h += res('Ont déjà payé', (payantsLus === null) ? '—' : nb(payantsLus),
       [['Achats de test', nb(r.achats_de_test)]],
-      'En production, hors essais. '
+      'En production, hors essais, une fois au moins (abonnement fini compris). '
       + (payantsLus === null
           ? '<b>Ce chiffre n’a pas pu être lu</b> — n’en concluez rien. '
           : (payantsLus > 0 ? '' : '<b>Aucune vente à ce jour.</b> '))
@@ -4831,10 +4831,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
   function tuileAbonnes(r){
     var nom = 'Abonnés';
     if(!r) return tuileIllisible(nom, 'le résumé manque', LIMITE_ABONNES);
-    var payants = entierOuNul(r.clients_payants), ao = entierOuNul(r.acces_offerts_en_cours);
-    if(payants === null || ao === null) return tuileIllisible(nom, 'colonne illisible', LIMITE_ABONNES);
-    // Même règle que la tuile du résumé : on ne soustrait nos octrois QUE si
-    // les deux colonnes internes existent (voir `rendreResume`).
+    var neuf = ('abonnes_payes_en_cours' in r) && ('abonnes_renouvellement_actif' in r), renouv = neuf ? entierOuNul(r.abonnes_renouvellement_actif) : 0; // 22/11 V138-46
+    var payants = entierOuNul(neuf ? r.abonnes_payes_en_cours : r.clients_payants), ao = entierOuNul(r.acces_offerts_en_cours);
+    if(payants === null || ao === null || renouv === null || renouv > payants) return tuileIllisible(nom, 'colonne illisible', LIMITE_ABONNES);
+    // Même règle que la tuile du résumé : on ne soustrait nos octrois QUE si les deux colonnes internes existent (voir `rendreResume`).
     var marqueInterne = ('acces_offerts_en_cours_internes' in r) && ('acces_offerts_total_internes' in r);
     var internes = marqueInterne ? entierOuNul(r.acces_offerts_en_cours_internes) : 0;
     if(internes === null) return tuileIllisible(nom, 'accès offerts internes illisibles', LIMITE_ABONNES);
@@ -4843,8 +4843,8 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--trait);
     var test = entierOuNul(r.achats_de_test);
     var nonSepares = !marqueInterne && !compterNosTests();
     return tuileAccueil({ nom:nom, badge:'en ce moment', grand:String(payants),
-      unite:'payant' + (payants > 1 ? 's' : ''),
-      sous:'et ' + aoAffiche + ' accès offert' + (aoAffiche > 1 ? 's' : '') + ' en cours'
+      unite:neuf ? 'payant' + (payants > 1 ? 's' : '') + ' en cours' : (payants > 1 ? 'ont déjà payé' : 'a déjà payé'),
+      sous:(neuf ? 'dont ' + renouv + ' avec renouvellement automatique · ' : '') + 'et ' + aoAffiche + ' accès offert' + (aoAffiche > 1 ? 's' : '') + ' en cours'
         + (test ? ' · ' + test + ' achat' + (test > 1 ? 's' : '') + ' de test à part' : '')
         + (nonSepares ? ' (nos octrois internes n’ont pas pu être séparés)' : ''),
       limite:LIMITE_ABONNES });

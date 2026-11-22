@@ -186,14 +186,18 @@
   function abonnesTexte(x){
     var r = x.d.resume;
     if(!r) return null;
-    var n = C.entierOuNul(r.clients_payants), ao = C.entierOuNul(r.acces_offerts_en_cours);
-    if(n === null || ao === null) return null;
+    // 22/11/2026 (V138-46) : même règle que la carte « Abonnés Pilou+ » (td-cartes.js).
+    var neuf = ('abonnes_payes_en_cours' in r) && ('abonnes_renouvellement_actif' in r);
+    var n = C.entierOuNul(neuf ? r.abonnes_payes_en_cours : r.clients_payants), ao = C.entierOuNul(r.acces_offerts_en_cours);
+    var renouv = neuf ? C.entierOuNul(r.abonnes_renouvellement_actif) : 0;
+    if(n === null || ao === null || renouv === null || renouv > n) return null;
     var marque = ('acces_offerts_en_cours_internes' in r) && ('acces_offerts_total_internes' in r);
     var internes = marque ? C.entierOuNul(r.acces_offerts_en_cours_internes) : 0;
     if(internes === null) return null;
     var aff = (marque && !x.avecTest) ? ao - internes : ao;
     if(aff < 0) return null;
-    return 'Abonnés en ce moment : ' + n + (n > 1 ? ' payants' : ' payant') + ' + ' + aff + (aff > 1 ? ' accès offerts' : ' accès offert')
+    return (neuf ? 'Abonnés en ce moment : ' + n + (n > 1 ? ' payants' : ' payant') + ' (dont ' + renouv + ' avec renouvellement automatique)'
+      : 'Ont déjà payé : ' + n) + ' + ' + aff + (aff > 1 ? ' accès offerts' : ' accès offert')
       + ((!marque && !x.avecTest) ? ' (nos accès internes n’ont pas pu être séparés)' : '');
   }
   function pilouPlus(x){
